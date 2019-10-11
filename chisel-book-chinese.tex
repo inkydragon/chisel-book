@@ -503,6 +503,11 @@ shall type in a shell/terminal/CLI are preceded by a \code{\$} character, which 
 shall not type in. As an example, here is the Unix \code{ls} command, which lists files in
 the current folder:
 
+这本书没有假设你的编程环境和使用的编辑器。
+在命令行中使用\code{sbt}同时使用一个你偏好的编辑器可以很容易的入门。在其他传统的书籍中，
+所有你需要键入终端的命令之前会有一个\code{\$}字符，这个字符你不需要输入。一个例子，Unix的列出当前文件夹下的文件\code{ls}
+命令：
+
 \begin{verbatim}
 $ ls
 \end{verbatim}
@@ -514,17 +519,30 @@ It is possible in \myref{https://www.eclipse.org/}{Eclipse} and
 \myref{https://www.jetbrains.com/help/idea/discover-intellij-idea-for-scala.html}{IntelliJ}
 to generate a project from the sbt project configuration in \code{build.sbt}.
 You can create an Eclipse project via
+
+也就是说，一个编译器后台运行的集成开发环境(IDE)，可以加速编程。因为Chisel是一个Scala库，所有的IDEs都支持Scala，也支持Chisel。
+在 \myref{https://www.eclipse.org/}{Eclipse} 和
+\myref{https://www.jetbrains.com/help/idea/discover-intellij-idea-for-scala.html}{IntelliJ}中生成一个包含\code{build.sbt}配置文件的sbt工程是可行了。
+你可以创建一个Eclipse工程通过
+
 \begin{verbatim}
 $ sbt eclipse
 \end{verbatim}
 and import that project into Eclipse.\footnote{This function needs the Eclipse plugin for sbt.}
 In IntelliJ you can create a new project from existing sources and then select from \code{build.sbt}.
+或者导入一个工程金Eclipse。\footnote{This function needs the Eclipse plugin for sbt.}
+在InterlliJ中你可以创建一个工程从已经存在的源码中，然后选择\code{build.sbt}文件。
+
 
 \myref{https://code.visualstudio.com/}{Visual Studio Code} with
 \myref{https://marketplace.visualstudio.com/items?itemName=scalameta.metals/}{Scala Metals} requires
 no setup beyond installing Visual Studio Code and the Scala Metals plugin. Scala Metals knows how to
 set up everything including but not limited to code completion, Chisel source code download and
 building based on \code{build.sbt}.
+
+\myref{https://code.visualstudio.com/}{Visual Studio Code} 和
+\myref{https://marketplace.visualstudio.com/items?itemName=scalameta.metals/}{Scala Metals}只需要
+ 安装VS code和Scala Metals插件。Scala Metals知道如何去设置所有的东西不包括但不限于代码补全，Chisel源代码下载和基于\code{build.sbt}的配置。
 
 \section{Source Access and eBook Features}
 
@@ -534,6 +552,11 @@ The code compiles with a recent version of Chisel, and many examples also includ
 We collect larger Chisel examples in the accompanying repository \myref{https://github.com/schoeberl/chisel-examples}{chisel-examples}. If you find an error or typo in the book, a GitHub pull request is the most convenient way to incorporate your improvement.
 You can also provide feedback or comments for improvements by filing an issue on GitHub
 or sending a plain, old school email.
+这本书是在GitHub: \myref{https://github.com/schoeberl/chisel-book}{chisel-book}上开源。书中所有的Chisel例子都包含在该仓库中。
+这些代码通过最近的Chisel版面编译，很多例子都包含了test bench。
+我们收集了很多Chisel例子在\myref{https://github.com/schoeberl/chisel-examples}{chisel-examples}仓库里。如果你找到了错误或者笔误，可以提交pull request。
+你可以在github上记录一个issue来提供反馈或者评论或者发送一个plain、邮件。
+
 
 This book is freely available as a PDF eBook and in classical printed form.
 The eBook version features links to further resources
@@ -542,15 +565,22 @@ We use Wikipedia entries for background information (e.g., binary number system)
 that does not directly fit into this book.
 We optimized the format of the eBook for reading on a tablet, such as an iPad.
 
+这本书有免费的古典印刷体PDF电子版。
+电子书提供了更多的资源和\myref{https://www.wikipedia.org/}{Wikipedia}入口。
+我们使用Wikipedia来说明与本书部直接相关的背景知识(例如二进制)。
+我们优化了电子书的排版，以方便便携式设备阅读，例如ipad。
+
 \section{Further Reading}
 
 Here a list of further reading for digital design and Chisel:
+这儿例出了关于数字电路设计和Chisel更深层次的读物：
 \begin{itemize}
 \item \myref{http://www.cambridge.org/es/academic/subjects/engineering/circuits-and-systems/digital-design-systems-approach}{Digital Design: A Systems Approach}, by William J. Dally and R. Curtis Harting,
 is a modern textbook on digital design. It is available in two versions: using Verilog or VHDL as a hardware description language.
 \end{itemize}
 
 The official Chisel documentation and further documents are available online:
+Chisel官方文档和之后的文档都会更新到互联网上：
 
 \begin{itemize}
 \item The \myref{https://chisel.eecs.berkeley.edu/}{Chisel} home page is the official starting point to
@@ -577,6 +607,10 @@ The Hello World example is in the folder \code{hello-world}, set up as
 a minimal project. You can explore the Chisel code of the blinking LED
 in \code{src/main/scala/Hello.scala}.
 Compile the blinking LED with the following steps:
+每个章节结尾都有手写的练习题。为了介绍联系，我们通常会使用一个FPGA板子上的一颗LED。
+第一步clone或者fork\myref{https://github.com/schoeberl/chisel-examples}{chisel-examples}仓库。 
+Hello World例子在\code{hello-world}文件夹里，是一个最小的工程。你可以探索LED闪烁的Chisel代码在\code{src/main/scala/Hello.scala}。
+按下下述步骤编译LED闪烁工程：
 
 \begin{chisel}
 $ git clone https://github.com/schoeberl/chisel-examples.git
@@ -591,6 +625,10 @@ you will notice that the Chisel module does not contain \code{clock} or \code{re
 Those signals are implicitly generated, and in most designs, it is convenient not to need to
 deal with these low-level details. Chisel provides register components, and those
 are connected automatically to \code{clock} and \code{reset} (if needed).
+在Chisel部分下载完成之后，程序会产出一个Verilog文件\code{Hello.v}。
+浏览这个Verilog文件，你会看到电路包含两个输入\code{clock}和\code{reset}
+和一个输出\code{io\_led}。当你对比Verilog文件和Chisel模块时，你将会发现Chisel模块申明时不包含\code{clock}和\code{reset}。
+这些信号是隐式生成的，在大部分设计中处理这些底层细节是不方便的。Chisel提供的寄存器如果需要，会自动连接\code{clock}和\code{reset}.
 
 The next step is to set up an FPGA project file for the synthesize tool, assign the pins,
 and compile\footnote{The real process is more elaborated with following steps: synthesizing the logic,
@@ -604,17 +642,24 @@ projects in folder \code{quartus} for several popular FPGA boards (e.g., DE2-115
 If the repository contains support for your board, start Quartus, open the project,
 compile it by pressing the \emph{Play} button, and configure the FPGA board
 with the \emph{Programmer} button and one of the LEDs should blink.
+下一步是建立FPGA工程文件，分配引脚，然后编译Verilog代码，最后利用生成的bit文件烧写进FPGA。
+我们无法提供这些步骤的详细过程。请参考你的EDA工具手册。
+然而，例程仓库里面包含了一些针对几个流行的FPGA的Quartus可用的工程在\code{quartus}文件夹中。
+如果仓库支持的板子包括你的FPGA，启动Quartus，打开工程，编译，烧录，然后一个LED将会闪烁。
 
 {\bf Gratulation! You managed to get your first design in Chisel running in an FPGA!}
+{\bf 厉害了！你成功在FPGA上运行了你第一个Chisel电路！}
 
 If the LED is not blinking, check the status of reset. On the DE2-115 configuration,
 the reset input is connected to SW0.
+如果LED没有闪烁，检查reset的状态。在DE2-115配置中，reset的输入连接SW0.
 
 Now change the blinking frequency to a slower or a faster value and
 rerun the build process. Blinking frequencies and also blinking patterns
 communicate different ``emotions''. E.g., a slow blinking LED signals that
 everything is ok, a fast blinking LED signals an alarm state.
 Explore which frequencies express best those two different emotions.
+现在改变闪烁的频率然后重新运行一遍构建工程。闪烁的频率和闪烁的方式可以预示不同的状态。例如一个缓慢的闪烁信代表一切正常，一个快速的闪烁信号代表一个报警。
 
 As a more challenging extension to the exercise, generate the following blinking pattern:
 the LED shall be on for 200~ms every second. For this pattern, you might
@@ -622,7 +667,9 @@ decouple the change of the LED blinking from the counter reset.
 You will need a second constant where you change the state of the
 \code{blkReg} register. What kind of emotion does this pattern produce?
 Is it alarming or more like a sign-of-live signal?
-
+一个更具有挑战性的练习，生成一个下述的闪烁模式：
+LED一秒中亮200~ms。对于这个模式，你可以会从计数器复位来分离LED的闪烁。你将会需要第二个常量来改变\code{blkReg}寄存器的状态。这个模式会产生什么种类的状态呢？
+是警报还是更像一个正常运行的信号呢？
 
 
 
