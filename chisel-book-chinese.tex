@@ -264,7 +264,7 @@ to enable you to build more complex, interacting digital systems in a shorter ti
 
 这本书是一个使用现代硬件构建语言Chisel做数字系统设计的导论。
 在这本书，我们聚焦在比平常的硬件设计更高抽象层，
-使搭建更为复杂和交互性的硬件系统变得可能。
+使在短时间搭建更为复杂和交互性的硬件系统变得可能。
 
 This book and Chisel are targeting two groups of developers:
 (1) hardware designers and (2) software programmers.
@@ -288,7 +288,7 @@ and functional languages, into digital design.
 Chisel does not only allow to express hardware at the register-transfer level
 but allows you to write hardware generators.
 
-Chisel给软件工程带来了优势，像是把目标和函数编程，代入了数字设计。
+Chisel将诸如面向对象和函数式语言之类的软件工程的优势引入数字系统设计。
 Chisel不仅仅允许表示硬件在寄存器传输的抽象层，而且允许你编写硬件生成器。
 
 Hardware is now commonly described with a hardware description language.
@@ -296,9 +296,8 @@ The time of drawing hardware components, even with CAD tools, is
 over. Some high-level schematics can give an overview of the system but are
 not intended to describe the system.
 
-硬件现在普遍通过硬件描述语言进行描述。
-描画硬件部分的时间，甚至是使用CAD工具画图，这个时代已经过去了。
-有一些高级草图可以给你一个系统的整体描绘，但是它们不是用来描述系统的。
+硬件现在普遍通过硬件描述语言进行描述。绘制硬件部件，甚至利用CAD工具的时代已经过去了。
+一些高层次的原理图可以给你一个系统的整体概述，但是它们不是用来描述系统。
 
 The two most common hardware description languages are Verilog and VHDL.
 Both languages are old, contain many legacies, and have a moving line of what
@@ -311,7 +310,7 @@ for testing and synthesis.
 
 两个最常用的硬件描述语言是Verilog和VHDL。
 这两个语言是古老的，包括大量规则，并且在综合到硬件的构建语言之间有一个变动的规则。
-不要把我理解错了：VHDL和Verilog可以完美描述用来综合成ASIC的硬件部分。
+别理解错我的意思：VHDL和Verilog可以完美描述用于综合成ASIC的硬件模块。
 对于Chisel的硬件设计，verilog充当一个测试和综合的中间语言。
 
 This book is not a general introduction to hardware design and the fundamentals of it.
@@ -332,8 +331,8 @@ As the build process in the examples is based on \code{sbt} and \code{make}
 basic knowledge of the command-line interface (CLI, also called terminal or
 Unix shell) will be helpful.
 
-这本书不是一个泛泛而谈的硬件设计和基础导论。
-对于一个基础的导论，像是如何使用CMOS晶体管搭建一个门电路，你要参考其它数字设计书。
+这本书不是对硬件的设计和基础一般性介绍。
+对有关数字设计基础知识的介绍，例如如何使用CMOS晶体管搭建一个门电路，你要参考其它数字设计书。
 但是，这本书的目的是教你在一个抽象层中进行数字设计，作为当今描述ASIC或是设计FPGA的例子。
 作为这本书的前置需求，我们假设你有一些基本的布尔逻辑和二进制数系统的知识。
 更多的，一些任意编程语言的编程经验也是需要的。不需要Verilog或是VHDL的知识（译者认为你最好还是会一些）。
