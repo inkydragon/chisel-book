@@ -422,7 +422,9 @@ Debian file (.deb). However, as of the time of this writing \code{sbt} is not
 available as a ready to install package. Therefore, the installation process
 is a little bit more involved:
 
-对于基于Debian的Ubuntu系统，软件通常通过.deb文件进行安装。然而，当编写本文时，\code{sbt}还不能通过这种方法安装。因此，安装过程牵扯了一点点其他方式：
+对于基于Debian的Ubuntu系统，软件通常通过.deb文件进行安装。
+然而，当编写本文时，\code{sbt}还不能通过这种方法安装。
+因此，安装过程牵扯了一点点其他方式：
 
 \begin{verbatim}
 echo "deb https://dl.bintray.com/sbt/debian /" | \
@@ -459,7 +461,7 @@ Intel提供了\myref{https://www.altera.com/products/design-software/fpga-design
 Each book on a programming language shall start with a minimal example,
 called the \emph{Hello World} example. Following code is the first approach:
 
-每一本编程语言书都会从叫做“Hello world”的最小例子开始。以下代码是第一种方法。
+每一本编程语言书都会从叫做\emph{Hello World}的最小例子开始。以下代码是第一种方法。
 
 
 \shortlist{src/main/scala/HelloScala.scala}
@@ -475,7 +477,7 @@ $ sbt "runMain HelloScala"
 
 \noindent leads to the expected output of a Hello World program:
 
-随后，Hollow World程序输出了预期的内容
+随后，Hello World程序输出了预期的内容：
 
 \begin{chisel}
 [info] Running HelloScala
@@ -486,7 +488,7 @@ Hello Chisel World!
 No, this is plain Scala code and not a representative Hello World
 program for a hardware design.
 
-然而，这就是Chisel吗？这个硬件被生成用于出书字符串？并不是这样，这里实际上是解释了Scala代码，并不代表着硬件设计的Hollo World程序。
+然而，这就是Chisel吗？这个硬件被生成用于出书字符串吗？并不是这样，这里实际上是解释了Scala代码，并不代表着硬件设计的Hello World程序。
 
 
 \section{Chisel Hello World}
@@ -605,7 +607,7 @@ is a modern textbook on digital design. It is available in two versions: using V
 
 \end{itemize}
 The official Chisel documentation and further documents are available online:
-Chisel官方文档和之后的文档都会更新到互联网上：
+Chisel官方文档和之后的文档都会更新到网上：
 
 \begin{itemize}
 \item The \myref{https://chisel.eecs.berkeley.edu/}{Chisel} home page is the official starting point to
@@ -757,7 +759,7 @@ Chisel使用\myref{https://en.wikipedia.org/wiki/Two\%27s\_complement}{two's com
 The following expression casts the Scala integer \code{n} to a Chisel \code{width},
 which is used for the definition of the \code{Bits} vector:
 
-Bits的矢量宽度被Chisel的width类型定义。以下表示把scala的整型n转换成Chisel的宽度，用于Bits矢量的定义。
+Bits的矢量宽度被Chisel的width类型(\code{Width})定义。以下表示把scala的整型\code{n}转换成Chisel的\code{width}，用于\code{Bits}矢量的定义。
 
 \shortlist{code/n_w.txt}
 
@@ -783,7 +785,8 @@ The same is also valid for bit widths. In many cases, Chisel will automatically 
 Therefore, a Chisel description of hardware is more concise and better readable than VHDL or
 Verilog.
 
-Chisel受益于Scala的类型推断，并且很多地方类型信息可以被省略。类似的也适用于位宽。在很多时候，Chisel会自动推断正确的宽度。于是，chisel描述的硬件语言比VHDL或Verilog更加简洁和可读。
+Chisel受益于Scala的类型推断，并且很多地方类型信息可以被省略。类似的也适用于位宽。
+在很多时候，Chisel会自动推断正确的宽度。于是，chisel描述的硬件语言比VHDL或Verilog更加简洁和可读。
 
 For constants defined in other bases than decimal, the constant is defined in a string with
 a preceding \code{h} for hexadecimal (base 16), \code{o} for octal (base 8), and \code{b}
@@ -791,7 +794,8 @@ for binary (base 2). The following example shows the definition of constant 255 
 bases. In this example we omit the bit width and Chisel infers the minimum width to fit
 the constants in, in this case 8 bits.
 
-对于以其它作为基底的十进制以外的常量，常量被定义为字符串，开头h是16进制，o是8进制，b是2进制。以下的例子表明了常量255的定义，在不同的基底。在这个例子，我们省略了位宽，chisel推断了最小宽度用来表示常量，在这个例子是8位。（16进制表示255， 8进制表示255， 二进制表示255）
+对于以其它作为基底的十进制以外的常量，常量被定义为字符串，开头\code{h}是16进制，\code{o}是8进制，\code{b}是2进制。
+以下的例子表明了常量255的定义，在不同的基底。在这个例子，我们省略了位宽，chisel推断了最小宽度用来表示常量，在这个例子是8位。（16进制表示255， 8进制表示255， 二进制表示255）
 
 
 \shortlist{code/const_base.txt}
@@ -807,7 +811,8 @@ The following code shows the definition of type \code{Bool} and the definition o
 \code{Bool} constants, by converting the Scala Boolean constants \code{true}
 and \code{false} to Chisel \code{Bool} constants.
 
-为了表示逻辑值，Chisel定义了Bool类型。Bool可以表示true或false值，以下的代码表示了Bool类型的定义以及Bool常量的定义，通过转换Scala Boolean常量true和false， 到Chisel的Bool类型。
+为了表示逻辑值，Chisel定义了\code{Bool}类型。Bool可以表示\emph{true}或\emph{false}值。
+以下的代码表示了\code{Bool}类型的定义以及\code{Bool}常量的定义，通过转换Scala Boolean常量\code{true}和\code{false}， 到Chisel的\code{Bool}类型。
 
 
 \shortlist{code/bool.txt}
@@ -822,7 +827,9 @@ the OR operator.
 Following line of code defines a circuit that combines signals \code{a} and \code{b} with \emph{and}
 gates and combines the result with signal \code{c} with \emph{or} gates.
 
-Chisel使用布尔逻辑操作符，和C，Java，Scala和可能很多其它编程语言中定义的一样，去描述组合电路。以下代码定义了一个对a和b进行与逻辑，然后把它的结果和c进行或逻辑的电路：
+Chisel使用\myref{https://en.wikipedia.org/wiki/Boolean_algebra}{Boolean algebra}操作符，
+和C，Java，Scala和可能很多其它编程语言中定义的一样，去描述组合电路。
+以下代码定义了一个对\code{a}和\code{b}进行\emph{and}逻辑，然后把它的结果和\code{c}进行\emph{or}逻辑的电路：
 
 
 \shortlist{code/logic.txt}
@@ -840,6 +847,9 @@ Figure~\ref{fig:logic} shows the schematic of this combinatorial expression.
 Note that this circuit may be for a vector of bits and not only single wires
 that are combined with the AND and OR circuits.
 
+Figure~\ref{fig:logic} 表明了这个组合逻辑的表达的草图。
+注意到这个电路可能用来表示一个向量的bits，并不仅是
+
 In this example, we do not define the type nor the width of signal \code{logic}.
 Both are inferred from the type and width of the expression.
 The standard logic operations in Chisel are:
@@ -853,6 +863,8 @@ The standard logic operations in Chisel are:
 4. 按位取反（译者：这个和！有区别的，注意）
 
 \noindent The arithmetic operations use the standard operators:
+
+\noindent 算术操作使用标准操作符
 
 \shortlist{code/arith_ops.txt}
 
@@ -868,15 +880,26 @@ details are available in the \myref{https://github.com/freechipsproject/firrtl/b
 A signal can also first be defined as a \code{Wire} of some type. Afterward, we can assign a
 value to the wire with the \code{:=} update operator.
 
+一个信号也可以先被定义为某种类型的\code{Wire}。随后，我们可以给这个wire赋一个值，使用\code{:=}。
+
 \shortlist{code/wire.txt}
 
 A single bit can be extracted as follows:
+
+一个简单的bit可以被如下提取：
+
 \shortlist{code/single_bit.txt}
 
 \noindent A subfield can be extracted from end to start position:
+
+\noindent 一个分割可以从终点到起点提取：
+
 \shortlist{code/sub_field.txt}
 
 \noindent Bit fields are concatenated with \code{Cat}.
+
+\noindent bit域通过\code{Cat}合并.
+
 \shortlist{code/concat.txt}
 
 Table~\ref{tab:operators} shows the full list of operators
@@ -889,6 +912,9 @@ is created by executing the Scala operators. The Scala operator precedence is si
 not identical to Java/C. Verilog has the same operator precedence as C, but VHDL
 has a different one. Verilog has precedence ordering for logic operations, but in VHDL
 those operators have the same precedence and are evaluated from left to right.}
+
+Table~\ref{tab:operators}
+
 
 Table~\ref{tab:functions} shows various functions defined on and for Chisel data types.
 
@@ -1051,11 +1077,17 @@ signals of different types and (2) a \code{Vec} to represent an indexable collec
 of the same type.
 \code{Bundle}s and \code{Vec}s can be arbitrarily nested.
 
+Chisel提供两个集成小组相关的信号：(1) 一个是\code{Bundle}， 组织不同类型信号 和 
+(2) 一个是 \code{Vec}， 去代表一个可索引的相同类型的信号。
+\code{Bundle}s和\code{Vec}s可以任意编织。
+
 
 A Chisel bundle groups several signals. The entire bundle can be referenced
 as a whole, or individual fields can be accessed by their name.
 We can define a bundle (collection of signals) by defining a class that
 extends \code{Bundle} and list the fields as \code{val}s within the constructor block.
+
+Chisel捆束多个信号。整个bundle可以被
 
 
 \shortlist{code/bundle.txt}
@@ -1071,6 +1103,8 @@ As Chisel is object-oriented, we use dot notation to access fields in a bundle.
 A bundle is similar to a \code{struct} in C, a \code{record} in VHDL, or a
 \code{struct} in SystemVerilog.
 A bundle can also be referenced as a whole:
+
+
 
 \shortlist{code/bundle_ref.txt}
 
@@ -1868,6 +1902,8 @@ Scala函数可以采用Chisel（和Scala）参数并返回生成的硬件。
 
 \noindent We can then create two adders by simply calling the function \code{adder}.
 
+\noindent 我们可以接下来创造两个加法器，通过呼叫函数\code{adder}.
+
 \shortlist{code/components_fn_use.txt}
 
 \noindent Note that this is a \emph{hardware generator}. You are not executing any add operation
@@ -1884,10 +1920,15 @@ braces ({}).
 \noindent By calling the function with the function itself as parameter, this generated a two
 clock cycle delay.
 
+\noindent 通过呼叫这个函数，传入这个函数本身，这产生两个周期的延迟。
+
 \shortlist{code/components_fn_2delay.txt}
 
 \noindent Again, this is a too short example to be useful, as \code{RegNext()}
 already is that function creating the register for the delay.
+
+\noindent 再次，这个例子太短，以致于不够有用, 像 \code{RegNext()}
+已经是那个函数，创造一个延时。
 
 Functions can be declared as part of a \code{Module}. However, functions that shall be
 used in different modules are better placed into a Scala object that collects utility
@@ -2052,6 +2093,10 @@ of the decoder with a truth table, such as Table~\ref{tab:decoder}.
 A Chisel \code{switch} statement describes the logic as a truth table.
 The \code{switch} statement is not part of the core Chisel language.
 Therefore, we need to include the elements of the package \code{chisel.util}.
+
+\code{switch}的chisel声明描述逻辑，作为一个真值表。
+\code{switch}声明不是chisel语言的一部分。
+于是，我们需要使用\code{chisel.util}的元素。
 
 \shortlist{code/encdec_util.txt}
 
@@ -3723,6 +3768,9 @@ Notice how the empty word bubbles from the reader side of the FIFO
 to the writer side. When a bubble FIFO is full, it takes
 a latency of the buffer depth for a read to affect the writer side. 
 
+下一个，是测试填充FIFO直到满，随之是一个简单的读。注意到空word如何从读到写端冒泡。
+当一个冒泡FIFO是满的，它需要一个buffer深度的延迟用来读，去影响写端。
+
 The end of the test contains a loop that tries to write and read at maximum speed.
 We can see the bubble FIFO running at maximum bandwidth, which is two
 clock cycles per word. A buffer stage has always to toggle between empty
@@ -4236,14 +4284,26 @@ hardware in Chisel and run it on an FPGA, write an assembler in Scala, write a
 Lipsi instruction set simulator in Scala for co-simulation, and write a few test cases
 in Lipsi assembler.
 
+\item[\myref{https://github.com/schoeberl/lipsi}{Lipsi}]是一个小型处理器，用于工具性函数，在system-on-chip~\cite{lipsi:arcs2018}。
+作为Lipsi的代码库是很小的，它可以作为使用chisel设计处理器的起始点。Lipsi也可以作为chisel生产力的代表。它花费了我14个小时去使用chisel描述硬件，
+在fpga上运行它，使用scala编写汇编，写了一个Lipsi指令集模拟器作为协仿真，并写了一些测试例子用于Lipsi汇编。
+
 \item[\myref{http://www.opensocfabric.org/}{OpenSoC Fabric}] is an open-source NoC
 generator written in Chisel~~\cite{OpenSoC:ispass2016}. It is intended to provide a
 system-on-chip for large-scale design exploration. The NoC itself is a state-of-the-art design with wormhole routing, credits for flow control, and virtual channels.
 OpenSoC Fabric is still using Chisel~2.
 
+\item[\myref{http://www.opensocfabric.org/}{OpenSoC Fabric}] 是一个开源NoC生成器，通过chisel~~\cite{OpenSoC:ispass2016}进行编写。
+它是用来提供一个片上系统的大型设计探索。NoC本身是使用虫孔路由的当代设计，为控制流，和虚拟通道创造贡献。
+OpenSoC Fabric仍然使用chisel2。
+
+
 \item[\myref{https://github.com/bu-icsg/xfiles-dana}{DANA}] is a neural network accelerator
 that integrates with the RISC-V Rocket processor using the Rocket Custom Coprocessor (RoCC) interface~\cite{RoCC:2015}.
 DANA supports inference and learning.
+
+\item[\myref{https://github.com/bu-icsg/xfiles-dana}{DANA}] 是一个神经网络加速器，整合了RISCV Rocket处理器，
+使用Rocket Custom Coprocessor(RoCC)接口~\cite{RoCC:2015}。DANA支持推理和学习。
 
 \end{description}
 
@@ -4277,10 +4337,18 @@ e.g., the \myref{https://github.com/t-crest/patmos}{Patmos}~\cite{patmos:rts2018
 Therefore, we provide here some information on Chisel 2 coding for those who
 have started with Chisel 3.
 
+但是，你可能加入一个仍旧使用chisel2的项目，
+例如，\myref{https://github.com/t-crest/patmos}{Patmos}~\cite{patmos:rts2018}处理器。
+于是，我们在这里提供一些chisel2的信息，为这些是以chisel3为起点的。
+
 First, all documentation on Chisel 2 has been removed from the web sites
 belonging to Chisel. We have rescued those PDF documents and put them
 on GitHub at \url{https://github.com/schoeberl/chisel2-doc}.
 You can use the Chisel 2 tutorial by switching to the Chisel 2 branch:
+
+首先，所有chisel2的文档官网上被移除了。我们保留了这些文档，并把它放在github上，
+在\url{https://github.com/schoeberl/chisel2-doc}。
+你可以使用chisel2教程，通过切换到chisel2的分支：
 
 \begin{chisel}
 $ git clone https://github.com/ucb-bar/chisel-tutorial.git
@@ -4291,7 +4359,6 @@ $ git checkout chisel2
 The main visible difference between Chisel 3 and 2 are the definitions of
 constants, bundles for IO, wires, memories, and probably older forms of register
 definitions.
-
 
 Chisel3和2之间的主要可见区别是
 常量，用于IO的捆束，电线，存储器以及可能是较旧形式的寄存器
