@@ -251,6 +251,15 @@ Thank you for moving out of your comfort zone and taking up the journey of
 learning and using a bleeding-edge hardware description language.
 Many of your questions have helped to shape this book.
 
+我想感谢所有在chisel上进行开发的人，他们创造了这样一个酷的硬件构建语言。chisel使用起来非常愉快，
+于是写这样一本书很值得。
+
+我很感谢整个chisel社区，非常对外欢迎友好，并且我从不对在chisel问问题感到疲惫。
+
+我也想感谢去年在我的高级计算机架构课上的学生，他们大多数选择使用chisel作为最终项目。
+感谢你们走出舒适区，走入了学习和使用前沿的硬件构建语言。
+你们大多数的问题帮助规范了这本书。
+
 
 \mainmatter
 
@@ -262,7 +271,8 @@ construction language, \myref{https://chisel.eecs.berkeley.edu/}{Chisel}~\cite{c
 In this book, we focus on a higher abstraction level than usual in digital design books,
 to enable you to build more complex, interacting digital systems in a shorter time.
 
-这本书是一个使用现代硬件构建语言Chisel做数字系统设计的导论。
+这本书是一个使用现代硬件构建语言Chisel做数字系统设计的导论, 
+\myref{https://chisel.eecs.berkeley.edu/}{Chisel}~\cite{chisel:dac2012}。
 在这本书，我们聚焦在比平常的硬件设计更高抽象层，
 使在短时间搭建更为复杂和交互性的硬件系统变得可能。
 
@@ -310,7 +320,7 @@ for testing and synthesis.
 
 两个最常用的硬件描述语言是Verilog和VHDL。
 这两个语言是古老的，包括大量规则，并且在综合到硬件的构建语言之间有一个变动的规则。
-别理解错我的意思：VHDL和Verilog可以完美描述用于综合成ASIC的硬件模块。
+别理解错我的意思：VHDL和Verilog可以完美描述用于综合成\myref{https://en.wikipedia.org/wiki/Application-specific_integrated_circuit}{ASIC}的硬件模块。
 对于Chisel的硬件设计，verilog充当一个测试和综合的中间语言。
 
 This book is not a general introduction to hardware design and the fundamentals of it.
@@ -333,11 +343,15 @@ Unix shell) will be helpful.
 
 这本书不是对硬件的设计和基础一般性介绍。
 对有关数字设计基础知识的介绍，例如如何使用CMOS晶体管搭建一个门电路，你要参考其它数字设计书。
-但是，这本书的目的是教你在一个抽象层中进行数字设计，作为当今描述ASIC或是设计FPGA的例子。
-作为这本书的前置需求，我们假设你有一些基本的布尔逻辑和二进制数系统的知识。
-更多的，一些任意编程语言的编程经验也是需要的。不需要Verilog或是VHDL的知识（译者认为你最好还是会一些）。
+但是，这本书的目的是教你在一个抽象层中进行数字设计，作为当今描述ASIC或是设计
+\myref{https://en.wikipedia.org/wiki/Field-programmable_gate_array}{FPGA}的例子。
+\footnote{As the author is more familiar with FPGAs
+than ASICs as target technology, some design optimizations shown in this book are
+targeting FPGA technology.}
+作为这本书的前置需求，我们假设你有一些基本的\myref{https://en.wikipedia.org/wiki/Boolean_algebra}{Boolean algebra}和\myref{https://en.wikipedia.org/wiki/Binary_number}{binary number system}的知识。
+更多的，一些任意编程语言的编程经验也是需要的。不需要Verilog或是VHDL的知识。
 Chisel能够成为你的第一个编程语言用来描述数字硬件。
-作为例子中的搭建过程是基于sbt和make，基本的命令行界面知识（CLI，又称terminal或是Unix shell）会是有用的。
+作为例子中的搭建过程是基于\code{sbt}和\code{make}，基本的命令行界面知识（CLI，又称terminal或是Unix shell）会是有用的。
 
 Chisel itself is not a big language. The basic constructs fit on
 \myref{https://chisel.eecs.berkeley.edu/doc/chisel-cheatsheet3.pdf}{one page}
@@ -349,8 +363,10 @@ The power of Chisel comes from the embedding of Chisel within
 Chisel inherits the feature from Scala being ``a language that grows on you''~\cite{Scala}.
 However, Scala is not the topic of this book.
 
-Chisel用来硬件设计，本身不是一个大的语言。于是，这本书也不是一本大书。Chisel应该是比VHDL和Verilog更小, 
-VHDL/Verilog有很多规则。Chisel的力量来自于它是嵌入在Scala里的，Scala本身是一个有力的语言。
+Chisel用来本身不是一个大的语言。基本的部分在这里\myref{https://chisel.eecs.berkeley.edu/doc/chisel-cheatsheet3.pdf}{one page}， 可以在数日内学习。
+于是，这本书也不是一本大书。Chisel应该是比VHDL和Verilog更小, 
+继承很多规则。Chisel的力量来自于它是嵌入在\myref{https://www.scala-lang.org/}{Scala}里的，Scala本身是一个有力的语言。
+Chisel继承Scala作为``a language that grows on you''~\cite{Scala}的特性
 但是，Scala不是本书的话题。
 
 % We provide a short section on Scala for hardware designers, but
@@ -358,7 +374,7 @@ VHDL/Verilog有很多规则。Chisel的力量来自于它是嵌入在Scala里的
 The textbook by Odersky et al.~\cite{Scala} provides a general introduction
 to Scala.
 
-我们提供了一个短的章节给硬件设计者，但是Odersky提供了一个更好的Scala导论。
+我们提供了一个短的章节给硬件设计者，但是Odersky~\cite{Scala}提供了一个更好的Scala导论。
 
 This book is a tutorial in digital design and the Chisel language; it is not
 a Chisel language reference, nor is it a book on complete chip design.
@@ -374,14 +390,14 @@ Besides showing Chisel code, we have also tried to show useful designs and
 principles of good hardware description style.
 
 所有的书中代码例子来自经过编译和测试过的程序。所以，代码不应该含有任何语法问题。
-代码例子在本书的github repo里。除了提供Chisel代码以外，我也试图提供有用的设计和好的硬件描述风格的规则。
+代码例子在本书的\myref{https://github.com/schoeberl/chisel-book}{GitHub repository}里。除了提供Chisel代码以外，我也试图提供有用的设计和好的硬件描述风格的规则。
 
 
 This book is optimized for reading on a laptop or tablet (e.g., an iPad).
 We include links to further reading in the running text, mostly to
 \myref{https://en.wikipedia.org/}{Wikipedia} articles.
 
-这本书在笔电或是平板上为阅读经过了优化。我们在字里行间提供了链接，大多数是维基的文章。
+这本书在笔电或是平板上为阅读经过了优化。我们在字里行间提供了链接，大多数是\myref{https://en.wikipedia.org/}{Wikipedia}的文章。
 
 \section{Installing Chisel and FPGA Tools}
 
@@ -389,12 +405,13 @@ Chisel is a Scala library, and the easiest way to install Chisel and Scala is
 with \code{sbt}, the Scala build tool. Scala itself depends on the installation
 of the \myref{https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html}{Java JDK 1.8}.
 
-Chisel是一个Scala库，安装Chisel和Scala最简单的方法时通过sbt(Scala Build Tool)，一个用于Scala工程构建的工具。
+Chisel是一个Scala库，安装Chisel和Scala最简单的方法时通过\code{sbt}, Scala Build Tool。
+Scala本身依赖于安装\myref{https://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html}{Java JDK 1.8}。
 
 On Mac OS X, with the packet manager \myref{https://brew.sh/}{Homebrew},
 \code{sbt} is installed with:
 
-在Mac OS X中，通过包管理软件Homerew，sbt可以通过此命令安装
+在Mac OS X中，通过包管理软件\myref{https://brew.sh/}{Homebrew}，sbt可以通过此命令安装
 
 \begin{verbatim}
 $ brew install sbt
@@ -405,7 +422,7 @@ Debian file (.deb). However, as of the time of this writing \code{sbt} is not
 available as a ready to install package. Therefore, the installation process
 is a little bit more involved:
 
-对于基于Debian的Ubuntu系统，软件通常通过.deb文件进行安装。然而，当编写本文时，sbt还不能通过这种方法安装。因此，安装过程牵扯了一点点其他方式。
+对于基于Debian的Ubuntu系统，软件通常通过.deb文件进行安装。然而，当编写本文时，\code{sbt}还不能通过这种方法安装。因此，安装过程牵扯了一点点其他方式：
 
 \begin{verbatim}
 echo "deb https://dl.bintray.com/sbt/debian /" | \
@@ -421,7 +438,8 @@ Chisel and Scala can also be installed and used under Windows.
 \myref{https://www.scala-sbt.org/1.x/docs/Installing-sbt-on-Windows.html}{Installing sbt on Windows}.
 
 Chisel和Scala也支持Windows操作系统。
-方法可以参考该网站。
+\code{sbt} 可以使用windows安装器安装，参照：
+\myref{https://www.scala-sbt.org/1.x/docs/Installing-sbt-on-Windows.html}{在windows安装sbt}.
 
 To build hardware for an FPGA, you need a synthesize tool. The two major
 FPGA vendors, Intel\footnote{former Altera} and Xilinx, provide free versions of
@@ -430,7 +448,10 @@ FPGAs are large enough to build multicore RISC style processors.
 Intel provides the \myref{https://www.altera.com/products/design-software/fpga-design/quartus-prime/download.html}{Quartus Prime Lite Edition} and Xilinx the
 \myref{https://www.xilinx.com/products/design-tools/vivado/vivado-webpack.html}{Vivado Design Suite, WebPACK Edition}.
 
-为了构建FPGA硬件，你需要综合工具。两大主要的FPGA工具供应商，Intel和Xilinx都提供了他们免费的工具，涵盖了小容量到中等容量大小的FPGA。其中，中等规模的FPGA已经足够容纳多核RISC架构处理器。
+为了构建FPGA硬件，你需要综合工具。两大主要的FPGA工具供应商，Intel和Xilinx都提供了他们免费的工具，涵盖了小容量到中等容量大小的FPGA。
+其中，中等规模的FPGA已经足够容纳多核RISC架构处理器。
+Intel提供了\myref{https://www.altera.com/products/design-software/fpga-design/quartus-prime/download.html}{Quartus Prime Lite Edition} 
+和\myref{https://www.xilinx.com/products/design-tools/vivado/vivado-webpack.html}{Vivado Design Suite, WebPACK Edition}。
 
 
 \section{Hello World}
@@ -446,7 +467,7 @@ called the \emph{Hello World} example. Following code is the first approach:
 
 \noindent Compiling and executing this short program with \code{sbt}
 
-编译、执行这个简短的程序通过sbt：
+编译、执行这个简短的程序通过\code{sbt}：
 
 \begin{chisel}
 $ sbt "runMain HelloScala"
@@ -554,7 +575,7 @@ or sending a plain, old school email.
 这本书是在GitHub: \myref{https://github.com/schoeberl/chisel-book}{chisel-book}上开源。书中所有的Chisel例子都包含在该仓库中。
 这些代码通过最近的Chisel版面编译，很多例子都包含了test bench。
 我们收集了很多Chisel例子在\myref{https://github.com/schoeberl/chisel-examples}{chisel-examples}仓库里。如果你找到了错误或者笔误，可以提交pull request。
-你可以在github上记录一个issue来提供反馈或者评论或者发送一个plain、邮件。
+你可以在github上记录一个issue来提供反馈或者评论或者发送一个简单的学校邮件。
 
 
 This book is freely available as a PDF eBook and in classical printed form.
@@ -573,27 +594,56 @@ We optimized the format of the eBook for reading on a tablet, such as an iPad.
 
 Here a list of further reading for digital design and Chisel:
 这儿例出了关于数字电路设计和Chisel更深层次的读物：
+
 \begin{itemize}
 \item \myref{http://www.cambridge.org/es/academic/subjects/engineering/circuits-and-systems/digital-design-systems-approach}{Digital Design: A Systems Approach}, by William J. Dally and R. Curtis Harting,
 is a modern textbook on digital design. It is available in two versions: using Verilog or VHDL as a hardware description language.
 \end{itemize}
 
+\myref{http://www.cambridge.org/es/academic/subjects/engineering/circuits-and-systems/digital-design-systems-approach}{Digital Design: A Systems Approach}, 作者是William J. Dally 和 R. Curtis Harting,
+，是一本现代的数字设计的教科书。它有两个版本，使用Verilog或是VHDL作为硬件描述语言。
+
+\end{itemize}
 The official Chisel documentation and further documents are available online:
 Chisel官方文档和之后的文档都会更新到互联网上：
 
 \begin{itemize}
 \item The \myref{https://chisel.eecs.berkeley.edu/}{Chisel} home page is the official starting point to
 download and learn Chisel.
+
+\myref{https://chisel.eecs.berkeley.edu/}{Chisel}主页是开始安装和学习chisel的地方。
+
+
 \item The \myref{https://github.com/ucb-bar/chisel-tutorial}{Chisel Tutorial} provides a ready setup
 project containing small exercises with testers and solutions.
 
+\myref{https://github.com/ucb-bar/chisel-tutorial}{Chisel Tutorial} 提供了一个准备安装的项目，
+包括小的测试和解决答案的练习。
+
+
 \item The \myref{https://github.com/freechipsproject/chisel3/wiki}{Chisel Wiki} contains
 a short users guide to Chisel and links to further information.
+
+\item \myref{https://github.com/freechipsproject/chisel3/wiki}{Chisel Wiki}包含了小的chisel的用户手册
+和更多信息的链接。
+
+
 \item The \myref{https://github.com/freechipsproject/chisel-testers}{Chisel Testers} are in
 their repository that contains a Wiki documentation.
+
+\item \myref{https://github.com/freechipsproject/chisel-testers}{Chisel Testers} 包括在他们的仓库，
+包含了一个wiki文档。
+
 \item The \myref{https://github.com/ucb-bar/generator-bootcamp}{Generator Bootcamp} is
 a Chisel course focusing on hardware generators, as a Jupyter notebook
+
+\item \myref{https://github.com/ucb-bar/generator-bootcamp}{Generator Bootcamp} 是chisel课程，专注在硬件生成器，
+作为jupyter notebook。
+
 \item A \myref{https://github.com/ccelio/chisel-style-guide}{Chisel Style Guide} by Christopher Celio.
+\end{itemize}
+
+\item \myref{https://github.com/ccelio/chisel-style-guide}{Chisel Style Guide}，作者是Christopher Celio。
 \end{itemize}
 
 \section{Exercise}
@@ -693,8 +743,12 @@ as signed integer representation.
 Here is the definition for different types, an 8-bit \code{Bits}, an 8-bit unsigned integer, and a 10-bit
 signed integer:
 
-Chisel提供了三种数据类型用来描述型号，组合逻辑，和寄存器：Bits， UInts，和SInt。
-UInt和SInt是Bits的拓展，并且所有的三种类型代表bits的矢量。UInts表示这个bits的矢量是一个无符号的整型，SInt表示一个有符号的整型。Chisel使用二补数表示有符号数的整型。以下是不同类型的定义，8位Bits，8位无符号整型，和一个10位有符号整型：
+Chisel提供了三种数据类型用来描述型号，组合逻辑，和寄存器：\code{Bits}， \code{UInt}，和\code{SInt}。
+\code{UInt}和code{SInt}是\code{Bits}的拓展，并且所有的三种类型代表bits的矢量。
+\code{UInt}表示这个bits的矢量是一个无符号的整型，\code{SInt}表示一个有符号的整型。
+\footnote{\codefoot{Bits}类型在本Chisel版本是遗失的操作，并且不是特别在使用者的代码中有用.}
+Chisel使用\myref{https://en.wikipedia.org/wiki/Two\%27s\_complement}{two's complement}表示有符号数的整型。
+以下是不同类型的定义，8位\code{Bits}，8位无符号整型，和一个10位有符号整型：
 
 
 \shortlist{code/types.txt}
@@ -930,7 +984,7 @@ The register is implicitly connected to a global clock and is updated on the ris
 When an initialization value is provided at the declaration of the register,
 it uses a synchronous reset connected to a global reset signal.
 
-Chisel提供了一个寄存器，这是一个D型触发器的集合。这个寄存器隐含连接到一个总时钟，并且上升触发。当一个初始值随着在寄存器声明的时候被提供，它使用的是一个同步复位，连接到总复位信号。
+Chisel提供了一个寄存器，这是一个\myref{https://en.wikipedia.org/wiki/Flip-flop\_(electronics)\#D\_flip-flop}{D flip-flops}的集合。这个寄存器隐含连接到一个总时钟，并且上升触发。当一个初始值随着在寄存器声明的时候被提供，它使用的是一个同步复位，连接到总复位信号。
 
 A register can be any Chisel type that can be represented as a collection of bits.
 Following code defines an 8-bit register, initialized with 0 at reset:
@@ -938,13 +992,12 @@ Following code defines an 8-bit register, initialized with 0 at reset:
 一个寄存器可以是任何bits集合的Chisel类型。下边的代码定义了一个八位寄存器，在复位初始化为0。
 
 
-
 \shortlist{code/register.txt}
 
 \noindent An input is connected to the register with the \code{:=} update operator and
 the output of the register can be used just with the name in an expression:
 
-一个输入连接到寄存器，通过:=更新操作数，输出的寄存器可以使用表达式通过名字调用。
+一个输入连接到寄存器，通过\code{:=}更新操作数，输出的寄存器可以使用表达式通过名字调用。
 
 \shortlist{code/reg_con.txt}
 
@@ -2380,6 +2433,10 @@ with the maximum value and reset the counter to that value when reaching 0.
 
 \noindent As we are writing and using more counters, we can
 define a function with a parameter to generate a counter for us.
+
+As we are writing and using more counters, we can
+define a function with a parameter to generate a counter for us.
+
 
 \shortlist{code/function_counter.txt}
 
@@ -4236,7 +4293,7 @@ constants, bundles for IO, wires, memories, and probably older forms of register
 definitions.
 
 
-凿子3和2之间的主要可见区别是
+Chisel3和2之间的主要可见区别是
 常量，用于IO的捆束，电线，存储器以及可能是较旧形式的寄存器
 定义。
 
@@ -4245,8 +4302,13 @@ using the compatibility layer using as package \code{Chisel} instead of \code{ch
 However, using this compatibility layer should only be used in a transition phase.
 Therefore, we do not cover it here.
 
+chisel2构建出的模块，在某种程度上，在chisel3项目中使用兼容层使用像是\code{Chisel}拓展包，而不是\code{Chisel3}拓展包。
+无论如何，使用兼容层应该只用来转换的过度。于是，我们在这里不讨论。
+
 Here are two examples of basic components, the same that have been presented
 for Chisel 3. A module containing combinational logic:
+
+有两个基础构成的例子，在Chisel3的版本里同样被演示过。一个包含组合逻辑的模块：
 
 \shortlist{chisel2/src/main/scala/Logic.scala}
 
@@ -4255,8 +4317,13 @@ an \code{IO()} class.  Furthermore, the direction of the different IO ports is d
 as part of the type definition, in this example as \code{INPUT} and \code{OUTPUT}
 as part of \code{UInt}. The width is given as the second parameter.
 
+注意到这个\code{Bundle}用来定义IO是\emph{not}被包裹进\code{IO()}类。更多的， 不同的IO端口的方向作为类型的定义，
+在这个例子里作为\code{INPUT}和\code{OUTPUT}，作为\code{UInt}的一部分。宽度作为第二参数提供。
+
 \begin{minipage}{\linewidth}
 The 8-bit register example in Chisel 2:
+
+Chisel2的8位寄存器例子：
 
 \shortlist{chisel2/src/main/scala/Register.scala}
 \end{minipage}
@@ -4266,14 +4333,20 @@ a \code{UInt} to the named parameter \code{init}. This form is still valid in Ch
 but the usage of \code{RegInit} and \code{RegNext} is recommended for new Chisel 3 designs.
 Note also here the constant definition of an 8-bit wide 0 as \code{UInt(0, 8)}.
 
+这里你看到一个伴随着复位值的典型寄存器定义，作为\code{UInt}在\code{init}下。这个形式在Chisel 3是仍旧有效的，
+但是使用\code{RegInit}和\code{RegNext}是被推荐的，在新的Chisel3设计中。注意到这里，8位常量的0被定义为\code{UInt(0, 8)}。
+
 Chisel based testing C++ code and Verilog code are generated by calling \code{chiselMainTest}
 and \code{chiselMain}. Both ``main'' functions take a \code{String} array for further parameters.
+
+以Chisel为基础的C++和Verilog的代码，是通过\code{chiselMainTest}和\code{chiselMain}生成的。 两个``main''函数采用\code{String}作为更多的参数。
 
 \shortlist{chisel2/src/main/scala/LogicTester.scala}
 
 \shortlist{chisel2/src/main/scala/LogicHardware.scala}
 
 A memory with sequential registered read and write ports is defined in Chisel 2 as:
+
 
 \begin{chisel}
   val mem = Mem(UInt(width = 8), 256, seqRead = true)
@@ -4389,11 +4462,3 @@ Stuff that saves a little hardware, but might not worse the less readable code
 
 
 \end{document}
-
-\subsection*{Course Abstract}
-
-Chisel is a hardware construction language implemented as a domain specific language in Scala. Therefore, the full power of a modern programming language is available to describe hardware and, more important, hardware generators. Chisel has been developed at UC Berkeley and successfully used for several tape outs of RISC-V. Here at DTU we used Chisel in the T-CREST project and in teaching advanced computer architecture.
-
-In this course I will give an overview of Chisel to describe circuits at the RTL, how to use the Chisel tester functionality to test and simulate digital circuits, present how to synthesize circuits for an FPGA, and present advanced functionality of Chisel for the description of circuit generators. Besides lecturing we will have lab sessions to describe small circuits and evaluate them in an FPGA.
-
-The aim of the course is to get a basic understanding of a modern hardware description language and be able to describe simple circuits in Chisel. This course shall give a basis to explore more advanced concepts of circuit generators written in Chisel/Scala.
