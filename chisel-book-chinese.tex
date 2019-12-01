@@ -1786,6 +1786,7 @@ The \code{Bundle} contains fields to represent input and output ports of
 the module. The direction is given by wrapping a field into either a call to \code{Input()}
 or \code{Output()}. The direction is from the view of the component itself.
 
+
 The following code shows the definition of the two example components A and B from
 Figure~\ref{fig:components}:
 
@@ -3789,6 +3790,7 @@ To make these implementations interchangeable we will use inheritance,
 as introduced in Section~\ref{sec:inheritance}. We define an \code{abstract}
 FIFO class:
 
+
 \shortlist{code/fifo_abstract.txt}
 
 \noindent Note that we use a Chisel type as parameter to be able to buffer
@@ -4176,21 +4178,34 @@ Therefore, you can also contribute to the project. Here we describe how to
 set up your environment for Chisel library development and how to contribute
 to Chisel.
 
+Chisel是一个开源项目，在不断地开发和改进。所以，你也可以对项目做贡献。这里我们描述了如何去设置你的Chisel library开发环境，
+以及如何对Chisel做贡献。
+
 \section{Setup the Development Environment}
 
 Chisel consists of several different repositories; all hosted at
 the \myref{https://github.com/freechipsproject}{freechips organization at GitHub}.
+
+Chisel包括了多个不同的仓库；所有在的\myref{https://github.com/freechipsproject}{freechips organization at GitHub}这里。
 
 Fork the repository, which you like to contribute, into your personal GitHub account.
 You can fork the repository by pressing the \code{Fork} button in the GitHub web interface.
 Then from that fork, clone your fork of the repository. In our example, we change
 \code{chisel3}, and the clone command for my local fork is:
 
+分支你想要做贡献的仓库，到你的个人Github账户上，
+你可以分支这个仓库，使用\code{Fork}按钮，在GitHub网页界面上。
+然后从那个分支，clone你的repo的fork。在我们的例子，我们切换到
+\code{chisel3}，clone命令到我的本地分支是：
+
 \begin{verbatim}
 $ git clone git@github.com:schoeberl/chisel3.git
 \end{verbatim}
 
 To compile Chisel 3 and publish as a local library execute:
+
+为了编译Chisel3，和发布作为本地library，执行：
+
 \begin{verbatim}
 $ cd chisel3
 $ sbt compile
@@ -4202,6 +4217,7 @@ library, which contains the string \code{SNAPSHOT}.
 If you use the tester and the published version is not compatible with the Chisel
 SNAPSHOT, fork and clone the \myref{https://github.com/freechipsproject/chisel-testers}{chisel-tester}
 repo as well and publish it locally.
+
 
 To test your changes in Chisel, you probably also want to set up a Chisel project,
 e.g., by forking/cloning an \myref{https://github.com/schoeberl/chisel-empty}{empty Chisel project},
@@ -4593,6 +4609,9 @@ writing is going on.}
  * building blocks (adder, mux, ALU, counter, memory)
  * maybe split into combinational and sequential
 
+ * 搭建模块（加法器，复用器，ALU，计数器，存储器）
+ * 可能会分为组合和时序逻辑
+
 \section{Bundles and Vecs (better title needed)}
 
 \section{Medium Complex Circuits (better title needed)}
@@ -4603,12 +4622,20 @@ writing is going on.}
 
  * Covered in stuff for Dally book lecture spring 2019
 
+ *
+
 \section{Memory}
 
  * Vec based ROM with address register
  * Vec based read/write
  * All other variations
  * Escape code in VHDL and Verilog for unsupported memories
+
+
+ *
+ *
+ *
+ *
 
 \section{Tips and Tricks (better title needed)}
 
@@ -4619,40 +4646,65 @@ Stuff that saves a little hardware, but might not worse the less readable code
  * Mux with one hot encoding of select
  * little tricks: count down, add/sub
 
+ *
+ *
+ *
+ *
+
+
 
 \section{Scala for Hardware Developers}
 
  * Simple Scala (for, if else)
  * functions for hardware generation
  * Classes and constructor
+
+ *
+ *
+ *
  
  \section{More Complex Testing}
  
   * As we know now sone Scala it is time to use the power of Scala for better testing
 
+  *
+
 \section{Hardware Generation}
 
  * More advanced stuff
  * Table generation (sinus, assembler)
+
+  *
+  *
  
  \section{Leros}
  
   * as a more complex design
   4. full design(s): processor
 
+  *
+  *
+
 \section{Chisel 2}
 
  * Some notes for reading Chisel 2 code
  * Update Lipsi to Chisel 3 to work on the 2 to 3 documentation
+
+  *
+  *
  
  \section{Chisel Projects}
  
   * Projects written in Chisel, as paper reference, some words and a URL.
+  * 使用Chisel编写的项目，作为纸质引用，一些words和一个URL
 
 \section{Appendix}
 
  * Basic digital circuits, e.g., transistor based inverter, half and full adder
  * With lot of links to Wikipedia
+
+ * 基本的数字电路，例如，晶体为基础的反相器，半加器和全加器 
+ * 和很多Wiki的链接
 
 
 
