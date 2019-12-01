@@ -913,7 +913,12 @@ not identical to Java/C. Verilog has the same operator precedence as C, but VHDL
 has a different one. Verilog has precedence ordering for logic operations, but in VHDL
 those operators have the same precedence and are evaluated from left to right.}
 
-Table~\ref{tab:operators}
+Table~\ref{tab:operators}表示了操作符号的全列表
+(查看\myref{https://github.com/freechipsproject/chisel3/wiki/Builtin-Operators}{builtin operators})。
+Chisel操作符优先级取决于电路的赋值顺序，遵守\myref{https://docs.scala-lang.org/tour/operators.html}{Scala operator precedence}。
+如果有疑问的话，使用括号是一个好的习惯。\footnote{在chisel里操作符号的优先级是硬件优化的副产品，因为硬件节点数
+是通过执行scala操作符创建的。Scala操作符的先后顺序与Java/C类似但是不等同。Verilog和C有着同样的操作符优先级，但是VHDL与之不同。
+Verilog有逻辑上的操作符优先级，但是V}
 
 
 Table~\ref{tab:functions} shows various functions defined on and for Chisel data types.
@@ -1828,6 +1833,9 @@ One of the central components for circuits that compute, e.g., a microprocessor,
 \myref{https://en.wikipedia.org/wiki/Arithmetic_logic_unit}{arithmetic-logic unit},
 or ALU for short. Figure~\ref{fig:alu} shows the symbol of an ALU.
 
+我们的一个核心计算的电路部分，例如，微处理器，是\myref{https://en.wikipedia.org/wiki/Arithmetic_logic_unit}{arithmetic-logic unit}，
+或是简单来说是ALU。Figure~\ref{fig:alu}表示了ALU的符号。
+
 \begin{figure}
   \centering
   \includegraphics[scale=\scale]{figures/alu}
@@ -1840,6 +1848,9 @@ and an output, labeled {Y}. The ALU operates on \code{A} and \code{B} and provid
 at the output. The input \code{fn} selects the operation on \code{A} and \code{B}.
 The operations are usually some arithmetic, such as addition and subtraction, and some logical
 functions such as and, or, xor. That's why it is called ALU.
+
+ALU有两个数据输入，图中标明为\code{A}和\code{B}，一个函数的输入\code{fn}，
+一个的输出labeled {Y}。 AL
 
 The function input \code{fn} selects the operation. The ALU is usually a combinational
 circuit without any state elements. An ALU might also have additional outputs to signal properties
@@ -1863,18 +1874,37 @@ bulk connection operator \code{<>}. This operator connects parts of bundles
 in both directions. Chisel uses the names of the leave fields for the connection.
 If a name is missing, it is not connected.
 
+为了连接具有多个IO端口的组件，Chisel提供了
+批量连接运算符\code{<>}。 该运算符在双方连接束。 Chisel使用离开字段的名称进行连接。
+如果缺少名称，则表示未连接。
+
+
 As an example, let us assume we build a pipelined processor. The fetch
 stage has a following interface:
+
+作为一个例子，让我们假定，我们搭建一个流水线的处理器。抓取阶段有一个如下的接口：
+
 \shortlist{code/bundle_fetch.txt}
 
 \noindent The next stage is the decode stage.
+
+\noindent 下一阶段是译码阶段。
+
 \shortlist{code/bundle_decode.txt}
 
 \noindent The final stage of our simple processor is the execute stage.
+
+\noindent 我们的简单处理器的最后阶段是执行。
+
 \shortlist{code/bundle_execute.txt}
 
 To connect all three stages we need just two \code{<>} operators.
 We can also connect the port of a submodule with the parent module.
+
+为了连接三个阶段，我们需要两个\code{<>}操作符。
+我们也可以使用它连接父模块下的子模块端口。
+
+
 \shortlist{code/bundle_connect.txt}
 
 
@@ -1886,9 +1916,7 @@ connecting it.
 
 
 模块是构造硬件描述的通用方法。
-但是，在声明模块以及实例化和
-连接它
-将它们描述为返回硬件的函数的方式。
+但是，有一些样板代码在声明模块以及实例化连接的时候可以去使用。
 
 A lightweight way to structure your hardware is to use functions.
 Scala functions can take Chisel (and Scala) parameters and return generated hardware.
@@ -2412,6 +2440,8 @@ with a conditional update:
 A register can also be part of an expression. Following circuit detects the rising edge
 of a signal by comparing its current value with the one from the last clock cycle.
 
+
+
 \shortlist{code/sequ_reg_rising.txt}
 
 Now that we have explored all basic uses of a register, we put those registers to
@@ -2681,6 +2711,11 @@ An FSM can be described as a set of \emph{states} and conditional (guarded)
 An FSM has an initial state, which is set on reset.
 FSMs are also called synchronous sequential circuits.
 
+有限状态机（FSM）是一个数字电路中的基本的搭建模块。一个FSM可以被描述为一个\emph{states}和（有限制的）状态条件
+\emph{state transitions}。
+一个FSM有一个初始状态，这是在reset
+
+
 An implementation of an FSM consists of three parts: (1) a register that holds the current state,
 (2) combinational logic that computes the next state that depends on the current
 state and the input, and (3) combinational logic that computes the output of the FSM.
@@ -2926,6 +2961,15 @@ detection with a Moore FSM.
 
 Figure~\ref{fig:diag:rising:moore} shows the state diagram for the rising
 edge detection with a Moore FSM. The first thing to notice is that the Moore FSM
+needs three states, compared to two states in the Mealy version.
+The state \code{puls} is needed to produce the single-cycle puls.
+The FSM stays in state \code{puls} just one clock cycle and then
+proceeds either back to the start state \code{zero} or to the \code{one}
+state, waiting for the input to become 0 again.
+We show the input condition on the state transition arrows and the
+FSM output within the state representing circles.
+
+Figure~\ref{fig:diag:rising:moore} . The first thing to notice is that the Moore FSM
 needs three states, compared to two states in the Mealy version.
 The state \code{puls} is needed to produce the single-cycle puls.
 The FSM stays in state \code{puls} just one clock cycle and then
@@ -3753,6 +3797,20 @@ $ make fifo
 This make command will compile the FIFO, run the test, and starts GTKWave for waveform
 viewing. Explore the tester and the generated waveform.
 
+FIFO也包括一个测试器，测试器包括读写操作，并生成波形文件
+\myref{https://en.wikipedia.org/wiki/Value_change_dump}{value change dump (VCD)} 格式。
+VCD也可以在波形观察器上查看，例如
+\myref{http://gtkwave.sourceforge.net/}{GTKWave}。
+查看
+\myref{https://github.com/schoeberl/chisel-examples/blob/master/src/test/scala/simple/FifoTester.scala}{FifoTester} 的文件夹.
+这个代码库也包含了 \code{Makefile} 用来运行例子, 例如FIFO例子
+只是输入:
+\begin{verbatim}
+$ make fifo
+\end{verbatim}
+这个命令会编译FIFO，运行测试，并且从GTKWave开始查看波形。
+请查看测试器和生成的波形。
+
 In the first cycles, the tester writes a single word. We can observe in
 the waveform how that word bubbles through the FIFO, therefore the
 name \emph{bubble FIFO}. This bubbling also means that the
@@ -3775,6 +3833,10 @@ The end of the test contains a loop that tries to write and read at maximum spee
 We can see the bubble FIFO running at maximum bandwidth, which is two
 clock cycles per word. A buffer stage has always to toggle between empty
 and full for a single word transfer.
+
+测试的末尾包含一个循环，试图去写入和读取，在最大的速度。
+我们可以看到冒泡FIFO在最高带宽下运行，这个是每周期两个word。
+一个缓冲阶段任何时候都可以在空和满状态下转递单个word。
 
 A bubble FIFO is simple and for small buffers has a low resource requirement.
 The main drawbacks of an $n$ stage bubble FIFO are: (1) maximum throughput is
@@ -3951,11 +4013,15 @@ to test against random inputs:
 
 \noindent You can run the tests within the Leros project with
 
+\noindent 你可以在Leros项目中运行测试
+
 \begin{verbatim}
 $ sbt "test:runMain leros.AluTester"
 \end{verbatim}
 
 and shall produce a success message similar to:
+
+应该会生成一个成功的消息像是如下：
 
 \begin{verbatim}
 [info] [0.001] SEED 1544507337402
@@ -3971,6 +4037,8 @@ However, first, we define the instruction encoding in its own Scala class and
 a \emph{shared} package. We want to share the encoding constants between
 the hardware implementation of Leros, an assembler for Leros, and an instruction
 set simulator of Leros.
+
+从ALU，我们
 
 \shortlist{code/leros_constants.txt}
 
@@ -4259,11 +4327,23 @@ commercially supported by \myref{https://www.sifive.com/}{SiFive}.
 %The codebase at SiFive serves as a major test bench for Chisel and new Chisel features
 %need to pass the tests at SiFive.
 
+\item[\myref{https://github.com/chipsalliance/rocket-chip}{Rocket Chip}]
+是\myref{https://en.wikipedia.org/wiki/RISC-V}{RISC-V}~\cite{risc-v}
+复杂处理器生成器， 包括rocket微处理器和TileLink连接生成器。 
+最早在UC Berkeley被开发出来，作为芯片大小的Chisel项目~\cite{rocket:techrep}，
+Rocket芯片现在被\myref{https://www.sifive.com/}{SiFive}商业支持。
+%该代码框架是作为Chisel的主要测试平台，新的Chisel特性必须通过Sifive的测试。
+
+
 \item[\myref{https://github.com/ucb-bar/riscv-sodor}{Sodor}] is a collection of RISC-V
 implementations intended for educational use. It contains 1, 2, 3, and 5 stages pipeline
 implementations. All processors use a simple scratchpad memory shared by instruction
 fetch, data access, and program loading via a debug port. Sodor is mainly intended to
 be used in simulation.
+
+\item[\myref{https://github.com/ucb-bar/riscv-sodor}{Sodor}]是一套RISC-V的搭建，教育专用。
+它包含1，2，3和5级流水线的搭建。所有的处理器使用一个简单的暂存存储器，被指令读取，数据读取，和debug端口程序所共享。
+Sodor主要是用来仿真。
 
 \item[\myref{https://github.com/t-crest/patmos}{Patmos}] is an implementation of a
 processor optimized for real-time systems~\cite{patmos:rts2018}. The Patmos repository
@@ -4272,9 +4352,18 @@ arbiter~\cite{t-crest:memnoc}, a network-on-chip~\cite{s4nocni:arcs2019}
 a shared scratchpad memory with an ownership~\cite{t-crest:ownspm}.
 At the time of this writing, Patmos is still described in Chisel 2.
 
+\item[\myref{https://github.com/t-crest/patmos}{Patmos}] 是一个为实时系统而补充的处理器~\cite{patmos:rts2018}.
+Patmos仓库包括多核通信的架构，例如时间可预测的存储器arbiter~\cite{t-crest:memnoc}
+, 一个片上网络~\cite{s4nocni:arcs2019}
+一个有版权的共享网络的存储器~\cite{t-crest:ownspm}.
+在我写这本书的时候，Patmos仍然使用Chisel2进行描述。
+
 \item[\myref{https://github.com/pretis/flexpret}{FlexPRET}] is an implementation of a
 precision timed architecture~\cite{Zimmer:EECS-2015-181}. FlexPRET implements
 the RISC-V instruction set and has been updated to Chisel 3.1.
+
+\item[\myref{https://github.com/pretis/flexpret}{FlexPRET}] 是一个实时系统架构的补充
+~\cite{Zimmer:EECS-2015-181}. FlexPRET补充了RISC-V指令集架构，并且升级到了Chisel3.1。
 
 \item[\myref{https://github.com/schoeberl/lipsi}{Lipsi}] is a tiny processor intended
 for utility functions on a system-on-chip~\cite{lipsi:arcs2018}. As the code base of
@@ -4413,6 +4502,8 @@ and \code{chiselMain}. Both ``main'' functions take a \code{String} array for fu
 \shortlist{chisel2/src/main/scala/LogicHardware.scala}
 
 A memory with sequential registered read and write ports is defined in Chisel 2 as:
+
+一个拥有时序寄存器的读写寄存器端口，在Chisel2被定义为：
 
 
 \begin{chisel}
