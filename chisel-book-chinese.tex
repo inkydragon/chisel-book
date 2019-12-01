@@ -224,11 +224,21 @@ Typeset by Martin Schoeberl.}
 \chapter{Preface}
 
 % This text goes on the backside of the book, and in Amazon description
+% 该文本在书本的背面，和亚马逊的介绍
+
 This book is an introduction to digital design with the focus on using the hardware construction language Chisel. Chisel brings advances from software engineering, such as object-orientated and functional languages, into digital design.
 
-This book addresses hardware designers and software engineers. Hardware designers, with knowledge of Verilog or VHDL, can upgrade their productivity with a modern language for their next ASIC or FPGA design. Software engineers, with knowledge of object-oriented and functional programming, can leverage their knowledge to program hardware, for example, FPGA accelerators executing in the cloud.
+This book addresses hardware designers and software engineers. Hardware designers, with knowledge of Verilog or VHDL, 
+
+can upgrade their productivity with a modern language for their next ASIC or FPGA design. 
+
+Software engineers, with knowledge of object-oriented and functional programming, can leverage their knowledge to program hardware, for example, FPGA accelerators executing in the cloud.
 
 The approach of this book is to present small to medium-sized typical hardware components to explore digital design with Chisel.
+
+这本书是一个专注于使用硬件构建语言chisel进行数字设计的导论。Chisel带来了软件工程的优势，像是面向对象和函数编程，进入数字设计。
+
+这本书是给硬件设计师和软件工程师的。硬件设计师，有着Verilog或VHDL的知识，可以增加
 
 
 % about me, backside
@@ -876,6 +886,7 @@ the width of the numerator for divide and modulo operations.\footnote{The exact
 details are available in the \myref{https://github.com/freechipsproject/firrtl/blob/master/spec/spec.pdf}{FIRRTL specification}.}
 
 加法和减法操作结果的宽度是操作数的最大宽度，乘法操作结果的库纳杜是两个操作数的位宽加和, 除法和余数操作的结果是被除数的位宽。
+\footnote{ \myref{https://github.com/freechipsproject/firrtl/blob/master/spec/spec.pdf}{FIRRTL specification}.}
 
 A signal can also first be defined as a \code{Wire} of some type. Afterward, we can assign a
 value to the wire with the \code{:=} update operator.
@@ -1488,10 +1499,18 @@ express our expectations in the test bench itself with \code{expect()},
 having the output port and the expected value as parameters.
 The following example shows testing with \code{expect()}:
 
+\noindent 我们看到0和1的与是0；3和2的与是2。
+除此之外手动查看结果，这个是一个极好的开始点，我们也可以在测试台上使用\code{expect()}，
+用来表示我们的期待值，放在输出端口，并传入期待值。
+以下的例子是使用\code{expect()}作为测试的例子。
+
 \shortlist{code/test_bench.txt}
 
 \noindent Executing this test does not print out any values from the hardware,
 but that all tests passed as all expect values are correct.
+
+\noindent 执行测试不打印出任何硬件的值，
+但是所有通过期待值的测试代表正确。
 
 \begin{verbatim}
 [info] [0.001] SEED 1544208437832
@@ -1503,6 +1522,9 @@ taking 0.018000 seconds
 \noindent A failed test, when either the DUT or the test bench contains an error,
 produces an error message describing the difference between the expected and actual
 value. In the following, we changed the test bench to expect a 4, which is an error:
+
+\noindent 一个失败的测试，当DUT或是测试台包含了一个错误，
+产生了一个错误消息，描述了期待值和实际值的差异。在以下，我们把测试台的期待值为4，产生了一个错误：
 
 \begin{verbatim}
 [info] [0.002] SEED 1544208642263
@@ -1523,11 +1545,15 @@ However, in Chisel, the full power of Scala is available to write testers.
 which we can use to run Chisel testers.
 To use it, include the library in your \code{build.sbt} with the following line:
 
+\myref{http://www.scalatest.org/}{ScalaTest} 是一个Scala(和Java)的测试工具，
+我们可以用来运行Chisel测试。
+为了使用它，把下边这段放在\code{build.sbt}里边：
+
 \begin{verbatim}
 libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
 \end{verbatim}
 
-\noindent Tests are usually found in \code{src/test/scala} and can be run with:
+\noindent 测试通常在\code{src/test/scala}被找到，使用以下：
 
 \begin{verbatim}
 $ sbt test
@@ -1536,14 +1562,15 @@ $ sbt test
 \noindent A minimal test (a testing hello world) to test a Scala Integer
 addition:
 
+\noindent 一个最小测试（测试hello world）来测试Scala整型
+
 \shortlist{code/scalatest_hello_world.txt}
 
 \noindent Although Chisel testing is more heavyweight than unit testing of Scala programs,
 we can wrap a Chisel test into a ScalaTest class. For the \code{Tester} shown
 before this is:
 
-
-尽管Chisel测试比Scala程序的单元测试更重要，我们可以将Chisel测试包装到ScalaTest类中。对于显示的Tester
+\noindent尽管Chisel测试比Scala程序的单元测试更重要，我们可以将Chisel测试包装到ScalaTest类中。对于显示的Tester
 在此之前：
 
 \shortlist{code/scalatest_simple.txt}
@@ -1582,6 +1609,16 @@ The only action of this application is to create a new \code{HelloWorld} object 
 to the Chisel driver \code{execute} function. The first argument is an array of Strings,
 where build options can be set (e.g., the output folder). The following code will
 generate the Verilog file \code{Hello.v}.
+
+\noindent 以下硬件描述，像是~\ref{lst:chisel:hello}出现的。
+为了生成一个Verilog描述，我们需要一个应用。Scala对象\code{extends App}
+是一个应用，直接在应用开始的地方隐式生成主函数。
+这个的唯一举动是生成一个新的\code{HelloWorld}对象，并把它传入Chisel驱动\code{execute}函数。
+这个的第一个参数是一个字符串的数组，
+
+
+
+
 
 \shortlist{code/generate.txt}
 
