@@ -1787,6 +1787,8 @@ the module. The direction is given by wrapping a field into either a call to \co
 or \code{Output()}. The direction is from the view of the component itself.
 
 
+
+
 The following code shows the definition of the two example components A and B from
 Figure~\ref{fig:components}:
 
@@ -2709,6 +2711,10 @@ the forwarding circuit. Read and write addresses are compared and gated with
 the write enable to select between the forwarding path of the write data or the
 memory read data. The write data is delayed by one clock cycle with a register.
 
+如果我们想要读出新写入的值，我们可以搭建一个前递电路，能够检查出相同地址情况下\emph{forwards}出写入数值。
+~\ref{fig:memory:forwarding}表明具有前递电路的存储器。读出和写入地址会相互比较，并受到写入使能控制，去选择
+写入数据的前递路径，或是存储器读取数据。这个写入数据是受到一个周期的寄存器延迟。
+
 Listing~\ref{lst:memory:forward} shows the Chisel code for a synchronous memory
 including the forwarding circuit. We need to store the write data into a register
 (\code{wrDataReg}) to be available in the next clock cycle the synchronous
@@ -2719,15 +2725,21 @@ That condition is also delayed by one clock cycle.
 A multiplexer selects between the forwarding (write) data or the read
 data from memory.
 
+列表~\ref{lst:memory:forward} 表明一个具有同步存储器，包含前馈电路的Chisel代码。
+我们需要存储写入数据到一个寄存器(\code{wrDataReg})，使之在下个周期变得有效，同步存储器也有一个周期的延迟。
+我们比较了两个写入地址(\code{wrAddr} 和 \code{rdAddr})并且去检查，看\code{wrEna}是否为真，在前馈的条件下。
+那个条件也受到一个周期的延迟。
+一个复用器在前馈写入数据和读出数据做出选择。
+
 \longlist{code/memory_forwarding.txt}{A memory with a forwarding circuit.}{lst:memory:forward}
-
-
 
 Chisel also provides \code{Mem}, which represents a memory with synchronous
 write and an asynchronous read. As this memory type is usually not directly available
 in an FPGA, the synthesize tool will build it out of flip-flops.
 Therefore, we recommend using \code{SyncReadMem}.
 
+Chisel也提供了\code{Mem}，代表了一个具有同步写入和同步读出的存储器。但是这个存储器一般不在FPGA可以使用，
+综合工具会把它变为触发器。于是，我们推荐使用\code{SyncReadMem}。
 
 \section{Exercise}
 
@@ -2751,18 +2763,27 @@ FSMs are also called synchronous sequential circuits.
 
 有限状态机（FSM）是一个数字电路中的基本的搭建模块。一个FSM可以被描述为一个\emph{states}和（有限制的）状态条件
 \emph{state transitions}。
-一个FSM有一个初始状态，这是在reset
+一个FSM有一个初始状态，这是在reset中被确定的。
+FSMs也被称为同步时序电路。
 
 
 An implementation of an FSM consists of three parts: (1) a register that holds the current state,
 (2) combinational logic that computes the next state that depends on the current
 state and the input, and (3) combinational logic that computes the output of the FSM.
 
+FSM的实现包括三个部分：(1) 一个具有现在状态的寄存器,
+(2) 组合逻辑根据目前状态和输入计算下个状态,  
+(3) 组合逻辑能够计算FSM的输出。
+
 In principle, every digital circuit that contains a register or other memory elements
 to store state can be described as a single FSM. However, this might
 not be practical, e.g., try to describe your laptop as a single FSM.
 In the next chapter, we describe how to build larger systems
 out of smaller FSMs by combining them into communicating FSMs.
+
+原则上，每个数字电路包含一个寄存器或是其它存储器元件去储存状态，可以被称为一个FSM。
+但是，着可能不实用，例如，把你的电脑描述为一个FSM。
+下个章节，我们描述如何通过组合小的FSM进行通信FSM，搭建更大的系统。
 
 \section{Basic Finite-State Machine}
 
@@ -2781,6 +2802,12 @@ The output logic computes the output (\code{out}). As the output depends on the 
 state only, this state machine is called a
 \myref{https://en.wikipedia.org/wiki/Moore_machine}{Moore machine}.
 
+图片~\ref{fig:fsm} 表明FSM的草图. 寄存器包含目前的\code{state}.
+通过\code{state}和输入(\code{in})用来计算下个状态的状态逻辑(\code{next\_state})。
+在下个时钟, \code{state} 变为 \code{next\_state}.
+输出逻辑计算输出 (\code{out}). 因为输出只取决于目前状态，这样的状态机被称为
+\myref{https://en.wikipedia.org/wiki/Moore_machine}{Moore machine}.
+
 A \myref{https://en.wikipedia.org/wiki/State_diagram}{state diagram}
 describes the behavior of such an FSM visually.
 In a state diagram, individual states are depicted as circles labeled
@@ -2788,6 +2815,12 @@ with the state names.
 State transitions are shown with arrows between states.
 The guard (or condition) when this transition is taken is drawn as a label
 for the arrow.
+
+\myref{https://en.wikipedia.org/wiki/State_diagram}{state diagram}
+使用图形描述FSM的行为。
+在状态图中，单独的状态被画成标注状态名字的圆圈。
+状态转移被描述为状态之间的箭头。
+当这个转移被采取的时候，改转移条件会在箭头上被标出。
 
 Figure~\ref{fig:diag-moore} shows the state diagram of a simple example FSM.
 The FSM has three states: \emph{green}, \emph{orange}, and \emph{red},
@@ -2797,6 +2830,9 @@ On a second bad event, the alarm level is switched to \emph{red}.
 In that case, we want to ring a bell; \emph{ring bell} it the only output of this FSM.
 We add the output to the \emph{red} state.
 The alarm can be reset with a \emph{clear} signal.
+
+~\ref{fig:diag-moore}图片表明了一个简单FSM的例子图表。
+这个FS
 
 \begin{figure}
   \centering
@@ -4617,6 +4653,7 @@ writing is going on.}
 \section{Medium Complex Circuits (better title needed)}
 
 3. small designs (better name): UART, FIFO, PWM, VGA, sigma delta
+
 
 \section{State Machines and Data Path}
 
