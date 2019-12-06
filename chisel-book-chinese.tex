@@ -2445,6 +2445,8 @@ The enable can be implemented, similar to the synchronous reset, with
 a multiplexer at the input of the register. One input to the multiplexer is the feedback of the
 output of the register.
 
+
+
 \begin{figure}
   \centering
   \includegraphics[scale=\scale]{figures/register-enable}
@@ -2625,6 +2627,15 @@ When counting down to zero, the comparator is a large NOR gate, which might be
 a little bit cheaper than the comparator against a constant in an ASIC.
 In an FPGA, where logic is built out of lookup tables, there is no difference between comparing
 against a 0 or 1 bit. The resource requirement is the same for the up and down counter.
+
+我们很多人有时会感觉自己像一个\myref{https://en.wikipedia.org/wiki/Nerd}{nerd}。
+例如，我们想要设计一个超级优化的计数器。
+一个标准的计数器需要以下资源：一个寄存器，一个加法器（或是减法器），一个比较器。
+我们不能再寄存器或是加法器做很多。如果我们向上数，我们需要比较一个目标数，这是一个字符。
+比较器可以从0开始反向生成一个字符，然后一个大的与们。
+当我们向下数零的时候，比较器是一个大的或非们，这个从AISC的角度是更加便宜的。
+在FPGA，逻辑来源于查找表，所以在比较1或是0的时候就没什么区别了，此时向上数和向下数对于资源的要求是一样的。
+
 
 However, there is still one more trick a clever hardware designer can pull off.
 Counting up or down needed a comparison against all counting bits, so far.
@@ -2832,7 +2843,12 @@ We add the output to the \emph{red} state.
 The alarm can be reset with a \emph{clear} signal.
 
 ~\ref{fig:diag-moore}图片表明了一个简单FSM的例子图表。
-这个FS
+这个FSM有三个状态：\emph{green}, \emph{orange}, and \emph{red}，
+表明闹铃的等级。FSM以绿色等级为开始，当\emph{bad event}发生的时候，闹铃等级切换到\emph{orange}。
+在下一个坏的时刻，闹铃等级被切换到\emph{red}。
+在那种情况下，我们想要响铃；\emph{ring bell}是唯一的FSM的输出。
+我们在\emph{red}状态下增加输出。
+然后响铃可以被重置到\emph{clear}信号。
 
 \begin{figure}
   \centering
@@ -2853,6 +2869,15 @@ input is a don't care when a \emph{bad event} happens. That means
 has some repetition. If we have a larger FSM and/or more outputs, we
 can split the table into two, one for the next state logic and one for the
 output logic.
+
+尽管状态图看起来很舒服，一个FSM可以被快速掌握，那么状态表可以更快地写下来。
+~\ref{tab:state:table}图标表明我们的闹铃FSM的状态表。
+我们列出了当前状态，输入值，和接下来的状态，和当前状态的输出值。原则上，我们需要
+列出所有可能状态下的所有输入值。这个表格可以有3*4=12列。我们把这个表格进行简化，
+当\emph{bad event}发生的时候，输入\emph{clear}是不管的。那意味着\emph{bad event}对于\emph{clear
+有优先级。输出列有一些重复。如果我们有一个更大的FSM或是更多输出，我们可以把列表分为两个，一个用于计算下个状态逻辑，
+一个用于计算输出逻辑。
+
 
 \begin{table}
 \centering
@@ -2882,14 +2907,24 @@ output of the FSM.
 To use \code{Enum} and the \code{switch} control instruction, we need to
 import \code{chisel3.util.\_}.
 
+最后，得到我们的等级警报FSM设计，我们使用chisel写下代码。
+~\ref{lst:fsm:alarm}表明了闹铃FSM的Chisel代码。
+注意到，我们使用Chisel的\code{Bool}作为输入和输出类型。
+为了使用\code{Enum}和\code{switch}控制指令，我们需要引入
+\code{chisel3.util.\_}。
+
 \longlist{code/simple_fsm.txt}{The Chisel code for the alarm FSM.}{lst:fsm:alarm}
 
 The complete Chisel code for this simple FSM fits into one page.
 Let us step through the individual parts.
 The FSM has two input and a single output signal, captured in a Chisel \code{Bundle}:
 %
-\shortlist{code/simple_fsm_io.txt}
 
+这个简单的FSM的Chisel完整代码可以放得下一页纸。
+让我们从独立的部分开始。
+这个FSM有两个输入和一个输出信号，在Chisel\code{Bundle}打包：
+
+\shortlist{code/simple_fsm_io.txt}
 
 \noindent Quite some work has been spent in optimal state encoding. Two common options
 are binary or one-hot encoding. However, we leave those low-level decisions to
@@ -2939,6 +2974,12 @@ path from the input to the output.
 Let us consider a minimal example, an edge detection circuit.
 We have seen this Chisel one-liner before:
 
+在一个Moore FSM，输出值只取决于当前状态。
+那意味着输入改变可以被看成导致\emph{最早的}下个周期的输出改变。
+如果我们想要观察一个间接的改变，我们需要一个组合路径，从输入到输出。
+让我们想一个最小的例子，在边沿检测电路。
+我们可能以前看过这一行Chisel代码：
+
 \shortlist{code/sequ_reg_rising.txt}
 
 \begin{figure}
@@ -2956,11 +2997,19 @@ is just the input. We can also consider this as a delay element of one
 clock cycle. The output logic \emph{compares} the current
 input with the current state.
 
+~\ref{fig:fsm-rising}表明了上升边沿检测器的草图。
+当这个周期输入为1的时候，经过一个周期，输出变为1，并且上个周期的输入是0.
+这个状态寄存器只是一个简单的D触发器，下个状态只是输入值。我们也可以把这个看成一个时钟延迟的元素。
+输出逻辑\emph{比较}当前输入和当前状态。
+
 
 
 When the output depends also on the input, i.e., there is a combinational path between
 the input of the FSM and the output, this is called a
 \myref{https://en.wikipedia.org/wiki/Mealy_machine}{Mealy machine}.
+
+当输出也取决于输入，例如，有一个组合逻辑的路径在FSM的输入和输出之间，这被称为
+\myref{https://en.wikipedia.org/wiki/Mealy_machine}{Mealy machine}。
 
 \begin{figure}
   \centering
@@ -3843,6 +3892,8 @@ As this ready-valid interface is so common, Chisel provides a definition
 of this interface in \code{DecoupledIO} as follows:\footnote{This is a simplification,
 as \codefoot{DecoupledIO} actually extends an abstract class.}
 
+
+
 \shortlist{code/fifo_decoupled.txt}
 
 \noindent The \code{DecoupledIO} interface is defined from the writer's (producer's) view point.
@@ -4061,12 +4112,17 @@ The switch statement enumerates all operations and assigns the expression accord
 All operations map directly to a Chisel expression.
 
 我们首先定义一个短的输入名字。res的逻辑通过switch声明得到。于是，它得到一个默认值为0.
+switch声明列举了所有操作，并分别赋值。所有的操作直接对应到一个Chisel表达式。
 
 In the end, we assign the result \code{res} to the ALU output \code{y}
+
+结尾，我们给\code{res}结果赋值ALU输出\code{y}。
 
 \longlist{code/leros_alu.txt}{The Leros ALU.}{lst:leros-alu}
 
 For the testing, we write the ALU function in plain Scala, as shown in Listing~\ref{lst:leros-alu-scala}.
+
+为了测试，我们使用普通Scala函数编写了ALU函数，如下所示~\ref{lst:leros-alu-scala}。
 
 \longlist{code/leros_alu_ref.txt}{The Leros ALU function written in Scala.}{lst:leros-alu-scala}
 
@@ -4074,9 +4130,13 @@ For the testing, we write the ALU function in plain Scala, as shown in Listing~\
 detect errors in the specification; it is at least some sanity check.
 We use some corner case values as the test vector:
 
+\noindent 使用Scala把这个Chisel硬件重写一遍不会检测出spec的错误；它只是一些合理性检验。
+我们使用一些边角情况作为测试向量。
+
 \shortlist{code/leros_alu_testvec.txt}
 
 \noindent We test all functions with those values on both inputs:
+\noindent 
 
 \shortlist{code/leros_alu_test.txt}
 
@@ -4381,6 +4441,8 @@ improve it and will publish new editions. You can contact me at
 \url{mailto:masca@dtu.dk}, or with an issue request on the GitHub
 repository. I am also happily accepting pull requests
 for the book repository for any fixes and improvements.
+
+
 
 \section*{Source Access}
 
