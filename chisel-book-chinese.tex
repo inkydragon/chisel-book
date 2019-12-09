@@ -1956,6 +1956,8 @@ and the individual fields of the IO \code{Bundle}.
 The simplest component in our design has just an input port, named \code{in}, and
 an output port named \code{out}.
 
+我们设计中最简单的部分只是一个输入端口，命名为\code{in}和输出端口\code{out}。
+
 \shortlist{code/components_d.txt}
 
 The final missing piece of our example design is the top-level component, which itself
@@ -2023,20 +2025,31 @@ The operations are usually some arithmetic, such as addition and subtraction, an
 functions such as and, or, xor. That's why it is called ALU.
 
 ALU有两个数据输入，图中标明为\code{A}和\code{B}，一个函数的输入\code{fn}，
-一个的输出labeled {Y}。 AL
+一个的输出labeled {Y}。 ALU操作在\code{A}和\code{B}，并且提供结果给输出。
+\code{fn}选取了\code{A}和\code{B}进行操作。
+这个操作经常是一些算法，例如加法和减法，并且一些逻辑性函数例如，和，或，异或。
+那是为什么被称为ALU。
 
 The function input \code{fn} selects the operation. The ALU is usually a combinational
 circuit without any state elements. An ALU might also have additional outputs to signal properties
 of the result, such as zero or the sign.
 
+函数输入\code{fn}选取操作。ALU经常是一个组合逻辑电路，没有任何的状态元素。
+一个ALU可能有一些额外的输出对于信号结果的属性，例如0或是正负符号。
+
 The following code shows an ALU with 16-bit inputs and outputs that supports: addition, subtraction, or, and and
 operation, selected by a 2-bit \code{fn} signal.
+
+以下的代码表明了一个具有16位输入和输出的ALU，支持加法，减法，或，和与操作，通过二位的\code{fn}信号。
 
 \shortlist{code/components_alu.txt}
 
 \noindent In this example, we use a new Chisel construct, the \code{switch/is} construct to describe
 the table that selects the output of our ALU.
 To use this utility function, we need to import another Chisel package:
+
+\noindent 在这个例子，我们使用new Chisel的结构，\code{switch/is}用于表示选取我们的ALU的输出表。
+为了使用这个函数，我们需要引入其它chisel包裹：
 
 \shortlist{code/components_util.txt}
 
@@ -2111,10 +2124,17 @@ Scala函数可以采用Chisel（和Scala）参数并返回生成的硬件。
 during elaboration, but create two adders (hardware instances). The adder is an artificial example
 to keep it simple. Chisel has already an adder generation function, like \code{+(that: UInt)}.
 
+\noindent 注意到这个是\emph{hardware generator}。你不只是在生成过程中执行任何相加操作，而是建造两个加法器（硬件模块）。
+加法器是一个人工的例子，去使它变得简单。chisel本身就有加法器生成函数，像是\code{+(that: UInt)}。
+
 Functions as lightweight hardware generators can also contain state (including a register).
 Following example returns a one clock cycle delay element (a register).
 If a function has just a single statement, we can write it in one line and omit the curly
 braces ({}).
+
+函数作为轻量级硬件生成器，也可以包含状态，包括几个寄存器。
+以下例子返回了一个时钟周期的元素（一个寄存器）。
+如果一个函数只是一个单一的声明，我们可以把它用一行写入，并忽略括号({})。
 
 \shortlist{code/components_fn_delay.txt}
 
@@ -2219,7 +2239,7 @@ Chisel条件建造when也有一个else的类型，它是otherwise。
 
 Chisel also supports a chain of conditionals (a if/elseif/else chain) with \code{.elsewhen}:
 
-Chisel也支持一链条的条件（a if elseif else链条）通过.elsewhen
+Chisel也支持一链条的条件（a if elseif else链条）通过\code{.elsewhen}
 
 \shortlist{code/comb_elsewhen.txt}
 
@@ -2238,7 +2258,8 @@ a default value to a \code{Wire}. A default assignment can be combined with the 
 declaration with \code{WireDefault}.\footnote{In the current version of Chisel
 it is called WireInit, but will change to \code{WireDefault} with the release of Chisel 3.2}
 
-对于更复杂的组合电路，可能设给Wire一个默认值更加有效。
+对于更复杂的组合电路，可能设给Wire一个默认值更加有效。一个默认的声明可以通过wire声明，使用\code{WireDefault}。
+\footnote{在目前chisel的版本称为WireInit, 但是会切换到\code{WireDefault}，通过chisel3.2的释放}。
 
 \shortlist{code/comb_wiredefault.txt}
 
@@ -2248,7 +2269,7 @@ conditional execution of Scala code, not generating Chisel (multiplexer) hardwar
 Those Scala conditionals have their use in Chisel when we write circuit generators,
 which take parameters to conditionally generate \emph{different} hardware instances.
 
-有人可能会问，为什么使用when，.elsewhen, 和.otherwise，Scala用的是if，else if和else。
+有人可能会问，为什么使用\code{when}，\code{.elsewhen}, 和\code{otherwise}，Scala用的是\code{if}，\code{else if}和\code{else}。
 这些声明式对于Scala代码的条件执行，不是用于生成Chisel（复用器）的硬件。
 这些Scala条件分支在Chisel中写电路生成器的时候有用处，它会采取变量，并条件化生成不同的硬件部分。
 
@@ -2260,7 +2281,7 @@ converts a binary number of $n$ bits to an $m$-bit signal, where $m \leq 2^n$.
 The output is one-hot encoded (where exactly one bit is one).
 
 
-译码器把n位的二进制码转化位m位的信号，这里m小于等于2^n。
+A \myref{https://en.wikipedia.org/wiki/Binary_decoder}{decoder}把$n$位的二进制码转化位$m$位的信号，这里$m \leq 2^n$。
 输出是独热码（这里1位对应的就是1）。
 
 \begin{figure}
@@ -2316,10 +2337,10 @@ It is intended to avoid situations with incomplete assignments for combinational
 (in Chisel a \code{Wire}) that will result in unintended latches in hardware description
 languages such as VHDL and Verilog. Chisel does not allow incomplete assignments.
 
-以上switch声明列出所有色sel信号的可能值，并把译码的值赋值到result信号。
-注意，即使我们列举了所有可能的输入值，Chisel仍旧需要我们去赋值一个默认值，我们把result设为0。
+以上\code{switch}声明列出所有\code{sel}信号的可能值，并把译码的值赋值到\code{result}t信号。
+注意，即使我们列举了所有可能的输入值，Chisel仍旧需要我们去赋值一个默认值，我们把\code{result}设为0。
 这个赋值从来不会被激发，于是在后端工具被优化掉。
-这个是用来防止组合电路的非完全赋值的情况（在Chisel是Wire），这样会导致硬件描述语言像是VHDL和Verilog的不想要的锁存器。
+这个是用来防止组合电路的非完全赋值的情况（在Chisel是\code{Wire}），这样会导致硬件描述语言像是VHDL和Verilog的不想要的锁存器。
 Chisel不允许非完全赋值。
 
 In the example before we used unsigned integers for the signals. Maybe a clearer representation
@@ -2338,8 +2359,8 @@ represented by \code{sel}. Therefore, we can express a decoder with the Chisel s
 operation \code{<<}.
 
 一个表格提供了更为刻度的译码器函数表示方式，但是这也变得拖沓。
-当检查表格的时候，我们看到了一个常见的结构：1被向左移动了sel个单位。
-于是，我们可以表达一个译码器通过Chisel移位操作<<。
+当检查表格的时候，我们看到了一个常见的结构：1被向左移动了\code{sel}个单位。
+于是，我们可以表达一个译码器通过Chisel移位操作\code{<<}。
 
 \shortlist{code/encdec_shift.txt}
 
@@ -2350,7 +2371,7 @@ Decoders can also be used for address decoding, and then the outputs are used as
 select signals, e.g., different IO devices connected to a microprocessor. 
 
 译码器作为一个由复用器组成的部分，输出结果和使能，选用一个与门选择信号作为输入。
-但是，在Chisel我们不需要搭建复用器，尽管库的Mux是可用的。
+但是，在Chisel我们不需要搭建复用器，尽管库的\code{Mux}是可用的。
 译码器可以用来翻译地址，然后输出是被选择的信号，例如，不同的IO器件连接到一个处理器。
 
 
@@ -2393,7 +2414,7 @@ works only as expected when the input signal is one-hot coded. For all other inp
 is undefined. As we cannot describe a function with undefined outputs, we use a default
 assignment that catches all undefined input patterns.
 
-图5.2表明了一个4位独热码输入到一个二进制输出的编码器，表5.3是编码函数的真值表。
+图5.2~\ref{fig:encoder}表明了一个4位独热码输入到一个二进制输出的编码器，表5.3~\ref{tab:encoder}是编码函数的真值表。
 但是，编码器只在输入信号是独热码的时候工作。
 对于其它的输入值，输出是未定义的。
 所以我们不能描述一个有着未定义的函数作为输出，我们使用默认值赋值，抓取所有的未经定义的输入形式
@@ -2410,7 +2431,7 @@ for the legal input values.
 Describe a combinational circuit to convert a 4-bit binary input to the encoding of a
 \myref{https://en.wikipedia.org/wiki/Seven-segment_display}{7-segment display}.
 
-描述一个组合电路，用来转换4位二进制输入作为7位输出的编码。
+描述一个组合电路，用来转换4位二进制输入作为myref{https://en.wikipedia.org/wiki/Seven-segment_display}{7位输出}的编码。
 
 You can either define the codes for the decimal digits, which was the initial
 usage of a 7-segment display or additionally, define encodings for the remaining bit pattern
@@ -2419,6 +2440,9 @@ to be able to display all 16 values of a single digit in
 When you have an FPGA board with a 7-segment display, connect 4 switches or
 buttons to the input of your circuit and the output to the 7-segment display.
 
+你可以定义十进制的代码，这个是有着7段显示作用的，或是额外地定义剩余的字节类型编码，
+使其能够显示所有的16个单一数字\myref{https://en.wikipedia.org/wiki/Hexadecimal}{hexadecimal}。
+当你有了一个具有七段编码的FPGA开发板，把它们连接到4个跳变或是按钮，到你的电路输入，和7段显示的输出。
 
 \chapter{Sequential Building Blocks}
 
@@ -2503,16 +2527,16 @@ Variable names start with lowercase and classes start with upper case.
 首先我们定义了寄存器并给它一个名字，其次我们连接了信号delayIn给寄存器的输入。
 注意寄存器的名字是reg开始的。
 为了简单区分组合电路和舒徐电路的元素，一般常用的方式是在开头添加reg的名字作为开头。
-并且记得
-
+并且记得scala的名字（同样适用于chisel）经常以\myref{https://en.wikipedia.org/wiki/Camel_case}{CamelCase}的形式。
+变量名称以小写开头，接下来的类别以首字母大写的形式。
 
 A register can also be initialized on reset. The \code{reset} signal is, as the \code{clock} signal,
 implicit in Chisel. We supply the reset value, e.g., zero, as a parameter to the register
 constructor \code{RegInit}. The input for the register is connected with a Chisel
 assignment statement.
 
-一个寄存器也可以被复位初始化。复位信号是像时钟信号一样，在Chisel是显性的。我们提供了复位值，例如，零，
-作为一个参数传给寄存器构造器RegInit。寄存器的输入是通过Chisel赋值声明连入的。
+一个寄存器也可以被复位初始化。\code{reset}信号是像\code{clock}信号一样，在Chisel是隐性的。我们提供了复位值，例如，零，
+作为一个参数传给寄存器构造器\code{RegInit}。寄存器的输入是通过Chisel赋值声明连入的。
 
 \shortlist{code/sequ_reg_init.txt}
 
@@ -2612,7 +2636,7 @@ As this is also a common design pattern, modern FPGA flip-flops contain a
 dedicated enable input, and no additional resources are needed.
 
 图片~\ref{fig:register-enable}表明一个具有使能信号的草图。
-这个是一个常见的设计类型，当代的F
+这个是一个常见的设计类型，当代的FPGA触发器包含一个
 
 \begin{figure}
   \centering
@@ -2626,19 +2650,27 @@ with enable. Most of the time, enable it high (\code{true}) and the register
 follows the input with one clock cycle delay. Only in the fourth clock cycle
 \code{enable} is low, and the register keeps its value (5) at rising edge D.
 
+图片~\ref{fig:register-en-wave}表明了一个波形图例子，用于含有使能信号的寄存器。
+大多数时间，使其变为高位(\code{true})，寄存器遵守输入的一个周期延迟。只是在第四个周期\code{enable}
+是低位的，于是寄存器在（5）保持他的值，在上升沿D。
+
 A register with an enable can be described in a few lines of Chisel code
 with a conditional update:
+
+一个具有使能的寄存器可以通过数行chisel码和一个条件更新被描述：
 
 \shortlist{code/sequ_reg_ena.txt}
 
 \noindent A register with enable can also be reset:
+
+\noindent 具有使能的寄存器也可以被重置：
 
 \shortlist{code/sequ_reg_init_ena.txt}
 
 A register can also be part of an expression. Following circuit detects the rising edge
 of a signal by comparing its current value with the one from the last clock cycle.
 
-
+一个寄存器也可以是表达式的一部分。以下电路检测了信号的上升沿，通过比较其当前值和上周期的值。
 
 \shortlist{code/sequ_reg_rising.txt}
 
@@ -2677,6 +2709,8 @@ to 0 again. A counter shall also be reset to a known value.
 
 \noindent When we want to count events, we use a condition to  increment the counter.
 
+\noindent 当我们想要去计数事件的时候，我们使用条件去增加计数器读数。
+
 \shortlist{code/sequ_event_counter.txt}
 
 \subsection{Counting Up and Down}
@@ -2693,13 +2727,15 @@ conditional statement.
 
 \noindent We can also use a multiplexer for our counter:
 
+\noindent 我们也可以使用复用器作为一个计数器的增加读数：
+
 \shortlist{code/mux_counter.txt}
 
 \noindent If we are in the mood of counting down, we start (reset the counter register)
 with the maximum value and reset the counter to that value when reaching 0.
 
 
-如果我们有倒数的想法，我们开始（重置计数器寄存器）
+\noindent如果我们有倒数的想法，我们开始（重置计数器寄存器）
 设置为最大值，并在达到0时将计数器重置为该值。
 
 \shortlist{code/down_counter.txt}
@@ -2707,9 +2743,7 @@ with the maximum value and reset the counter to that value when reaching 0.
 \noindent As we are writing and using more counters, we can
 define a function with a parameter to generate a counter for us.
 
-As we are writing and using more counters, we can
-define a function with a parameter to generate a counter for us.
-
+\noindent 当我们写入和使用更多的计数器的时候，我们可以定义一个具有参数的函数去为我们生成计数器。
 
 \shortlist{code/function_counter.txt}
 
@@ -2730,6 +2764,13 @@ circuit other than counting clock ticks. If we know the clock frequency, we
 can generate circuits that generate timed events, such as blinking a LED
 at some frequency as we have shown in the Chisel ``Hello World'' example.
 
+除了计数时间，技术经常被使用去生成延迟。
+一个同步电路使用一个时钟和特定的频率。
+电路在这些时钟变化中生成结果。
+在数字电路中没有时间的概念，除了计算时钟周期。
+如果我们知道时钟频率，我们可以生成电路用于生成时间性事件，类似在一些特定频率闪烁LED，
+像是我们前边知道的Chisel``Hello World''例子。
+
 A common practice is to generate single-cycle \emph{ticks} with a frequency $f_{tick}$
 that we need in our circuit. That tick occurs every $n$ clock cycles,
 where $n = f_{clock}/f_{tick}$ and the tick is precisely one clock cycle long.
@@ -2737,6 +2778,8 @@ This tick is \emph{not} used as a derived clock, but as an enable signal for
 registers in the circuit that shall logically operate at frequency $f_{tick}$.
 Figure~\ref{fig:tick-wave} shows an example of a tick generated every
 3 clock cycles.
+
+一个常见的生成单个具有频率$f_{tick}$的我们电路中需要的\emph{ticks}的方式
 
 \begin{figure}
   \centering
@@ -2839,9 +2882,18 @@ to be written (\code{wrData}), and a write enable (\code{wrEna}).
 Note that for all inputs, there is a register within the memory showing the
 synchronous behavior.
 
+~\ref{fig:memory}图片表明了这样一个同步存储器的草图。
+这个存储器是双端口的，具有一个读出和写入端口。
+这个读出端口有一个单一输入，读出地址(\code{rdAddr})和一个输出数据(\code{rdData})。
+写入端口有三个输入：地址(\code{wrAddr})，写入的数据(\code{wrData})，和写入使能(\code{wrEna})。
+注意到对于所有的输入，存储器的寄存器表明了同步的行为。
+
 To support on-chip memory, Chisel provides the memory constructor \code{SyncReadMem}.
 Listing~\ref{lst:memory} shows a component \code{Memory} that implements
 1~KB of memory with byte-wide input and output data and a write enable.
+
+为了支持片上存储，chisel提供了存储器构建器\code{SyncReadMem}。
+~\ref{lst:memory}表明了\code{Memory}的构成去支持1KB的存储器，具有字节位宽的输入和输出数据，和一个写入使能。
 
 \longlist{code/memory.txt}{1 KB of synchronous memory.}{lst:memory}
 
@@ -2918,6 +2970,9 @@ overlapped (all 7 segments will light up).
 Therefore, you need to slow down the counting. Create a second
 counter that can generate a single-cycle \emph{tick} signal every 500 milliseconds.
 Use that signal as enable signal for the 4-bit counter.
+
+使用来自上一章的7段编码器并添加一个4位计数器作为输入，去切换显示，从\code{0}到\code{F}。
+当你直接连接这个计数器到
 
 \todo{Luca: More exercises would be nice. Maybe in the future?}
 
@@ -3237,7 +3292,9 @@ puls for each rising edge of the input.
 
 作为Mealy FSM的输出，并不只是依赖于状态，也依赖于输入，我们不能描述输出作为状态圆的一部分。
 相反，状态间的转移函数和输入值和输出值是一起被标出的。
-注意到我们画本身的状态转移，例如，在
+注意到我们画本身的状态转移，例如，在状态\code{zero}当输入是\code{0}，FSM停留在\code{zero}，
+输出是{0}。
+FSM的上升沿产生\code{1}作为输出，
 
 \longlist{code/rising_fsm.txt}{Rising edge detection with a Mealy FSM.}{lst:fsm:rising}
 
@@ -3282,14 +3339,10 @@ state, waiting for the input to become 0 again.
 We show the input condition on the state transition arrows and the
 FSM output within the state representing circles.
 
-Figure~\ref{fig:diag:rising:moore} . The first thing to notice is that the Moore FSM
-needs three states, compared to two states in the Mealy version.
-The state \code{puls} is needed to produce the single-cycle puls.
-The FSM stays in state \code{puls} just one clock cycle and then
-proceeds either back to the start state \code{zero} or to the \code{one}
-state, waiting for the input to become 0 again.
-We show the input condition on the state transition arrows and the
-FSM output within the state representing circles.
+Figure~\ref{fig:diag:rising:moore} 表明了使用Moore FSM的状态图用于上升沿检测。
+第一个事情是去注意到Moore FSM需要三个状态，相比较于Mealy版本需要两个状态。
+\code{puls}状态需要去产生单一周期的脉冲。
+FSM
 
 \longlist{code/rising_moore_fsm.txt}{Rising edge detection with a Moore FSM.}{lst:fsm:rising:moore}
 
@@ -3333,6 +3386,11 @@ Now it is time to write some \emph{real} FSM code.
 Pick a little bit more complex example and implement the FSM and
 write a test bench for it.
 
+% 这是一个无聊的例子，或许我可以发现一个更有兴趣的。
+在这一章节，你已经看到了很多小的FSM的例子。
+现在是时候写一些\emph{real}的FSM代码。
+选取一些更复杂的例子，并去补充FSM和一些测试台。
+
 A classic example for a FSM is a traffic light controller (see~\cite[Section~14.3]{dally:vhdl:2016}).
 A traffic light controller has to ensure that on a switch from red to green
 there is a phase in between where both roads in the intersection
@@ -3341,6 +3399,12 @@ To make this example a little bit more interesting, consider a priority road.
 The minor road has two car detectors (on both entries into the intersection).
 Switch to green for the minor road only when a car is detected and then switch
 back to green for the priority road.
+
+一个经典FSM的例子是交通灯控制器(看~\cite[Section~14.3]{dally:vhdl:2016})。
+一个交通灯控制器需要去确定从红到绿的切换，有一个状态是两条路的中间没有信号灯（红色或是橘色）。
+为了使这个例子变得更有趣一些，想象一个主干道。
+副路需要有两个车辆检测器（在交叉的两个入口）。
+当检查到车辆的时候，在副路切换到绿灯，然后切换回主干道切换回绿灯。
 
 \todo{Luca: Greatest common divisor with Euclide algorithm can be also a nice exercise.
 Martin: but this is shown at the Chisel homepage without an FSM.}
@@ -3370,6 +3434,17 @@ sequence starts;
 for the next start.
 \end{itemize}
 
+为了讨论FSM的通信，我们使用一个例子~\cite[Chapter~17]{dally:vhdl:2016}，灯光闪烁器/
+灯光闪烁器有一个输入\code{start}和一个输出\code{light}。
+灯光闪烁器像是如下:
+\begin{itemize}
+\item 当\code{start} 在一个周期内, 闪烁序列开始
+\item 一个序列闪烁三次。
+\item 当\code{light}变为\emph{on}为6个周期，\code{light}变为\emph{off}四个周期，在一次闪烁中。
+\item 在序列后，FSM变为\code{light} \emph{off}，等待下一个开始。
+\end{itemize}
+
+
 The FSM for a direct implementation\footnote{The state diagram is shown
 in~\cite[p.~376]{dally:vhdl:2016}.} has 27 states:
 one initial state that is waiting for the input, $3 \times 6$ states for the three
@@ -3377,10 +3452,18 @@ one initial state that is waiting for the input, $3 \times 6$ states for the thr
 We do not show the code for this simple-minded implementation of the light
 flasher.
 
+FSM用于直接补充\footnote{The state diagram is shown
+in~\cite[p.~376]{dally:vhdl:2016}.}有27个状态:
+一个开始值是等待输入，$3 \times 6$个状态，对于前三个\emph{on}的状态，并且$2 \times 4$个状态，对于\emph{off}状态。
+我们不放出这个简单的灯光闪烁器的代码。
+
 The problem can be solved more elegantly by factoring this large FSM into
 two smaller FSMs: the master FSM implements the flashing logic, and the timer FSM
 implements the waiting. Figure~\ref{fig:flasher} shows the composition of
 the two FSMs.
+
+这个问题可以通过更优雅地分解大型FSM到两个小的FSM: 主FSM补充了闪烁逻辑，和计时器FSM补充了等待。
+图片~\ref{fig:flasher}表明了两个FSM的组成。
 
 \begin{figure}
   \centering
@@ -3391,6 +3474,8 @@ the two FSMs.
 
 The timer FSM counts down for 6 or 4 clock cycles to produce the desired timing.
 The timer specification is as follows:
+
+计时器FSM从
 
 \begin{itemize}
 \item when \code{timerLoad} is asserted, the timer loads a value into the down counter,
@@ -3422,6 +3507,9 @@ are performing the same function, states \code{space1} and \code{space2} as well
 We can factor out the number of remaining flashes into a second counter.
 Then the master FSM is reduced to three states: \code{off}, \code{flash},
 and \code{space}.
+
+
+
 
 Figure~\ref{fig:flasher2} shows the design with a master FSM and two FSMs
 that count: one FSM to count clock cycles for the interval length of \emph{on}
@@ -3470,6 +3558,8 @@ The FSMD shown in Figure~\ref{fig:popcnt-fsmd} serves as an example that compute
 popcount, also called the \myref{https://en.wikipedia.org/wiki/Hamming_weight}{Hamming weight}.
 The Hamming weight is the number of symbols different from the zero symbol.
 For a binary string, this is the number of `1's.
+
+FSMD在图片~\ref{fig:popcnt-fsmd}作为一个例子，去计算冒泡计数，也被称为
 
 The popcount unit contains the data input \code{din} and the result output \code{popCount},
 both connected to the datapath. For the input and the output we use a ready-valid handshake.
@@ -3664,15 +3754,26 @@ to the Module constructor. Furthermore, we need to have one constructor
 parameter of that type. Additionally, in this example, we also make the number
 of router ports configurable.
 
+我们也可以参数化模块，使用chisel类型。
+让我们假定，我们想要设计一个noc芯片，在处理核心和数据之间移动。
+但是，我们不想要在路由界面上硬编码数据类型；我们想要对其进行\emph{parametrize}。
+类似于函数的参数，我们对模块的构造器添加参数\code{T}。更多地，我们需要有那个类型的构造参数。
+额外地，在这个例子，我们也使路由的端口数量变得可以设置。
+
 \shortlist{code/param_mod.txt}
 
 \noindent To use our router, we first need to define the data type we want to route, e.g.,
 as a Chisel \code{Bundle}:
 
+\noindent 为了使用我们的路由，我们首先需要去定义我们想要路由的数据类型，例如，
+像是chisel的\code{Bundle}
+
 \shortlist{code/param_mod_type.txt}
 
 \noindent We create a router by passing an instance of the user-defined Bundle and
 the number of ports to the constructor of the router:
+
+\noindent 我们通过传入
 
 \shortlist{code/param_mod_use.txt}
 
@@ -4661,13 +4762,19 @@ improve it and will publish new editions. You can contact me at
 repository. I am also happily accepting pull requests
 for the book repository for any fixes and improvements.
 
-
+能收到反馈，我会非常高兴的，并且我会进一步加强，并推出新版本。
+你可以通过\url{mailto:masca@dtu.dk}联系我，或是在github提出issue。
+我会很高兴接受书目录的pull request，用于任何的更正和改进。
 
 \section*{Source Access}
 
 This book is available in open source.
 The repository also contains slides for a Chisel course and
 all Chisel examples: \url{https://github.com/schoeberl/chisel-book}
+
+这本书是开源的。
+这个目录也包含了其它的chisel课程的演示内容，以及所有的chisel例子：
+\url{https://github.com/schoeberl/chisel-book}
 
 A collection of medium-sized examples, which most are referenced
 in the book, is also available in open source. This collection
