@@ -2652,7 +2652,7 @@ follows the input with one clock cycle delay. Only in the fourth clock cycle
 
 图片~\ref{fig:register-en-wave}表明了一个波形图例子，用于含有使能信号的寄存器。
 大多数时间，使其变为高位(\code{true})，寄存器遵守输入的一个周期延迟。只是在第四个周期\code{enable}
-是低位的，于是寄存器在（5）保持他的值，在上升沿D。
+是低位的，于是寄存器在在上升沿D（5）保持他的值。
 
 A register with an enable can be described in a few lines of Chisel code
 with a conditional update:
@@ -3475,7 +3475,8 @@ the two FSMs.
 The timer FSM counts down for 6 or 4 clock cycles to produce the desired timing.
 The timer specification is as follows:
 
-计时器FSM从
+计时器FSM从6或4向下数产生想要的延迟，
+时序的定义如下：
 
 \begin{itemize}
 \item when \code{timerLoad} is asserted, the timer loads a value into the down counter,
@@ -3486,13 +3487,27 @@ and remains asserted;
 \item otherwise, the timer counts down.
 \end{itemize}
 
+\begin{itemize}
+\item 当code{timerLoad}被插入，计时器读入数值到向下计数器，
+独立于状态。
+\item \code{timerSelect} 选择5或3，用于读取。
+\item \code{timerDone} 信号被插入，当计数器完成了向下计数，并保持插入。
+\item 否则，计时器向下数。
+\end{itemize}
+
 \noindent Following code shows the timer FSM of the light flasher:
+
+\noindent 以下的代码表明了FSM的时序用于亮灯的闪光：
 
 \shortlist{code/flasher_timer.txt}
 
 \noindent Listing~\ref{lst:flasher:master} shows the master FSM.
 
+\noindent Listing~\ref{lst:flasher:master} 表明了主FSM.
+
 \longlist{code/flasher_fsm.txt}{Master FSM of the light flasher.}{lst:flasher:master}
+
+\longlist{code/flasher_fsm.txt}{用于灯光闪烁器的主FSM}{lst:flasher:master}
 
 \begin{figure}
   \centering
@@ -3508,14 +3523,25 @@ We can factor out the number of remaining flashes into a second counter.
 Then the master FSM is reduced to three states: \code{off}, \code{flash},
 and \code{space}.
 
-
+具有一个主FSM和一个计数器的解决方案始终在主FSM有代码的冗余。
+状态\code{flash1}， \code{flash2}, 和\code{flash3}完成着同样的函数，
+还有状态\code{space1}和code{space2}。
+我们可以其它flash装进第二个计数器。
+然后主FSM被缩减到三个状态：\code{off}, \code{flash},
+和 \code{space}。
 
 
 Figure~\ref{fig:flasher2} shows the design with a master FSM and two FSMs
 that count: one FSM to count clock cycles for the interval length of \emph{on}
 and \emph{off}; the second FSM to count the remaining flashes.
 
+图片~\ref{fig:flasher2} 表明了主FSM的设计和两个计数的FSM。
+一个FSM用于计数\emph{on}和\emph{off}之间的时钟周期长度；
+第二个FSM去计数剩余的闪烁。
+
 Following code shows the down counter FSM:
+
+以下代码表明FSM的向下计数器：
 
 \shortlist{code/flasher2_counter.txt}
 
@@ -3668,6 +3694,13 @@ The author has often written small Java programs to generate VHDL tables.
 In Chisel, the full power of Scala (and Java libraries) is available at hardware
 construction. Therefore, we can write our hardware generators in the same
 language and execute them as part of the Chisel circuit generation.
+
+chisel有力的一点使它允许我们去写所谓的硬件生成器。
+有了旧的硬件描述语言，类似VHDL或是Verilog，
+我们一般使用其它语言，像是Java或是Python去生成硬件。
+作者经常编写小型java程序去生成vhdl网表。
+在chisel，scala（和java libraries）的完整力量在硬件构建上是可行的。
+于是，我们可以使用相同语言编写硬件生成器，并去执行它们，作为chisel电路的生成。
 
 \section{Configure with Parameters}
 
