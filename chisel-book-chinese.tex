@@ -33,7 +33,7 @@
 
 
 
-
+\usepackage{CJKutf8}
 \usepackage{pslatex} % -- times instead of computer modern, especially for the plain article class
 \usepackage[colorlinks=true,bookmarks=false]{hyperref}
 \usepackage{booktabs}
@@ -3549,6 +3549,9 @@ Following code shows the down counter FSM:
 \emph{remaining} flashes and is decremented in state \code{space} when the timer
 is done. Listing~\ref{lst:flasher2:master} shows the master FSM for the double refactored flasher.
 
+\noindent 注意到，计数器读2的时候，是闪烁三次的，因为它计数剩下的闪烁，当计时器结束的时候减少状态量。
+~\ref{lst:flasher2:master}表明主FSM用于双倍闪烁。
+
 \longlist{code/flasher2_fsm.txt}{Master FSM of the double refactored light flasher.}{lst:flasher2:master}
 
 Besides having a master FSM that is reduced to just three states, our current solution
@@ -3585,7 +3588,10 @@ popcount, also called the \myref{https://en.wikipedia.org/wiki/Hamming_weight}{H
 The Hamming weight is the number of symbols different from the zero symbol.
 For a binary string, this is the number of `1's.
 
-FSMD在图片~\ref{fig:popcnt-fsmd}作为一个例子，去计算冒泡计数，也被称为
+FSMD在图片~\ref{fig:popcnt-fsmd}作为一个例子，去计算种群计数，
+也被称为\myref{https://en.wikipedia.org/wiki/Hamming_weight}{汉明重量}。
+汉明重量是一串符号中非零符号的个数。
+对于二进制字符，是1的数量。
 
 The popcount unit contains the data input \code{din} and the result output \code{popCount},
 both connected to the datapath. For the input and the output we use a ready-valid handshake.
@@ -3593,6 +3599,13 @@ When data is available, valid is asserted. When a receiver can accept data it as
 When both signals are asserted the transfer takes place. The handshake signals are connected
 to the FSM. The FSM is connected with the datapath with control signals towards the datapath
 and with status signals from the datapath.
+
+种群计数单元包含数据输入\code{din}和结果输出\code{popCount}，连接到数据通路。
+对于输入和输出，我们使用ready-valid握手信号。
+当数据是可用的，出现valid。当接收器可以接受数据，出现ready。
+当信号都出现，开始传输信号。握手信号传给FSM。
+fsm使用控制信号传入数据通路，通过来自数据通路的状态信号和控制信号。
+
 
 \begin{figure}
   \centering
@@ -3717,9 +3730,16 @@ a module that implements an adder with a configurable bit width.
 The bit width \code{n} is a parameter (of Scala type \code{Int}) of the component
 passed into the constructor that can be used in the IO bundle.
 
+最基本的参数化电路的方式是去定义一个单元宽度作为参数。参数可以被传入作为chisel的构建器。
+以下例子是那个模块的玩具例子，去实现一个可以参数化单元宽度的加法器。
+这个参数宽度\code{n}是作为组成部分的参数(scala类型的 \code{Int})传入构建器，
+可以在IO捆束使用。
+
 \shortlist{code/param_adder.txt}
 
 \noindent Parameterized versions of the adder can be created as follows:
+
+\noindent 加法器的参数化版本可以像如下被创造：
 
 \shortlist{code/use_param_adder.txt}
 
@@ -3732,12 +3752,21 @@ can accept any types for the multiplexing.
 To show how to use types for the configuration, we build a multiplexer
 that accepts arbitrary types. Following function defines the multiplexer:
 
+有了位宽作为参数，这是硬件生成器的开始点。一个非常复杂的设置是使用类型。
+这个功能允许你使用chisel使用任何类型的输入作为复用器(\code{Mux})。
+为了表明如何使用参数的类型，我们搭建了一个可以接受任何类型的复用器。
+以下函数定义了复用器：
+
 \shortlist{code/param_func.txt}
 
 Chisel allows parameterizing functions with types, in our case with Chisel
 types. The expression in the square brackets \code{[T <: Data]} defines
 a type parameter \code{T} set is \code{Data} or a subclass of \code{Data}.
 \code{Data} is the root of the Chisel type system.
+
+chisel允许使用类型参数化函数，在我们的例子里是去使用chisel的类型。在方括号的表达式\code{[T <: Data]}
+定义了一个参数变量\code{T}集合是\code{Data}或是\code{Data}的一个子集。
+\code{Data}是chisel类型系统的根。
 
 Our multiplexer function has three parameters: the boolean condition,
 one parameter for the true path, and one parameter for the false path.
@@ -3747,6 +3776,11 @@ we define a wire with the default value of \code{fPath} and
 change the value is the condition is true to the \code{tPath}.
 This condition is a classic multiplexer function.
 At the end of the function, we return the multiplexer hardware.
+
+我们的复用器函数有三个参数，布尔条件，一个参数用于真的通路，和一个参数用于假的通路。
+两个参数属于类型\code{T}，一个信息在函数呼叫的时候被提供。
+函数本身是直接的：
+我们定义一个wire，具有默认值是\code{fPath}，并去改变这个值
 
 We can use our multiplexer function with simple types such as
 \code{UInt}:
