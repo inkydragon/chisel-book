@@ -2497,7 +2497,7 @@ connection of a signal to the register's clock input is needed.
 
 In Chisel a register with input \code{d} and output \code{q} is defined with:
 
-在Chisel一个寄存器d输入和q输出被被定义为：
+在Chisel一个寄存器输入\code{d}和输出\code{q}被被定义为：
 
 \shortlist{code/sequ_reg.txt}
 
@@ -2524,9 +2524,9 @@ also in Chisel) are usually in
 \myref{https://en.wikipedia.org/wiki/Camel_case}{CamelCase}.
 Variable names start with lowercase and classes start with upper case.
 
-首先我们定义了寄存器并给它一个名字，其次我们连接了信号delayIn给寄存器的输入。
-注意寄存器的名字是reg开始的。
-为了简单区分组合电路和舒徐电路的元素，一般常用的方式是在开头添加reg的名字作为开头。
+首先我们定义了寄存器并给它一个名字，其次我们连接了信号\code{delayIn}给寄存器的输入。
+注意寄存器的名字是\code{Reg}开始的。
+为了简单区分组合电路和舒徐电路的元素，一般常用的方式是在开头添加\code{Reg}的名字作为开头。
 并且记得scala的名字（同样适用于chisel）经常以\myref{https://en.wikipedia.org/wiki/Camel_case}{CamelCase}的形式。
 变量名称以小写开头，接下来的类别以首字母大写的形式。
 
@@ -2782,7 +2782,10 @@ registers in the circuit that shall logically operate at frequency $f_{tick}$.
 Figure~\ref{fig:tick-wave} shows an example of a tick generated every
 3 clock cycles.
 
-一个常见的生成单个具有频率$f_{tick}$的我们电路中需要的\emph{ticks}的方式
+一个常见的生成单个具有频率$f_{tick}$的我们电路中需要的\emph{ticks}的方式。
+每隔$n$个周期发生一次tick，这里$n = f_{clock}/f_{tick}$, tick是被设为一个时钟的长度。
+这个tick是、emph{不}用做推演的时钟的，而是作为一个作为电路的使能信号，逻辑上在$f_{tick}$下操作。
+~\ref{fig:tick-wave}表明一个每三个周期产生tick的例子。
 
 \begin{figure}
   \centering
@@ -2791,12 +2794,16 @@ Figure~\ref{fig:tick-wave} shows an example of a tick generated every
   \label{fig:tick-wave}
 \end{figure}
 
-
 In the following circuit, we describe a counter that counts from \code{0}
 to the maximum value of \code{N - 1}. When the maximum value is reached,
 the \code{tick} is \code{true} for a single cycle, and the counter is reset to \code{0}.
 When we count from \code{0} to \code{N - 1}, we generate one logical tick
 every \code{N} clock cycles.
+
+在下边的这个例子，我们介绍了一个计数器，从\code{0}数到最大值\code{N - 1}。
+当达到最大值的时候，\code{tick}在一个单周期内变为\code{true}，计数器被重置为\code{0}。
+当我们从\code{0}数到\code{N - 1}, 我们每\code{N}时钟周期生成一个逻辑tick。
+
 
 \shortlist{code/sequ_tick_gen.txt}
 
@@ -2805,6 +2812,9 @@ to advance other parts of our circuit with this slower, logical clock.
 In the following code, we use just another counter that increments by \code{1}
 every $n$ clock cycles.
 
+\noindent 每隔$n$时钟生成一个逻辑上的tick可以被使用区增加其它电路中的时钟部分，通过这个慢的逻辑电路。
+在下边的代码，我们使用另一个计数器，每过$n$时钟周期增加\code{1}单位。
+
 \shortlist{code/sequ_tick_counter.txt}
 
 Examples of the usage of this slower \emph{logical} clock are: blinking an LED,
@@ -2812,11 +2822,16 @@ generating the baud rate for a serial bus, generating signals for 7-segment
 display multiplexing, and subsampling input values for debouncing of buttons
 and switches. 
 
+使用这个更慢的\emph{logical}时钟的场景: 闪烁一个lED，对于一个序列串口胜场波特率，
+生成7段显示复用器信号，向下采样输入值用于防止上下抖动。
 
 Although width inference should size the registers, it is better to explicitly
 specify the width with the type at register definition or with the
 initialization value. Explicit width definition can avoid surprises when a reset value of \code{0.U}
 results in a counter with a width of a single bit.
+
+尽管位宽推断应该规定寄存器尺寸大小，但是更明确位宽，通过寄存器的类型的定义，或是通过初始值的方式，是更好的。
+定义明确的位宽可以防止当重置为\code{0.U}的时候，产生一个位宽为1的意外。
 
 \subsection{The Nerd Counter}
 
@@ -4161,6 +4176,8 @@ The reader side provides data with \code{dout} and the read is initiated
 with \code{read}. The \code{empty} signal is responsible for the flow control
 at the reader side.
 
+
+
 \shortlist{code/bubble_fifo_reader_io.txt}
 
 Listing~\ref{lst:fifo:stage} shows a single buffer. The buffer has a enqueueing port
@@ -4655,7 +4672,8 @@ the hardware implementation of Leros, an assembler for Leros, and an instruction
 set simulator of Leros.
 
 从ALU，我们向后退一步，补充指令译码器。
-但是，首先，我们定义在
+但是，首先，我们在它本身的scala类定义指令和一个\emph{shared}的拓展包。
+我们想要在
 
 \shortlist{code/leros_constants.txt}
 
