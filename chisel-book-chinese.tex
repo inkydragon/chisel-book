@@ -1427,7 +1427,7 @@ but use the fully qualified name \code{mypack.Abc} to refer to the module
 
 \noindent It is also possible to import just a single class and create an instance of it:
 
-引用只是一个单个的类，并创造它也是可以的：
+也可以引用一个单个的类并去创建它。
 
 \shortlist{code/usepacket3.txt}
 
@@ -2750,6 +2750,9 @@ define a function with a parameter to generate a counter for us.
 \noindent The last statement of the function \code{genCounter} is the return
 value of the function, in this example, the counting register \code{cntReg}.
 
+\noindent The last statement of the function \code{genCounter} is the return
+value of the function, in this example, the counting register \code{cntReg}.
+
 Note, that in all the examples our counter had values between \code{0} and
 \code{N}, including \code{N}. If we want to count 10 clock cycles we need
 to set \code{N} to 9. Setting \code{N} to 10 would be a classic example of an
@@ -3233,8 +3236,6 @@ input with the current state.
 这个状态寄存器只是一个简单的D触发器，下个状态只是输入值。我们也可以把这个看成一个时钟延迟的元素。
 输出逻辑\emph{比较}当前输入和当前状态。
 
-
-
 When the output depends also on the input, i.e., there is a combinational path between
 the input of the FSM and the output, this is called a
 \myref{https://en.wikipedia.org/wiki/Mealy_machine}{Mealy machine}.
@@ -3350,6 +3351,10 @@ Listing~\ref{lst:fsm:rising:moore} shows the Moore version of the rising edge de
 circuit. Is uses double the number of D flip-flops than the Mealy or direct
 coded version. The resulting next state logic is therefore also larger
 than the Mealy or direct coded version.
+
+Listing~\ref{lst:fsm:rising:moore}
+
+
 
 \begin{figure}
   \centering
@@ -3558,11 +3563,17 @@ Besides having a master FSM that is reduced to just three states, our current so
 is also better configurable. No FSM needs to be changed if we want to change
 the length of the \emph{on} or \emph{off} intervals or the number of flashes.
 
+除了有一个缩减到三个状态的主FSM，我们目前的解决方案也是一个更好的可配置方案。如果我们想要改变\emph{on}或是\emph{off}的闪烁数量间隔，
+没有FSM需要被改变。
+
 In this section, we have explored communicating circuits, especially FSM, that
 only exchange control signals. However, circuits can also exchange data.
 For the coordinated exchange of data, we use handshake signals.
 The next section describes the ready-valid interface for flow control of
 unidirectional data exchange.
+
+在这个部分，我们已经探索了电路间通信，特别是FSM，那个只是交换控制信号。但是，电路也交换数据。
+对于调度数据的交换，我们使用握手信号。下个部分描述了对于控制流数据交换的单向ready-valid界面。
 
 \section{State Machine with Datapath}
 
@@ -3573,6 +3584,12 @@ performs the computation. The FSM input is the input from the environment and th
 from the datapath. The data from the environment is fed into the datapath, and the
 data output comes from the datapath. Figure~\ref{fig:popcnt-fsmd} shows an example
 of the combination of the FSM with the datapath.
+
+我们的一个状态机通信的例子是具有数据通路的状态机。这个组合被称为具有数据通路的有限状态机(FSMD)。
+这个状态机控制着数据通路，数据通路完成计算。这个FSM数据是来自环境的输入和来自数据通路的输入。
+来自于环境的数据输入到数据通路，输出来自数据通路。Figure~\ref{fig:popcnt-fsmd}表明一个具有
+数据通路的FSM组合的例子。
+
 
 \begin{figure}
   \centering
@@ -3588,7 +3605,7 @@ popcount, also called the \myref{https://en.wikipedia.org/wiki/Hamming_weight}{H
 The Hamming weight is the number of symbols different from the zero symbol.
 For a binary string, this is the number of `1's.
 
-FSMD在图片~\ref{fig:popcnt-fsmd}作为一个例子，去计算种群计数，
+FSMD在图片~\ref{fig:popcnt-fsmd}作为一个例子，去计算位1计数，
 也被称为\myref{https://en.wikipedia.org/wiki/Hamming_weight}{汉明重量}。
 汉明重量是一串符号中非零符号的个数。
 对于二进制字符，是1的数量。
@@ -3600,12 +3617,11 @@ When both signals are asserted the transfer takes place. The handshake signals a
 to the FSM. The FSM is connected with the datapath with control signals towards the datapath
 and with status signals from the datapath.
 
-种群计数单元包含数据输入\code{din}和结果输出\code{popCount}，连接到数据通路。
+位1计数单元包含数据输入\code{din}和结果输出\code{popCount}，连接到数据通路。
 对于输入和输出，我们使用ready-valid握手信号。
 当数据是可用的，出现valid。当接收器可以接受数据，出现ready。
 当信号都出现，开始传输信号。握手信号传给FSM。
 fsm使用控制信号传入数据通路，通过来自数据通路的状态信号和控制信号。
-
 
 \begin{figure}
   \centering
@@ -3624,8 +3640,18 @@ zero, we are finished and the FSM moves to state \code{Done}. There the FSM sign
 signal that the popcount value is ready to be consumed. On a ready signal from the
 receiver, the FSM moves back to the \code{Idle} state, ready to compute the next popcount.
 
+作为下一步，我们可以设计FSM, 从状态图开始，像是Figure~\ref{fig:popcnt-states}的那样。
+我们从\code{Idle}状态开始，这里FSM等待输入。当数据到来的时候，数据伴随着有效信号，FSM进入到\code{Load}状态，
+开始读取移位寄存器。FSM进行到下一个状态\code{Count}，这里‘1’按照顺序读取。
+我们使用一个移位寄存器，一个加法器，一个累加寄存器，和一个向下计数器去完成计算。
+当向下计数器到达了0，我们完成了，FSM移动到状态\code{Done}。
+这里具有valid的信号的FSM，它的位1计数开始被读取。
+接收到接收器的ready信号以后，FSM返回到\code{Idle}状态，开始计算下一个位1计数。
+
 The top level component, shown in Listing~\ref{lst:pop:top} instantiates the FSM and the datapath components and connects
 them with bulk connections.
+
+顶层部分，像是~\ref{lst:pop:top}初始化了FSM和数据通路的部分，并且使用整体连线的方式进行连线。
 
 \longlist{code/popcnt_main.txt}{The top level of the popcount circuit.
 \todo{Bulk connection should be used here (and tested).}}{lst:pop:top}
@@ -3647,15 +3673,31 @@ has finished. The FSM switches to state \code{Done} and signals the result
 by asserting \code{popCntReady}. When the result is read, signaled by asserting
 \code{popCntValid} the FSW switches back to \code{Idle}.
 
+~\ref{fig:popcnt-data}表明了位1计数电路的数据通路。
+数据读入\code{shf}寄存器。在读取端，\code{cnt}被置为0。
+为了计算1的数量，\code{shf}是向右移动，每个周期最低位添加到\code{cnt}。
+计数器没有出现在这个图片里，向下数，直到所有的二进制位移动到最低位。
+当计数器到达零的时候，计数器结束了。
+FSM切换到状态0，位1计数完成了。FSM切换到状态\code{Done}，并且通过\code{popCntReady}声明信号结果。
+当开始读出结果的时候，通过查看\code{popCntValid}, FSM切换回\code{Idle}。
+
+
 On a \code{load} signal, the \code{regData} register is loaded with the input,
 the \code{regPopCount} register reset to 0, and the counter register \code{regCount}
 set to the number of shifts to be performed.
+
+收到\code{load}信号以后，\code{regData}寄存器通过输入读取，\code{regPopCount}重置为0，
+计数寄存器\code{regCount}被设为需要移位的数量。
 
 Otherwise, the \code{regData} register is shifted to the right, the least significant bit
 of the \code{regData} register added to the \code{regPopCount} register, and the counter
 decremented until it is 0. When the counter is 0, the output contains the popcount.
 Listing~\ref{lst:pop:data} shows the Chisel code for the datapath of the popcount
 circuit.
+
+另一方面，\code{regData}向右移动，最低位的二进制位通过\code{regData}寄存器添加到\code{regPopCount}寄存器，
+计数器向下计数直到为0。当计数器数到0，输出包含位1计数。
+~\ref{lst:pop:data} 表明了用于位1计数的数据通路的chisel代码。
 
 \longlist{code/popcnt_data.txt}{Datapath of the popcount circuit.}{lst:pop:data}
 
@@ -3664,6 +3706,11 @@ switches to the \code{count} state and waits till the datapath has finished coun
 When the popcount is valid, the FSM switches to state \code{done} and waits till the
 popcount is read (signaled by \code{popCntReady}).
 Listing~\ref{lst:pop:fsm} shows the code of the FSM.
+
+FSM从状态\code{idle}开始。一旦输入(\code{dinValid})有效，它切换到状态\code{count}，
+等到数据通路完成了计数。
+当位1计数的结果是有效的，FSM切换到状态\code{done}，等到位1计数开始读（通过\code{popCntReady}）。
+~\ref{lst:pop:fsm}表明了FSM的代码。
 
 \longlist{code/popcnt_fsm.txt}{The FSM of the popcount circuit.}{lst:pop:fsm}
 
@@ -3676,6 +3723,9 @@ Communication of subsystems can be generalized to the movement
 of data and handshaking for flow control. In the popcount example,
 we have seen a handshaking interface for the input and the output data
 using valid and ready signals.
+
+在子系统间通信可以通过数据移动和控制流的握手信号进行归纳。
+在位1计数的例子，我们已经看到了使用到valid-ready信号的输入和输出数据的握手界面。
 
 \begin{figure}
   \centering
@@ -3693,8 +3743,15 @@ of data. The transmission of the data happens when both signals, \code{valid}
 and \code{ready}, are asserted. If either of the two signals is not asserted,
 no transfer takes place.
 
+ready-valid界面~\cite[p.~480]{dally:vhdl:2016}是一个简单的控制流界面，包含了\code{data}和\code{valid}，
+在发送端，\code{ready}在接收端（参见~\ref{fig:readyvalid}）。发送端声明\code{valid}，当\code{data}是有效的。
+当接收端开始接收一个字长的数据，它声明了\code{ready}。当两边信号\code{valid}和\code{ready}全部被声明的时候，
+数据传输开始。如果两边的信号有一边没有被声明，没有传输发生。
+
 To make this interface composable neither \code{ready} not \code{valid} is
 allowed to depend combinational on the other signal.
+
+为了让这个界面可以被拆解，\code{ready}和\code{valid}任意一方的逻辑组合，都不允许相互依赖。
 
 \todo{Read and cite AXI}
 
@@ -3720,6 +3777,9 @@ chisel有力的一点使它允许我们去写所谓的硬件生成器。
 Chisel components and functions can be configured with parameters.
 Parameters can be as simple as an integer constant, but can also be a Chisel
 hardware type.
+
+chisel组成部分和函数可以通过参数被设置。
+参数可以像是整数常量一样简单，但是也可以称为chisel硬件类型。
 
 \subsection{Simple Parameters}
 
@@ -3780,25 +3840,36 @@ At the end of the function, we return the multiplexer hardware.
 我们的复用器函数有三个参数，布尔条件，一个参数用于真的通路，和一个参数用于假的通路。
 两个参数属于类型\code{T}，一个信息在函数呼叫的时候被提供。
 函数本身是直接的：
-我们定义一个wire，具有默认值是\code{fPath}，并去改变这个值
+我们定义一个wire，具有默认值是\code{fPath}，并去改变这个值。
+这个条件是一个常见的复用器函数。
+在函数的末尾，我们返回复用器硬件。
 
 We can use our multiplexer function with simple types such as
 \code{UInt}:
+
+我们可以使用复用器函数，具有简单的类型类似于\code{UInt}:
 
 \shortlist{code/param_func_simple.txt}
 
 \noindent The types of the two multiplexer paths need to be the same.
 Following wrong usage of the multiplexer results in a runtime error:
 
+\noindent 两个复用器线路的类型需要一致。
+以下复用器的错误使用会返回一个运行时间错误：
+
 \shortlist{code/param_func_wrong.txt}
 
 \noindent We define our type as a \code{Bundle} with two fields:
+\noindent 我们定义了我们的\code{Bundle}类型，打包进两个域：
 
 \shortlist{code/param_func_type.txt}
 
 \noindent We can define \code{Bundle} constants by first creating
 a \code{Wire} and then setting the subfields.
 Then we can use our parameterized multiplexer with this complex type.
+
+\noindent 我们可以定义\code{Bundle}常量，通过首先创造一个\code{Wire}，然后设置子域。
+然后我们可以通过这个复杂类型，来使用我们定制的复用器。
 
 \shortlist{code/param_func_complex.txt}
 
@@ -3807,6 +3878,11 @@ to create a wire with the type \code{T} with a default value.
 If we need to create a wire just of the Chisel type without using a default
 value, we can use \code{fPath.cloneType} to get the Chisel type.
 Following function shows the alternative way to code the multiplexer.
+
+在我们最开始的函数设计，我们使用\code{WireInit}用于创建一个具有\code{T}的默认类型的wire。
+如果我们想要创建一个只有chisel类型的weire，没有告知默认值，我们可以使用\code{fPath.cloneType}
+去访问chisel的类型。
+以下的函数表明了另一个方式去编写复用器。
 
 \shortlist{code/param_func_alt.txt}
 
@@ -3840,7 +3916,9 @@ as a Chisel \code{Bundle}:
 \noindent We create a router by passing an instance of the user-defined Bundle and
 the number of ports to the constructor of the router:
 
-\noindent 我们通过传入
+\noindent 我们创造了一个路由，通过传入一个自定义的bundle的实例，
+并且给路由的构建器传入端口数量：
+
 
 \shortlist{code/param_mod_use.txt}
 
@@ -3850,6 +3928,9 @@ In the router example, we used two different vectors of fields for the input
 of the router: one for the address and one for the data, which was parameterized.
 A more elegant solution would be to have a \code{Bundle} that itself
 is parametrized. Something like:
+
+在路由的例子，我们使用两个不同的矢量域作为路由的输入，一个用于地址，另一个用于数据，这个是参数化的。
+一个更加优雅的解法是使用自参数化的\code{Bundle}，类似于:
 
 \shortlist{code/param_bundle_issue.txt}
 
@@ -3861,6 +3942,8 @@ However, when we use a constructor parameter, this parameter becomes a
 public field of the class. When Chisel needs to clone the type of the \code{Bundle},
 e.g., when it is used in a \code{Vec}, this public field is in the way.
 A solution (workaround) to this issue is to make the parameter field private:
+
+
 
 \shortlist{code/param_bundle.txt}
 
@@ -3884,9 +3967,13 @@ Listing~\ref{lst:file:reader} shows how to use the Scala \code{Source}
 class form the Scala standard library to read the file ``data.txt'', which
 contains integer constants in a textual representation.
 
-在Chisel，我们可以简单生成逻辑，通过逻辑表
+在Chisel，我们可以简单生成逻辑，通过使用来自继承自scala\code{Array}的chisel\code{Vec}创建的逻辑表。
+我们可能会在文件内有数据，便于我们在硬件生成逻辑表的时候读数据。
+~\ref{lst:file:reader}表明了如何使用scala的scala标准library的\code{Source}类，
+读出文件``data.txt''。这个包含了用于文字表示的整型常量。
 
-A few words on the maybe a bit intimidating expression:
+一些字段可能对表达式产生隐患。
+
 \begin{chisel}
   val table = VecInit(array.map(_.U(8.W)))
 \end{chisel}
@@ -3900,6 +3987,13 @@ from a Scala \code{Int} value to a Chisel \code{UInt} literal, with a size of 8-
 The Chisel object \code{VecInit} creates a Chisel \code{Vec} from a sequence \code{Seq}
 of Chisel types.
 
+\noindent scala的\code{Array}可以隐式转换到序列(\code{Seq})，
+这个支持map函数\code{map}。
+\code{map} 产生了一个函数，序列的每一个元素返回了一序列的函数返回值。
+在我们的函数\code{\_.U(8.W)}表示来自scala 序列的每一个\code{Int}，作为\code{\_}，完成了
+从scala\code{Int}到chisel\code{UInt}的表达式，具有8位的大小。
+chisel的对象\code{VecInit}创建了一个chisel\code{Vec}，来自序列\code{Seq}的chisel类型。
+
 
 \longlist{code/file_reader.txt}{Reading a text file to generate a logic table.}{lst:file:reader}
 
@@ -3909,6 +4003,10 @@ compute constants for digital filters, or writing a small assembler in Scala
 to generate code for a microprocessor written in Chisel. All those functions
 are in the same code base (same language) and can be executed during
 hardware generation.
+
+我们可以使用scala的全部能力，去生成我们的逻辑表。
+例如，生成一个表格的定点类型常量，去表示一个三角函数，
+计算数字滤波器的常量，或是编写一个小的scala汇编器，去编写用于
 
 A classic example is the conversion of a binary number
 into a \myref{https://en.wikipedia.org/wiki/Binary-coded_decimal}{binary-coded decimal}
@@ -4053,7 +4151,9 @@ at the writer side.
 
 我们开始定义IO信号用于写入和读出端。
 数据的大小通过\code{size}设置。
-写入数据是\code{din}
+写入数据是\code{din}，写入信号是\code{write}。
+\code{full}作为\myref{https://en.wikipedia.org/wiki/Flow_control_(data)}{flow control}
+在写入端。
 
 \shortlist{code/bubble_fifo_writer_io.txt}
 
@@ -4240,7 +4340,8 @@ as introduced in Section~\ref{sec:inheritance}. We define an \code{abstract}
 FIFO class:
 
 在这个部分，我们会补充一个FIFO序列的不同变量。
-
+为了补充这些可互换量，我们会使用继承，
+像是在~\ref{sec:inheritance}介绍的那样。我们定义一个\code{abstract}的FIFO类型：
 
 \shortlist{code/fifo_abstract.txt}
 
@@ -4258,26 +4359,23 @@ As this ready-valid interface is so common, Chisel provides a definition
 of this interface in \code{DecoupledIO} as follows:\footnote{This is a simplification,
 as \codefoot{DecoupledIO} actually extends an abstract class.}
 
-\noindent Note that we use a Chisel type as parameter to be able to buffer
-any Chisel data type.
-In Section~\ref{sec:fifo} we defined our own types for the interface with common
-names for signals, such as \code{write}, \code{full}, \code{din}, \code{read},
-\code{empty}, and \code{dout}. The input and the output of such a buffer consists
-of data and two signals for handshaking (e.g., we \code{write} into the FIFO when
-it is not \code{full}.
-However, we can generalize this handshaking to the so called ready-valid interface.
-E.g, we can enqueue an element (write into the FIFO) when the FIFO is \code{ready}.
-We signal this at the writer side with \code{valid}.
-As this ready-valid interface is so common, Chisel provides a definition
-of this interface in \code{DecoupledIO} as follows:\footnote{This is a simplification,
-as \codefoot{DecoupledIO} actually extends an abstract class.}
-
-
+\noindent 注意到我们使用chisel类型作为变量去缓存任何chisel数据类型。
+在~\ref{sec:fifo}我们定义了我们的具有常见名称的界面类型，
+例如\code{write}, \code{full}, \code{din}, \code{read}, \code{empty}和\code{dout}。
+这样的缓存输入和输出包含了数据和两套握手信号(例如，当不是\code{full}的时候， 我们\code{write}入FIFO。)
+但是，我们可以产生这个握手信号，作为所谓的ready-valid界面。
+例如，我们可以产生一个元素（写入FIFO），当FIFO是\code{ready}。
+我们使用\code{valid}作为写入端的信号。
+因为这个ready-valid界面是很常见的，chisel提供了一个\code{DecoupledIO}界面，定义如下：
+\footnote{这是一个简化，因为\codefoot{DecoupledIO}实际上拓展了一个抽象类型。}
 
 \shortlist{code/fifo_decoupled.txt}
 
 \noindent The \code{DecoupledIO} interface is defined from the writer's (producer's) view point.
 Therefore, enqueue port of the FIFO needs to flip the signal directions.
+
+\noindent \code{DecoupledIO}界面通过写入端的角度（或是产生端）的角度。
+于是，FIFO的输入端需要去翻转信号的方向。
 
 \section{Exercises}
 
@@ -4410,6 +4508,8 @@ and is available in open source at \url{https://github.com/leros-dev/leros}.
 
 We would like to mention that this is an advanced example and some computer
 architecture knowledge is needed to follow the presented code examples.
+
+
 
 Leros is designed to be simple, but still a good target for a C compiler.
 The description of the instructions fits on one page, see Table~\ref{tab:leros:isa}.
@@ -4599,9 +4699,14 @@ and (2) assemble the program with the symbols collected in the first pass.
 Therefore, we call \code{assemble} twice with a parameter to indicate which pass it is.
 
 \noindent 但是，这个是一个很困难的方法去测试处理器。
-
-
-
+使用一个表达性的语言，像是scala编写一个汇编器，不是一个大的项目。
+于是，我们写一个简单的汇编器用于leros，使用了不到100行的代码。
+我们定义一个函数\code{getProgram}，呼叫汇编器。
+对于跳转的目的地，我们需要一个符号的表格，这个在\code{Map}中被收集。
+一个经典的汇编器在两个步骤：
+(1)收集元素表格的值
+(2)使用从第一步收集来的符号汇编程序。
+于是，我们呼叫\code{assemble}两次，并使用一个参数去表明是哪个步骤。
 
 \shortlist{code/leros_asm_call.txt}
 
@@ -4612,13 +4717,19 @@ and defining two helper functions to parse the two possible operands: (1) an
 integer constant (allowing decimal or hexadecimal notation) and (2) to read
 a register number.
 
+代码\code{assemble} 函数从读取源文件开始\footnote{这个函数实际上不读取源文件，
+但是本次讨论中我们可以认为它读取函数}，
+并定义两个辅助函数去传入两个可能的操作数：（1）一个整型常量（允许十进制和十六进制表示）
+（2）读入寄存器数。
+
 \shortlist{code/leros_asm_start.txt}
 
 Listing~\ref{lst:leros-asm-match} shows the core of the assembler for Leros.
 A Scala \code{match} expression covers the core of the assembly function.
 \todo{Some more words on the code.}
 
-
+~\ref{lst:leros-asm-match} 表明了汇编器的主要部分。
+scala的\code{match}表达式覆盖了函数核心部分。
 
 \longlist{code/leros_asm_match.txt}{The main part of the Leros assembler.}{lst:leros-asm-match}
 
@@ -4702,6 +4813,7 @@ SNAPSHOT, fork and clone the \myref{https://github.com/freechipsproject/chisel-t
 repo as well and publish it locally.
 
 
+
 To test your changes in Chisel, you probably also want to set up a Chisel project,
 e.g., by forking/cloning an \myref{https://github.com/schoeberl/chisel-empty}{empty Chisel project},
 renaming it, and removing the \code{.git} folder from it.
@@ -4754,8 +4866,7 @@ Furthermore, if you add functionality to Chisel, you should also provide tests f
 new features.
 
 
-此外，如果您向Chisel添加功能，还应该提供针对
-新功能。
+此外，如果您向Chisel添加功能，还应该提供针对新功能的测试。
 
 \section{Contribute with a Pull Request}
 
@@ -4770,6 +4881,14 @@ The Chisel group started to document
 \myref{https://github.com/freechipsproject/chisel-lang-governance/blob/master/reviewer_guidelines.md}{contribution
 guidelines}.
 
+在chisel项目中，没有开发者直接对主仓库进行更新。
+一次更新，是通过\myref{https://help.github.com/articles/creating-a-pull-request-from-a-fork/}{pull request}
+从library的分支发动更新请求的。
+对于更多的信息，参考github的文档\myref{https://help.github.com/categories/collaborating-with-issues-and-pull-requests/}{collaboration with
+pull requests}。
+chisel小组开始在\myref{https://github.com/freechipsproject/chisel-lang-governance/blob/master/reviewer_guidelines.md}{contribution
+guidelines}进行文档。
+
 \section{Exercise}
 
 Invent a new operator for the \code{UInt} type, implement it in the Chisel library,
@@ -4778,6 +4897,14 @@ a useful operator; just anything will be good, e.g., a ? operator that delivers 
 if it is different from 0 otherwise the righthand side. Sounds like a multiplexer, right?
 How many lines of code did you need to add?\footnote{A quick and dirty implementation
 needs just two lines of Scala code.}
+
+创造一个用于\code{UInt}类型的新操作符，把它写入chisel library，
+并写下一些使用和测试代码去探索新的操作符。它不一定是一个有用的操作符；
+只是无论是否有用都很好，例如，?操作符表示操作数的左手侧是否为零，否则就返回右手侧。
+听起来像是复用器，对吗？
+你需要添加多少行代码？
+\footnote{一个快速和直接的补充只需要两行scala代码}。
+
 
 As simple as this was, please be not tempted to fork the Chisel project and
 add your little extensions. Changes and extension shall be coordinated with the
@@ -4796,6 +4923,11 @@ Then contribute with a pull request to Chisel.
 However, probably first watch the style of development in Chisel by watching the GitHub
 repositories.
 See how changes and pull requests are handled in the Chisel open-source project.
+
+如果你变得有经验，你可以选取其中一个\myref{https://github.com/freechipsproject/chisel3/issues}{open issues}并且试图去解决它。
+然后通过更新请求做出贡献。
+但是，可能你要先去关注chisel开发的样式，通过点击github的watch。
+这样你就会观察和对
 
 
 \chapter{Summary}
