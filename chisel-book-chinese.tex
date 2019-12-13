@@ -3978,16 +3978,23 @@ public field of the class. When Chisel needs to clone the type of the \code{Bund
 e.g., when it is used in a \code{Vec}, this public field is in the way.
 A solution (workaround) to this issue is to make the parameter field private:
 
-
+\code{Bundle}具有类型\code{T}，是chisel的\code{Data}的子类型。
+在bundle，我们定义了一个\code{data}域，通过对其类型呼叫\code{cloneType}。
+但是，当我们使用构建器参数，这个参数称为类的公共域。当chisel需要复制这个\code{Bundle}的类型，
+例如，当在\code{Vec}内部使用的情况下，这个公共域行不通。
+这个的解决方式是把参数变为私有域。
 
 \shortlist{code/param_bundle.txt}
 
 \noindent With that new \code{Bundle}, we can define our router ports
+\noindent 通过新的\code{Bundle}，我们可以定义我们的路由端口
 
 \shortlist{code/param_mod2.txt}
 
 \noindent and instantiate that router with a \code{Port} that takes
 a \code{Payload} as a parameter:
+
+\noindent 使用\code{Port}去实例化我们的路由，采取\code{Payload}作为一个参数：
 
 \shortlist{code/param_mod_use2.txt}
 
@@ -4099,6 +4106,8 @@ We start with an abstract class to define the ticking interface:
 \noindent Listing~\ref{lst:ticker:up} shows a first implementation of that abstract class
 with a counter, counting up, for the tick generation.
 
+\noindent ~\ref{lst:ticker:up}表明那个抽象类型，具有一个计数器，向上计数，产生tick的第一个编写方式。
+
 \longlist{code/up_ticker.txt}{Tick generation with a counter.}{lst:ticker:up}
 
 We can test all different versions of our \emph{ticker} logic with a single test bench.
@@ -4110,6 +4119,12 @@ The \code{TickerTester} has several parameters: (1) the type parameter
 and (3) the number of clock cycles we expect for each tick.
 The tester waits for the first occurrence of a tick (the start might be different for
 different implementations) and then checks that \code{tick} repeats every $n$ clock cycles.
+
+我们可以测试所有不同的\emph{ticker}逻辑，使用一个简单的测试平台。
+我们emph{只是}需要去定义测试平台去接收\code{Ticker}的子类型。
+~\ref{lst:ticker:test}表明了用于测试器的chisel代码。
+\code{TickerTester}有一些参数：(1)类型参数\code{[T <: Ticker]}去接受一个\code{Ticker}
+或是任何
 
 \longlist{code/ticker_tester.txt}{A tester for different versions of the ticker.}{lst:ticker:test}
 
@@ -4256,6 +4271,13 @@ In a Scala \code{for} loop we connect the individual buffers.
 The first buffers enqueueing side is connected to the enqueueing IO of
 the complete FIFO and the last buffer's dequeueing side to the
 dequeueing side of the complete FIFO.
+
+~\ref{lst:fifo}表明了一个完整的FIFO。完整的FIFO具有一样的IO端口，像是单独的FIFO缓存。
+\code{BubbleFifo}具有数据字长的\code{size}参数，和缓存的级数\code{depth}。
+我们可以搭建一个\code{depth}的阶段用于缓冲FIFO，来自\code{FifoRegister}的深度\code{depth}。
+我们通过把它们装填入scala的\code{Array}。
+scala的array没有任何硬件意义，它\emph{只是}提供给我们一个容器，去
+
 
 
 
@@ -4894,11 +4916,13 @@ If you use the tester and the published version is not compatible with the Chise
 SNAPSHOT, fork and clone the \myref{https://github.com/freechipsproject/chisel-testers}{chisel-tester}
 repo as well and publish it locally.
 
-
-
 To test your changes in Chisel, you probably also want to set up a Chisel project,
 e.g., by forking/cloning an \myref{https://github.com/schoeberl/chisel-empty}{empty Chisel project},
 renaming it, and removing the \code{.git} folder from it.
+
+为了测试你对chisel做出的改变，你可能也想要建立一个chisel对象，
+例如，通过分支或是克隆\myref{https://github.com/schoeberl/chisel-empty}{空chisel项目},
+重命名，并且移除来自其中的\code{.git}。
 
 Change the \code{build.sbt} to reference the locally published version of Chisel.
 Furthermore, at the time of this writing, the head of Chisel source uses Scala 2.12, but Scala
@@ -4906,6 +4930,12 @@ Furthermore, at the time of this writing, the head of Chisel source uses Scala 2
 \myref{https://github.com/freechipsproject/chisel-template/issues/35}{anonymous bundles}.
 Therefore, you need to add the following Scala option: \code{"-Xsource:2.11"}.
 The \code{build.sbt} should look similar to:
+
+改变\code{build.sbt}去引用本地版本的chisel。
+更多地，在我写作的时刻，chisel源的头部使用scala 2.12, 但是scala 2.12在使用
+\myref{https://github.com/freechipsproject/chisel-template/issues/35}{匿名捆束}会出现问题。
+于是，你需要添加以下在scala的设置：\code{"-Xsource:2.11"}。
+\code{build.sbt}应该看起来像是如下：
 
 \begin{verbatim}
 scalaVersion := "2.12.6"
@@ -5179,6 +5209,7 @@ Chisel3：
 \item \myref{https://github.com/schoeberl/chisel-examples/blob/master/TowardsChisel3.md}{Towards Chisel 3}
 \end{itemize}
 
+
 However, you might get involved in a project that still uses Chisel 2,
 e.g., the \myref{https://github.com/t-crest/patmos}{Patmos}~\cite{patmos:rts2018} processor.
 Therefore, we provide here some information on Chisel 2 coding for those who
@@ -5262,7 +5293,6 @@ and \code{chiselMain}. Both ``main'' functions take a \code{String} array for fu
 A memory with sequential registered read and write ports is defined in Chisel 2 as:
 
 一个拥有时序寄存器的读写寄存器端口，在Chisel2被定义为：
-
 
 \begin{chisel}
   val mem = Mem(UInt(width = 8), 256, seqRead = true)
