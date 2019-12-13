@@ -2734,7 +2734,6 @@ conditional statement.
 \noindent If we are in the mood of counting down, we start (reset the counter register)
 with the maximum value and reset the counter to that value when reaching 0.
 
-
 \noindent如果我们有倒数的想法，我们开始（重置计数器寄存器）
 设置为最大值，并在达到0时将计数器重置为该值。
 
@@ -2878,6 +2877,10 @@ FPGAs contain on-chip memory blocks, also called block RAMs.
 Those on-chip memory blocks can be combined for larger memories.
 Memories in an FPGA usually have one read and one write port, or
 two ports where the direction can be switched.
+
+存储器可以通过一系列的寄存器搭建，在chisel，一个\code{Vec}的\code{Reg}。
+但是，这个在硬件上是昂贵的，更大的存储器是通过\myref{https://en.wikipedia.org/wiki/Static_random-access_memory}{SRAM}搭建的。
+对于一个AI
 
 FPGAs (and also ASICs) usually support synchronous memories.
 Synchronous memories have registers on their inputs (read and write address, write data,
@@ -3322,6 +3325,11 @@ The output logic is now part of the next state logic; on the transition from
 \code{zero} to \code{one}, the output is set to \code{true.B}. Otherwise,
 the default assignment to the output (\code{false.B}) counts.
 
+Listing~\ref{lst:fsm:rising}表明了使用Mealy机器用于上升沿检测的chisel代码。
+像是前边的例子，我们使用chisel类型\code{Bool}用于单比特的输入和输出。
+输出逻辑是下个逻辑的一部分，在从\code{zero}到\code{one}的转换过程，输出被设定为\code{true.B}。
+否则的话，默认赋值是按照(\code{false.B})。
+
 One can ask if a full-blown FSM is the best solution for the edge detection circuit,
 especially, as we have seen a Chisel one-liner for the same functionality.
 The hardware consumptions is similar. Both solutions need a single D flip-flop
@@ -3330,13 +3338,25 @@ the state change depends on the current state and the input value.
 For this function, the one-liner is easier to write and easier to read,
 which is more important. Therefore, the one-liner is the preferred solution.
 
+如果问到如果一个成熟的FSM是不是一个最好的边沿检测电路的最好方法，
+特别地，像我们看到过chisel单行代码解决了同样的问题。
+硬件消耗是同样的。两个解决方案需要一个单D触发器用于表示状态。
+FSM的组合逻辑可能有点复杂，随着状态改变，需要依赖于现有状态和输入值。
+对于这个函数，单行代码是易写和易读的，这个更为重要。
+于是，单行代码是更好的解决方式。
+
 We have used this example to show one of the smallest possible Mealy FSMs.
 FSMs shall be used for more complex circuits with three and more states.
+
+我们已经使用了这个例子区表明了一个更为聪明的方式去编写Mealy FSM。
+FSM应当在更为复杂的三个或是更多状态的电路种被使用。
 
 \section{Moore versus Mealy}
 
 To show the difference between a Moore and Mealy FSM, we redo the edge
 detection with a Moore FSM. 
+
+为了表明Moore和Mealy FSM的区别，我们重做了一遍使用Moore FSM进行边沿检测。
 
 \begin{figure}
   \centering
@@ -4021,7 +4041,8 @@ hardware generation.
 
 我们可以使用scala的全部能力，去生成我们的逻辑表。
 例如，生成一个表格的定点类型常量，去表示一个三角函数，
-计算数字滤波器的常量，或是编写一个小的scala汇编器，去编写用于
+计算数字滤波器的常量，或是编写一个小的scala汇编器用来生成chisel编写的微处理器。
+所有的这些函数在同一个代码库（同一个语言）并且可以在硬件生成的过程中被执行。
 
 A classic example is the conversion of a binary number
 into a \myref{https://en.wikipedia.org/wiki/Binary-coded_decimal}{binary-coded decimal}
@@ -4031,13 +4052,26 @@ format using 4 bits fo each decimal digit. For example, decimal \code{13} is in 
 BCD allows displaying numbers in decimal, a more user-friendly number
 representation than hexadecimal.
 
+一个经典的例子是二进制数转换为\myref{https://en.wikipedia.org/wiki/Binary-coded_decimal}{十进制}
+(BCD)表达方式。BCD用来生成十进制格式，每个十进制的数使用4二进制位。例如，十进制\code{13}在二进制\code{1101}
+，在BCD里作为1和3的二进制\code{00010011}。
+BCD允许显示十进制数，是更为用户友好的数字表达形式，相比较于十六进制。
+
 We can write a Java program that computes the table to convert binary to BCD.
 That Java program prints out VHDL code that can be included in a project.
 The Java program is about 100 lines of code; most of the code generating
 VHDL strings. The key part of the conversion is just two lines.
 
+我们可以编写一个Java程序用来计算表格并转换二进制到BCD。
+那个Java程序打印出的VHDL代码可以在一个项目中被引用。
+Java程序大概是100行代码；大多数代码是生成VHDL字符串。
+最核心的转换只是两行。
+
 With Chisel, we can compute this table directly as part of the hardware generation.
 Listing~\ref{lst:bcd} shows the table generation for the binary to BCD conversion.
+
+有了chisel，我们可以直接计算这个表格作为硬件生成的一部分。
+~\ref{lst:bcd}表明了这个表格的生成，作为二进制到BCD的转换。
 
 \longlist{code/bcd_table.txt}{Binary to binary-coded decimal conversion.}{lst:bcd}
 
@@ -4048,10 +4082,17 @@ Chisel is an object-oriented language. A hardware component, the Chisel \code{Mo
 is a Scala class. Therefore, we can use inheritance to factor a common behavior
 out into a parent class. We explore how to use inheritance with an example.
 
+Chisel是一个面对对象语言。一个硬件部分，chisel的\code{Module}是一个scala的类。
+于是，我们可以使用继承，去把一个共有的行为归类为父类。我们用以下例子来探索如何使用继承。
+
 In Section~\ref{sec:counter} we have explored different forms of counters,
 which may be used for a low-frequency tick generation. Let us assume we want to
 explore those different versions, e.g., to compare their resource requirement.
 We start with an abstract class to define the ticking interface:
+
+~\ref{sec:counter} 我们探索了不同类型的计数器，这个可以生成低频下的tick。
+我们假设，我们想要探索不同版本，例如，去比较其它资源需求。
+我们开始使用一个抽象类去定义tick的界面。
 
 \shortlist{code/ticker.txt}
 
@@ -4176,7 +4217,8 @@ The reader side provides data with \code{dout} and the read is initiated
 with \code{read}. The \code{empty} signal is responsible for the flow control
 at the reader side.
 
-
+读出端提供了code{dout}作为数据，读出端使用\code{read}初始化。
+\code{empty}信号负责控制读出端的信号控制。
 
 \shortlist{code/bubble_fifo_reader_io.txt}
 
@@ -4192,6 +4234,14 @@ If the buffer is \code{full}, a read will consume the data and change to the
 The IO ports \code{full} and \code{empty} represent the buffer state for
 the writer and the reader.
 
+~\ref{lst:fifo:stage}表明了一个单个缓存。缓存有一个进入端口\code{enq}，具有\code{WriterIO}的类型，
+和一个输出端口\code{deq}，具有\code{ReaderIO}的类型。buffer的状态元素是一个寄存器，
+含有数据（\code{dataReg}和一个状态寄存器用于一个简单的FSM(\code{stateReg})。
+FSM只有两个状态：当状态是\code{empty}或是\code{full}。
+如果缓存位于\code{empty}，写入会寄存输入数据，并且改变到\code{full}的状态。
+如果缓存位于\code{full}，读出会倒出数据，并且改变为\code{empty}状态。
+IO端口\code{full}和\code{empty}代表缓存的写入和读取的状态）
+
 \longlist{code/bubble_fifo_register.txt}{A single stage of the bubble FIFO.}{lst:fifo:stage}
 
 Listing~\ref{lst:fifo} shows the complete FIFO. The complete FIFO has
@@ -4206,6 +4256,8 @@ In a Scala \code{for} loop we connect the individual buffers.
 The first buffers enqueueing side is connected to the enqueueing IO of
 the complete FIFO and the last buffer's dequeueing side to the
 dequeueing side of the complete FIFO.
+
+
 
 \longlist{code/bubble_fifo.txt}{A FIFO is composed of an array of FIFO bubble stages.}{lst:fifo}
 
@@ -4243,6 +4295,7 @@ Figure~\ref{fig:uart:wave} shows the timing diagram of one byte transmitted.
 We design our UART in a modular way with minimal functionality
 per module. We present a transmitter (TX), a receiver (RX),
 a buffer, and then usage of those base components.
+
 
 First, we need an interface, a port definition.
 For the UART design, we use a ready/valid handshake interface,
@@ -4634,13 +4687,16 @@ We use some corner case values as the test vector:
 \shortlist{code/leros_alu_testvec.txt}
 
 \noindent We test all functions with those values on both inputs:
-\noindent 
+\noindent 我们把这些值赋予输入，测试了所有的函数：
 
 \shortlist{code/leros_alu_test.txt}
 
 \noindent Full, exhaustive testing for 32-bit arguments is not possible, which was the reason we
 selected some corner cases as input values. Beside testing against corner cases, it is also useful
 to test against random inputs:
+
+\noindent 全部，尽可能地去列举32位的参数是不可能的，这是为什么我们选取一些边角情况作为输入值。
+除了测试一些边角情况，测试一些随机值也是有用的：
 
 \shortlist{code/leros_alu_rand.txt}
 
@@ -4682,16 +4738,24 @@ set simulator of Leros.
 \noindent For the decode component, we define a \code{Bundle} for the output,
 which is later fed partially into the ALU.
 
+\noindent 对于译码单元，我们定义了一个\code{Bundle}用于输出，
+这个以后用于传给ALU。
+
 \shortlist{code/leros_decode_bundle.txt}
 
 \noindent Decode takes as input an 8-bit opcode and delivers the decoded signals
 as output. Those driving signals are assigned a default value with \code{WireInit}.
+
+\noindent 译码单元采取8位操作码作为输入，并把译码后的信号作为输出。
+这些驱动信号被赋予一个默认值，通过\code{WireInit}。
 
 \shortlist{code/leros_decode_init.txt}
 
 \noindent The decoding itself is just a large switch statement on the part of the
 instruction that represents the opcode (in Leros for most instructions the upper
 8 bits.)
+
+\noindent 译码本身是一个大的跳转声明，根据指令对应的操作码（在Leros, 指令大多根据前8位）。
 
 \shortlist{code/leros_decode.txt}
 
