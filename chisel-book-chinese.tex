@@ -684,6 +684,7 @@ you will notice that the Chisel module does not contain \code{clock} or \code{re
 Those signals are implicitly generated, and in most designs, it is convenient not to need to
 deal with these low-level details. Chisel provides register components, and those
 are connected automatically to \code{clock} and \code{reset} (if needed).
+
 在Chisel部分下载完成之后，程序会产出一个Verilog文件\code{Hello.v}。
 浏览这个Verilog文件，你会看到电路包含两个输入\code{clock}和\code{reset}
 和一个输出\code{io\_led}。当你对比Verilog文件和Chisel模块时，你将会发现Chisel模块申明时不包含\code{clock}和\code{reset}。
@@ -1273,7 +1274,9 @@ You can find examples of pin assignments in the Quartus project files of the ALU
 (e.g., for the \myref{https://github.com/schoeberl/chisel-examples/blob/master/quartus/altde2-115/alu.qsf}{DE2-115
 FPGA board}).
 
-对于这些开关，你也可以给FPGA板上的PIN分配名字。你可以找到管脚命名的例子在Quartus项目文件中的ALU项目（例如，DE2-115 FPGA 板子）。
+对于这些开关，你也可以给FPGA板上的PIN分配名字。你可以找到管脚命名的例子在Quartus项目文件中的ALU项目（例如，DE2-115 FPGA 板子）
+(e.g., for the \myref{https://github.com/schoeberl/chisel-examples/blob/master/quartus/altde2-115/alu.qsf}{DE2-115
+FPGA board})。
 
 When you have defined those inputs and the pin assignment, start with a simple test:
 drop all blinking logic from the design and connect one switch to the LED output;
@@ -1963,6 +1966,8 @@ an output port named \code{out}.
 The final missing piece of our example design is the top-level component, which itself
 is assembled out of components C and D:
 
+最后我们的例子缺少的一部分是顶层部分，它本身由C和D组成。
+
 \shortlist{code/components_top.txt}
 
 Good component design is similar to the good design of functions or methods in
@@ -2239,7 +2244,7 @@ Chisel条件建造when也有一个else的类型，它是otherwise。
 
 Chisel also supports a chain of conditionals (a if/elseif/else chain) with \code{.elsewhen}:
 
-Chisel也支持一链条的条件（a if elseif else链条）通过\code{.elsewhen}
+Chisel也支持一链条的条件（a if elseif else链条）通过\code{.elsewhen}：
 
 \shortlist{code/comb_elsewhen.txt}
 
@@ -2749,13 +2754,18 @@ define a function with a parameter to generate a counter for us.
 \noindent The last statement of the function \code{genCounter} is the return
 value of the function, in this example, the counting register \code{cntReg}.
 
-\noindent The last statement of the function \code{genCounter} is the return
-value of the function, in this example, the counting register \code{cntReg}.
+\noindent 最后的函数声明\code{genCounter}返回了函数数值，在这个例子，
+是计数器寄存器\code{cntReg}。
 
 Note, that in all the examples our counter had values between \code{0} and
 \code{N}, including \code{N}. If we want to count 10 clock cycles we need
 to set \code{N} to 9. Setting \code{N} to 10 would be a classic example of an
 \myref{https://en.wikipedia.org/wiki/Off-by-one_error}{off-by-one error}.
+
+注意，所有的例子里，我们的计数器在\code{0}和\code{N}，包括\code{N}都有数值。
+如果我们想要数10个时钟周期，我们需要把\code{N}设为9。
+把\code{N}设为10可能会成为一个经典的例子，
+产生\myref{https://en.wikipedia.org/wiki/Off-by-one_error}{off-by-one错误}
 
 \subsection{Generating Timing with Counters}
 
@@ -3378,7 +3388,9 @@ FSM output within the state representing circles.
 Figure~\ref{fig:diag:rising:moore} 表明了使用Moore FSM的状态图用于上升沿检测。
 第一个事情是去注意到Moore FSM需要三个状态，相比较于Mealy版本需要两个状态。
 \code{puls}状态需要去产生单一周期的脉冲。
-FSM
+FSM处于状态\code{puls}只是一个周期，然后返回到开始状态\code{zero}或是状态\code{one}，
+等待输入再次变为0。
+我们表明了在状态转移箭头下的输入条件，和在圆圈代表的状态下FSM的输出。
 
 \longlist{code/rising_moore_fsm.txt}{Rising edge detection with a Moore FSM.}{lst:fsm:rising:moore}
 
@@ -3387,9 +3399,9 @@ circuit. Is uses double the number of D flip-flops than the Mealy or direct
 coded version. The resulting next state logic is therefore also larger
 than the Mealy or direct coded version.
 
-Listing~\ref{lst:fsm:rising:moore}
-
-
+列表~\ref{lst:fsm:rising:moore}表明了Moore版本的上升沿检测电路。
+它使用双倍的D触发器，比Mealy或是直接的版本。
+转移逻辑于是比Mealy或直接版本的更大。
 
 \begin{figure}
   \centering
@@ -3404,6 +3416,10 @@ follows the input rising edge, while the Moore output rises after the clock tick
 We can also see that the Moore output is one clock cycle wide, where the Mealy
 output is usually less than a clock cycle.
 
+图片~\ref{fig:rising}表明了Mealy和Moore版本的上升沿检测FSM。你可以看到Mealy输出紧紧跟随上升边沿，
+当Moore输出在时钟tick后上升。
+我们也可以看到Moore输出是一个时钟周期的宽度，而Mealy输出一般小于一个时钟周期。
+
 From the above example, one is tempted to find Mealy FSMs the \emph{better}
 FSMs as they need less state (and therefore logic) and react faster than a Moore FSM.
 However, the combinational path within a Mealy machine can cause trouble in
@@ -3413,10 +3429,23 @@ a circle, the result is a combinational loop, which is an error in synchronous d
 Due to a cut in the combinational path with the state register in a Moore FSM,
 all the above issues do not exist for communicating Moore FSMs.
 
+从以上的例子，你可以发现Mealy FSM是\emph{更好的}，
+因为它需要更少的状态（和逻辑），并比Moore FSM反应更快。
+但是，在一个Mealy机器种，组合电路可能在更大规模的决定上制造麻烦。
+首先，具有一串通信FSM（看下一章），这个组合通路可以很长。
+其次，如果FSM的通信形成一个圆圈，会造成组合回馈，在同步设计造成错误。
+由于具有状态寄存器的组合通路的一个切割形成Moore FSM，
+上述的问题在Moore FSM通信不存在。
+
 In summary, Moore FSMs combine better for communicating state machines; they
 are \emph{more robust} than Mealy FSMs. Use Mealy FSMs only when the reaction within the same
 cycle is of utmost importance. Small circuits such as the rising edge detection,
 which are practically Mealy machines, are fine as well.
+
+总结来说，Moore FSM在状态机间通信的组合是更好的，他们比Mealy FSM\emph{更加稳定}。
+使用Mealy FSM只是当关注在相同周期的反应下更为重要。
+小的电路，像是上升沿检测，
+像是实际上的Mealy机，也是可以的。
 
 \section{Exercise}
 
@@ -3458,6 +3487,14 @@ another FSMs input, and the FSM watches the output of the other FSM.
 When we split a large FSM into simpler ones, this is called factoring FSMs.
 However, often communicating FSMs are directly designed from the specification,
 as often a single FSM would be infeasible large.
+
+一个问题是，经常很复杂，去使用单一FSM去描述一个电路。
+在那种情况下，这个问题可以被分为两个或是更小更简单的FSM。
+这些FSM然后使用信号去通信。
+一个FSM的输出是另一个FSM的输入，然后这个FSM观察了另一个FSM的输出。
+当我们把一个大型FSM为简单的FSM，这个被称为分解FSM。
+但是，经常来说，直接根据要求在FSM之间进行通信，
+作为一个简单的FSM会是非常大的。
 
 \section{A Light Flasher Example}
 
@@ -4124,7 +4161,11 @@ different implementations) and then checks that \code{tick} repeats every $n$ cl
 我们emph{只是}需要去定义测试平台去接收\code{Ticker}的子类型。
 ~\ref{lst:ticker:test}表明了用于测试器的chisel代码。
 \code{TickerTester}有一些参数：(1)类型参数\code{[T <: Ticker]}去接受一个\code{Ticker}
-或是任何
+或是任何一个类型去继承\code{Ticker}。
+(2) 接受测试的设计，作为类型\code{T}或是其子类型。
+(3) 对于每个tick，我们期待的时钟周期。
+测试器等待第一个tick发生的时间（开始的时间可能根据不同的做法有所不同），然后检查tick每$n$时钟周期重复。
+
 
 \longlist{code/ticker_tester.txt}{A tester for different versions of the ticker.}{lst:ticker:test}
 
@@ -4136,6 +4177,11 @@ generation with a counter counting down to 0.
 Listing~\ref{lst:ticker:nerd} shows the nerd version of counting down to -1 to use
 less hardware by avoiding the comparator.
 
+第一个，简单的ticker的做法，我们可以测试测试器本身，可能是使用一些code{println}作为debug手段。
+当我们对于这个简单的ticker感到有信心，并且测试器是正确的情况下，我们可以继续探索两个ticker的版本。
+~\ref{lst:ticker:down}表明tick生成器，通过向下计数，数到0。
+列表~\ref{lst:ticker:nerd}表明了傻瓜版本的向下数到-1，使用更少的硬件，通过规避比较器。
+
 \longlist{code/down_ticker.txt}{Tick generation with a down counter.}{lst:ticker:down}
 
 \longlist{code/nerd_ticker.txt}{Tick generation by counting down to -1.}{lst:ticker:nerd}
@@ -4144,14 +4190,17 @@ We can test all three versions of the ticker by using ScalaTest specifications,
 creating instances of the different versions of the ticker and passing them
 to the generic test bench. Listing~\ref{lst:ticker:spec} shows the specification.
 We run only the ticker tests with:
+
+我们可以测试所有的3个ticker的版本，通过使用ScalaTest的要求，
+创建不同版本的ticker，并把它们传入testbench本身。
+列表~\ref{lst:ticker:spec}表明要求。
+我们使用ticker测试，通过:
+
 \begin{chisel}
 sbt "testOnly TickerSpec"
 \end{chisel}
 
 \longlist{code/ticker_spec.txt}{ScalaTest specifications for the ticker tests.}{lst:ticker:spec}
-
-
-
 
 \chapter{Example Designs}
 
@@ -4212,6 +4261,9 @@ a copy of the FIFO code as well.}
 可能有一些不同形式对FIFO的补充：
 例如，使用片上存储，读取和写入指针或只是一连串的寄存器伴随小的状态寄存器。
 对于小的缓冲器（最多十多种元素）， FIFO通过一些小的寄存器连接到一串缓冲是一个简单高效的写法。
+冒泡FIFO在\myref{https://github.com/schoeberl/chisel-examples}{chisel-examples}仓库下。
+\footnote{为了整体性，本书的仓库也包含了一份FIFO代码}
+
 
 We start by defining the IO signals for the writer and the reader side.
 The size of the data is configurable with \code{size}.
@@ -4276,9 +4328,9 @@ dequeueing side of the complete FIFO.
 \code{BubbleFifo}具有数据字长的\code{size}参数，和缓存的级数\code{depth}。
 我们可以搭建一个\code{depth}的阶段用于缓冲FIFO，来自\code{FifoRegister}的深度\code{depth}。
 我们通过把它们装填入scala的\code{Array}。
-scala的array没有任何硬件意义，它\emph{只是}提供给我们一个容器，去
-
-
+scala的array没有任何硬件意义，它\emph{只是}提供给我们一个容器，去有创造缓存的依据。
+在scala的\code{for}循环，我们连接了单独的缓存。
+在第一个buffer，读入端接入完整的FIFO端口，最后一个缓存的读出端连接到完整FIFO的读出端。
 
 
 \longlist{code/bubble_fifo.txt}{A FIFO is composed of an array of FIFO bubble stages.}{lst:fifo}
@@ -4289,12 +4341,23 @@ This is simple, and a good solution when the data rate is considerable slower
 than the clock rate, e.g., as a decouple buffer for a serial port, which is presented
 in the next section.
 
+这个展示的想法是连接独立的缓冲, 去补充一个FIFO队列, 称为冒泡FIFO, 因为数据从队列冒泡。
+这个简单的解法，在数据率比时钟慢的情况下是好的，例如，用于序列端口的去耦缓冲，
+在下一部分展示。
+
 However, when the data rate approaches the clock frequency, the bubble FIFO
 has two limitations: (1) As each buffer's state has to toggle between \emph{empty} and
 \emph{full}, which means the maximum throughput of the FIFO is 2 clock cycles
 per word. (2) The data needs to bubble through the complete FIFO, therefore,
 the latency from the input to the output is at least the number of buffers.
 I will present other possible implementations of FIFOs in Section~\ref{sec:more:fifo}.
+
+但是，当数据绿达到时钟频率，冒泡FIFO有两个限制：
+(1)因为每个缓存需要在\emph{empty}和\emph{full}摆动，
+这意味着最大吞吐量是每个字长两个时钟周期。
+(2)数据需要通过整个FIFO进行冒泡，于是，
+从输入到输出的延迟至少是buffer的数量。
+我会展示另外的FIFO的可能做法Section~\ref{sec:more:fifo}。
 
 \section{A Serial Port}
 
@@ -4307,6 +4370,14 @@ one start bit (0), the 8-bit data, least significant bit first, and then one or 
 bits (1). When no data is transmitted, the output is 1.
 Figure~\ref{fig:uart:wave} shows the timing diagram of one byte transmitted.
 
+一个串口(经常被称为\myref{https://en.wikipedia.org/wiki/Universal_asynchronous_receiver-transmitter}{UART}
+或是\myref{https://en.wikipedia.org/wiki/RS-232}{RS-232})是其中一个最简单的方法去连接你的电脑和FPGA板子。
+像名字暗示的那样，数据串行传输。一个8位的字节按照以下传输：
+从开始的0位开始，8位的数据，从最低位开始，然后是每次1到2个比特。
+当没有数据传输的时候，输出是1.
+图片~\ref{fig:uart:wave}表明了一个字节传输的时序图。
+
+
 \begin{figure}
   \centering
   \includegraphics[scale=1]{figures/uart_wave}
@@ -4318,13 +4389,24 @@ We design our UART in a modular way with minimal functionality
 per module. We present a transmitter (TX), a receiver (RX),
 a buffer, and then usage of those base components.
 
+我们设计我们的UART以一个模块的方式，每个模块实现最小功能。
+我们呈现一个发送器(TX), 接收端(RX),
+一个缓存，然后是使用这些基本的单元。
 
 First, we need an interface, a port definition.
 For the UART design, we use a ready/valid handshake interface,
 with the direction as seen from the transmitter.
+
+首先，我们需要一个界面，一个端口定义。
+从UART的定义，我们使用ready/valid握手界面，
+从发送端观察。
+
 \shortlist{code/uart_channel.txt}
+
 The convention of a ready/valid interface is that the data is transferred
 when both \code{ready} and \code{valid} are asserted.
+
+ready/valid界面的常见做法是数据当\code{ready}和\code{valid}高位的时候进行传输。
 
 \longlist{code/uart_tx.txt}{A transmitter for a serial port.}{lst:uart:tx}
 
@@ -4335,6 +4417,10 @@ and send.
 To generate the correct timing, we compute a constant for by computing
 the time in clock cycles for one serial bit.
 
+列表~\ref{lst:uart:tx}表明一个准系统串行发送器(\code{Tx})。
+IO端口是\code{txd}端口，这里串行数据进行发送，\code{Channel}是发送器用来接受串行和发送的数据。
+为了产生正确的时序，我们计算一个常量，通过计算一个串行二进制位的时钟周期。
+
 We use three registers:
 (1) register to shift the data (serialize them) (\code{shiftReg}),
 (2) a counter to generate the correct baud rate (\code{cntReg}), and
@@ -4342,14 +4428,27 @@ We use three registers:
 No additional state register of FSM is needed, all state is encoded in
 those three registers.
 
+我们使用三个寄存器：
+(1) 移动数据的寄存器(串行化)(\code{shiftReg})。
+(2) 一个计数器去生成正确的波特率(\code{cntReg})，和
+(3) 一个计数器用于计算需要被移动走二进制位的数量。
+不需要额外的FSM状态寄存器，所有的状态在这三个寄存器编码。
+
 Counter \code{cntReg} is continuously running (counting down to 0
 and reset to the start value when 0). All action is only done when
 \code{cntReg} is 0. As we build a minimal transmitter, we have only
 the shift register to store the data. Therefore, the channel is only ready
 when \code{cntReg} is 0 and no bits are left to shift out.
 
+计数器\code{cntReg}持续在运行(向下数到0，数到0以后重置到开始值)。
+所有的行为只有当\code{cntReg}是0的时候结束。当我们搭建一个最小的发送器，
+我们只有移位寄存器去保存数据。于是，这个通道只有当\code{cntReg}是ready的，
+没有剩下的二进制位需要被移走。
+
 The IO port \code{txd} is directly connected to the least significant bit
 of the shift register.
+
+IO端口\code{txd}直接连接到移位寄存器的最小位。
 
 When there are more bits to shift out (\code{bitsReg =/= 0.U}),
 we shift the bits to the right and fill with 1 from the top (the idle level
@@ -4358,6 +4457,12 @@ If no more bits need to be shifted out, we check if the channel contains
 data (signaled with the \code{valid} port). If so, the bit string to
 be shifted out is constructed with one start bit (0), the 8-bit data, and
 two stop bits (1). Therefore, the bit count is set to 11.
+
+当存在更多二进制位去移动(\code{bitsReg =/= 0.U})，
+我们移动二进制位到右边，并把它从顶部填充1（发送器的闲置）。
+如果没有更多的二进制位需要被移位，我们检查一下通道是否包含数据
+(通过\code{valid}端口标志信号)。
+如果是这样的，二进制字符
 
 This very minimal transmitter has no additional buffer and can
 accept a new character only when the shift register is empty
@@ -4477,6 +4582,11 @@ and (2) exploring the UART and extending it.
 Source code for both exercises is included in the
 \myref{https://github.com/schoeberl/chisel-examples}{chisel-examples} repository.
 
+练习部分有点长，它包含两个练习：
+(1)探索冒泡FIFO，并补充一个不同的FIFO设计；
+(2)探索UART并去拓展它。
+两个练习的源码在\myref{https://github.com/schoeberl/chisel-examples}{chisel-examples}仓库。
+
 \subsection{Explore FIFO Variations}
 
 The FIFO source also includes a tester that provokes different read and write behavior and generates a waveform in the 
@@ -4540,14 +4650,29 @@ one word every two clock cycles, (2) a data word has to travel $n$ clock cycles
 from the writer end to the reader end, and (3) a full FIFO needs $n$ clock cycles
 for the restart.
 
+一个冒泡FIFO是简单的，对于小的缓存的资源要求低。
+主要的缺点是$n$级冒泡FIFO是：
+(1)最大吞吐量是每周期两个时钟周期生成一个字，
+(2)一个字长需要旅行$n$时钟周期从写入端到读出端，
+(3)一个完整的FIFO需要$n$时钟周期重新开始
+
 These drawbacks can be solved by a FIFO implementation with a
 \myref{https://en.wikipedia.org/wiki/Circular_buffer}{circular buffer}.
 The circular buffer can be implemented with a memory and
 read and write pointers.
+
+这些缺点可以通过\myref{https://en.wikipedia.org/wiki/Circular_buffer}{环形缓冲器}
+来解决。
+环形缓冲可以通过存储器，读取和写入指针来解决。
+
 Implement a FIFO as a circular buffer with four elements, using the same
 interface, and explore the different behavior with the tester.
 For an initial implementation of the circular buffer use, as a shortcut,
 a vector of registers (\code{Reg(Vec(4, UInt(size.W)))}).
+
+补充一个FIFO作为一个环形缓冲使用四种元素，使用相同的界面，并探索测试器下不同的行文。
+对于一个最初的环形缓冲器的做法，作为一个快捷方式，
+是一个向量的寄存器(\code{Reg(Vec(4, UInt(size.W)))})。
 
 \subsection{The UART}
 
@@ -4572,9 +4697,29 @@ With Quartus use the play button to synthesize the design and then configure
 the FPGA.
 After configuration, you should see a greeting message in the terminal.
 
+对于UART的例子，你需要一个具有串口的FPGA板子和带有串口的电脑(经常是通过USB连接)。
+在FPGA板和电脑连接串口线。开始一个terminal程序，例如，windows下的hyperterm，
+或是linux下的\code{gtkterm}
+\begin{verbatim}
+$ gtkterm &
+\end{verbatim}
+设置你的端口去选择正确设备，使用一个USB UART，这个经常是类似\code{/dev/ttyUSB0}。
+把波特率设为114200，没有奇偶校验位或是控制流(握手信号)。
+通过以下的命令行，你可以创造verilog代码用于UART：
+\begin{verbatim}
+$ make uart
+\end{verbatim}
+然后使用你的综合工具去综合设计。
+仓库包含了一个Quartus项目用于DE2-115的FPGA板子。
+通过Quartus点击运行按钮去综合设计，然后设置FPGA。
+经过设置，你应该在terminal看到一个欢迎的消息。
+
 Extend the blinking LED example with a UART and write 0 and 1 to the serial
 line when the LED is off and on. Use the \code{BufferedTx}, as in the \code{Sender}
 example.
+
+拓展闪光LED的例子，使用一个UART，并去给串口线写0和1，当LED是关闭或是开启的时候。
+使用\code{BufferedTx}，作为\code{Sender}的例子。
 
 With the slow output of characters (two per second), you can write the data
 to the UART transmit register and can ignore the read/valid handshake.
@@ -4582,9 +4727,15 @@ Extend the example by writing repeated numbers 0-9 as fast as the baud rate allo
 In this case, you have to extend your state machine to poll the UART status
 to check if the transmit buffer is free.
 
+有了字符的缓慢输出（每秒钟2个），你可以给UART传输寄存器写入数据，并且可以忽略read/valid握手信号。
+通过重复写入数字0-9，尽波特率的最大允许速率，拓展这个例子。
+在这个情况下，你需要拓展状态机去轮询UART状态，用来查看传输缓存是否空闲。
+
 The example code contains only a single buffer for the \code{Tx}. Feel free to
 add the FIFO that you have implemented to add buffering to the transmitter
 and receiver. 
+
+这个例子代码包含了只有一个
 
 \chapter{Design of a Processor}
 
@@ -5186,7 +5337,6 @@ DANA supports inference and learning.
 
 If you know an open-source project that uses Chisel, please drop me a note
 so I can include it in a future edition of the book.
-
 
 如果您知道使用Chisel的开源项目，请给我留言
 因此我可以将其包含在本书的未来版本中。
