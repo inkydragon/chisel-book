@@ -4462,7 +4462,8 @@ two stop bits (1). Therefore, the bit count is set to 11.
 我们移动二进制位到右边，并把它从顶部填充1（发送器的闲置）。
 如果没有更多的二进制位需要被移位，我们检查一下通道是否包含数据
 (通过\code{valid}端口标志信号)。
-如果是这样的，二进制字符
+如果是这样的，留做移动的二进制字符串通过首位(0), 8位数据，和两个停止位(1)。
+于是，二进制位的总数被设为11。
 
 This very minimal transmitter has no additional buffer and can
 accept a new character only when the shift register is empty
@@ -4471,6 +4472,12 @@ Accepting new data only when \code{cntReg} is 0 also means
 that the ready flag is also de-asserted when there would be
 space in the shift register. However, we do not want to add this
 ``complexity'' to the transmitter but delegate it to a buffer.
+
+这是一个非常小的发射器，没有额外的缓存，可以接受一个新的字符，当且仅当移位寄存器是空的，
+并且时钟周期是\code{cntReg}为0的情况下。
+当且仅当在\code{cntReg}为0的情况下接收新的数据也意味着
+当移位寄存器没有空位的时候，ready符号也会被取消。
+但是，我们不想把这个复杂性添加到发射器，而是把它作为缓冲器。
 
 \longlist{code/uart_buffer.txt}{A single-byte buffer with a ready/valid interface.}{lst:uart:buffer}
 Listing~\ref{lst:uart:buffer} shows a single byte buffer, similar to
@@ -4481,11 +4488,23 @@ to indicate \code{empty} or \code{full}. The buffer driven handshake
 signals (\code{in.ready} and \code{out.valid} depend on the state
 register.
 
+\longlist{code/uart_buffer.txt}{一个具有ready/valid界面的单字节缓冲器}{lst:uart:buffer}
+列表~\ref{lst:uart:buffer}表明了一个单字节的缓冲器，
+类似于FIFO寄存器，用于冒泡FIFO。输入端口是\code{Channel}界面，
+输出是翻转的\code{Channel}界面。
+缓冲包含最小状态机，去表明是否\code{空}还是\code{满}。
+缓冲器驱动握手信号(\code{in.ready} 和 \code{out.valid} 取决于状态寄存器)。
+
 When the state is \code{empty}, and data on the input is \code{valid},
 we register the data and switch to state \code{full}.
 When the state is \code{full}, and the downstream receiver is
 \code{ready}, the downstream data transfer happens, and we switch
 back to state \code{empty}.
+
+当状态为\code{empty}的时候，数据输入是\code{valid}，
+当我们寄存数据，状态切换到状态\code{full}。
+当状态切换到\code{full}，下方的接收器是\code{ready}，向下数据传输开始，
+我们切换回状态\code{empty}。
 
 \longlist{code/uart_buffered_tx.txt}{A transmitter with an additional buffer.}{lst:uart:buffered:tx}
 With that buffer we can extend our bare-bone transmitter.
@@ -4496,6 +4515,14 @@ this issue to the buffer module.
 An extension of the single word buffer to a real FIFO can easily be done
 and needs no change in the transmitter or the single byte buffer.
 
+\longlist{code/uart_buffered_tx.txt}{带有额外缓冲器的发射器}{lst:uart:buffered:tx}
+有了缓冲器，我们可以拓展我们的发射器原型。
+列表~\ref{lst:uart:buffered:tx}表明了发射器的组合\code{Tx}和一个单独的缓冲器在前边。
+这个缓冲器现在变为这样一个问题，\code{Tx}只有在单时钟周期是\code{ready}的。
+我们现在把这个问题变为缓冲器的问题。
+单字长缓冲器的拓展，对于一个真实FIFO，可以简单被完成，
+并且不需要在发射器或是单字节缓冲器做出改变。
+
 \longlist{code/uart_rx.txt}{A receiver for a serial port.}{lst:uart:rx}
 Listing~\ref{lst:uart:rx} shows the code for the receiver (\code{Rx}).
 A receiver is a little bit tricky, as it needs to reconstruct the timing of
@@ -4505,6 +4532,15 @@ of bit 0. Then it shifts in the bits every bit time. You can observe these
 two waiting times as \code{START\_CNT} and \code{BIT\_CNT}.
 For both times, the same counter (\code{cntReg}) is used.
 After 8 bits are shifted in, \code{valReg} signals an available byte
+
+\longlist{code/uart_rx.txt}{用于串行端口的接收器}{lst:uart:rx}
+列表~\ref{lst:uart:rx}表明了接收器(\code{Rx})的代码。
+接收器有点需要技巧，因为它需要去重新构建串行数据的时序。
+接收端等待开始位的下降沿。
+从那个时刻，接收端以每次1.5二进制位的速度等待，到它本身的位置0。
+然后它每次移位一个二进制位。你可以观察这两个等待时间, 通过\code{START\_CNT}和\code{BIT\_CNT}。
+对于这两个时间，使用相同的计数器(\code{cntReg})。
+在8位全部移动进入，\code{valReg}标志着字节有效。
 
 \longlist{code/uart_sender.txt}{Sending ``Hello World!" via the serial port.}{lst:uart:sender}
 Listing~\ref{lst:uart:sender} shows the usage of the serial port transmitter
@@ -4523,10 +4559,28 @@ With each \code{ready} signal we increase the counter until the full string
 is sent out. The sender keeps \code{valid} asserted until the last character
 has been sent out.
 
+\longlist{code/uart_sender.txt}{通过串行端口发送"Hello World!"}{lst:uart:sender}
+列表~\ref{lst:uart:sender}表明了串行端口的使用，通过发送一个友善的信息。
+我们在scala字符串定义消息(\code{msg})并把它转换为chisel的一个\code{Vec}的\code{UInt}。
+scala字符串是一串序列，支持\code{map}方法。yu
+\code{map}方法作用于函数字面量的参数，把这个函数应用于每个元素，并且搭建一串函数，返回数值。
+如果函数字面量应该有一个参数，作为这个例子，
+这个参数可以通过\code{\_}表示。我们的函数字面量呼叫chisel方法\code{.U}去传唤scala的\code{Char}
+变为chisel\code{UInt}。
+这个序列然后传递到\code{VecInint}去构建chisel的\code{Vec}。
+我们使用计数器\code{cntReg}索引向量\code{text}，去提供单一的字符到具有缓存的发送器。
+每收到\code{ready}信号，我们每增加计数器，直到完整的字符串被发送。
+发送方保持\code{valid}为真，直到最后的字符被发送。
+
+
 \longlist{code/uart_echo.txt}{Echoing data on the serial port.}{lst:uart:echo}
 Listing~\ref{lst:uart:echo} shows the usage of the receiver and the transmitter
 by connecting them together. This connection generates an \code{Echo} circuit where each
 received character is sent back (echoed).
+
+\longlist{code/uart_echo.txt}{在串口端口打印数据}{lst:uart:echo}
+Listing~\ref{lst:uart:echo} 表明了接收端和发送端的使用，通过将它们相连。
+这个连接产生了\code{Echo}电路，这里每个接受到的字符都被返回（回声echo）。
 
 \section{FIFO Design Variations}
 \label{sec:more:fifo}.
@@ -4735,7 +4789,7 @@ The example code contains only a single buffer for the \code{Tx}. Feel free to
 add the FIFO that you have implemented to add buffering to the transmitter
 and receiver. 
 
-这个例子代码包含了只有一个
+这个例子代码包含了只有一个缓冲用于\code{Tx}。欢迎添加你写好的FIFO，用于发送和接收的缓冲。
 
 \chapter{Design of a Processor}
 
@@ -4752,7 +4806,7 @@ and is available in open source at \url{https://github.com/leros-dev/leros}.
 We would like to mention that this is an advanced example and some computer
 architecture knowledge is needed to follow the presented code examples.
 
-
+我们想要说这是一个高阶的例子，一些计算机架构需要遵守所示代码例子。
 
 Leros is designed to be simple, but still a good target for a C compiler.
 The description of the instructions fits on one page, see Table~\ref{tab:leros:isa}.
@@ -5067,6 +5121,11 @@ If you use the tester and the published version is not compatible with the Chise
 SNAPSHOT, fork and clone the \myref{https://github.com/freechipsproject/chisel-testers}{chisel-tester}
 repo as well and publish it locally.
 
+注意到在本地发布library的版本的命令行，包含了\code{SNAPSHOT}。
+如果你使用测试器，发布的版本和Chisel SNAPSHOT不兼容，
+要把它\myref{https://github.com/freechipsproject/chisel-testers}{chisel-tester}
+也克隆下来，并且本地发布。
+
 To test your changes in Chisel, you probably also want to set up a Chisel project,
 e.g., by forking/cloning an \myref{https://github.com/schoeberl/chisel-empty}{empty Chisel project},
 renaming it, and removing the \code{.git} folder from it.
@@ -5110,8 +5169,15 @@ the Scala version is different between your Chisel library and your application 
 it picks up the SNAPSHOT version from the server instead of your local published
 library.)
 
+编译你的chisel测试应用，并且仔细看一下，它是否采用本地发布的chisel library(也存在一个发布的SNAPSHOT版本，
+所以如果，例如，scala版本在你的chisel library和你的应用代码是有所不同的，
+它会从服务器采取SNAPSHOT版本，而不是你本地发布的library)。
+
 See also \myref{https://github.com/freechipsproject/chisel3\#for-chisel-developers}{some notes
 at the Chisel repo}.
+
+也看一下\myref{https://github.com/freechipsproject/chisel3\#for-chisel-developers}{一些chisel笔记}.
+
 
 \section{Testing}
 
@@ -5241,6 +5307,10 @@ all Chisel examples: \url{https://github.com/schoeberl/chisel-book}
 A collection of medium-sized examples, which most are referenced
 in the book, is also available in open source. This collection
 also contains projects for various popular FPGA boards:
+\url{https://github.com/schoeberl/chisel-examples}
+
+在这本书受到最多的引用的一系列中等大小的例子，也是开源的。
+这个系列也包含了用于各种不同的FPGA例子的项目：
 \url{https://github.com/schoeberl/chisel-examples}
 
 \appendix
