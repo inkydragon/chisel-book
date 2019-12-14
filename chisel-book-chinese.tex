@@ -238,7 +238,11 @@ The approach of this book is to present small to medium-sized typical hardware c
 
 这本书是一个专注于使用硬件构建语言chisel进行数字设计的导论。Chisel带来了软件工程的优势，像是面向对象和函数编程，进入数字设计。
 
-这本书是给硬件设计师和软件工程师的。硬件设计师，有着Verilog或VHDL的知识，可以增加
+这本书是给硬件设计师和软件工程师的。硬件设计师，有着Verilog或VHDL的知识，可以通过新型语言增加生产力，用于下一个ASIC或是FPDA设计。
+
+软件工程师，有着面向对象语言和函数编程的知识，可以把这些知识用于生产硬件，例如，云FPGA。
+
+这本书的方法是呈现小型到中型大小的典型硬件部分，去探索使用chisel做数字设计。
 
 
 % about me, backside
@@ -432,7 +436,7 @@ is a little bit more involved:
 
 对于基于Debian的Ubuntu系统，软件通常通过.deb文件进行安装。
 然而，当编写本文时，\code{sbt}还不能通过这种方法安装。
-因此，安装过程牵扯了一点点其他方式：
+因此，安装过程有点麻烦：
 
 \begin{verbatim}
 echo "deb https://dl.bintray.com/sbt/debian /" | \
@@ -458,7 +462,7 @@ FPGAs are large enough to build multicore RISC style processors.
 Intel provides the \myref{https://www.altera.com/products/design-software/fpga-design/quartus-prime/download.html}{Quartus Prime Lite Edition} and Xilinx the
 \myref{https://www.xilinx.com/products/design-tools/vivado/vivado-webpack.html}{Vivado Design Suite, WebPACK Edition}.
 
-为了构建FPGA硬件，你需要综合工具。两大主要的FPGA工具供应商，Intel和Xilinx都提供了他们免费的工具，涵盖了小容量到中等容量大小的FPGA。
+为了构建FPGA硬件，你需要综合工具。两大主要的FPGA工具供应商，Intel\footnote{曾经是Altera}和Xilinx都提供了他们免费的工具，涵盖了小容量到中等容量大小的FPGA。
 其中，中等规模的FPGA已经足够容纳多核RISC架构处理器。
 Intel提供了\myref{https://www.altera.com/products/design-software/fpga-design/quartus-prime/download.html}{Quartus Prime Lite Edition} 
 和\myref{https://www.xilinx.com/products/design-tools/vivado/vivado-webpack.html}{Vivado Design Suite, WebPACK Edition}。
@@ -520,7 +524,7 @@ example, we count from 0 up to 25000000-1 and then toggle the blinking signal
 (\code{blkReg := \textasciitilde blkReg}) and restart the counter (\code{cntReg := 0.U}).
 That hardware then blinks the LED at 1~Hz.
 
-Figure~\ref{fig:chisel:hello}展现的是一个通过Chisel描述的闪烁LED。你是否理解这个代码案例的细节是不重要的。我们将会介绍这些内容在以下的章节中。
+F~\ref{fig:chisel:hello}展现的是一个通过Chisel描述的闪烁LED。你是否理解这个代码案例的细节是不重要的。我们将会介绍这些内容在以下的章节中。
 仅仅需要注意这个电路通常有着高频率的时钟，例如50MHz，我们需要一个计数器来分频得到Hz级别的频率来实现可视化的闪烁。在这个例子中我们从0计数到25000000-1然后触发闪烁信号(\code{blkReg := \textasciitilde blkReg}) 
 然后复位计数器 (\code{cntReg := 0.U})。这个硬件以1~Hz频率闪烁LED。
 
@@ -560,7 +564,7 @@ $ sbt eclipse
 \end{verbatim}
 and import that project into Eclipse.\footnote{This function needs the Eclipse plugin for sbt.}
 In IntelliJ you can create a new project from existing sources and then select from \code{build.sbt}.
-或者导入一个工程金Eclipse。\footnote{This function needs the Eclipse plugin for sbt.}
+或者导入一个工程入Eclipse。\footnote{This function needs the Eclipse plugin for sbt.}
 在InterlliJ中你可以创建一个工程从已经存在的源码中，然后选择\code{build.sbt}文件。
 
 
@@ -597,7 +601,7 @@ We optimized the format of the eBook for reading on a tablet, such as an iPad.
 
 这本书有免费的古典印刷体PDF电子版。
 电子书提供了更多的资源和\myref{https://www.wikipedia.org/}{Wikipedia}入口。
-我们使用Wikipedia来说明与本书部直接相关的背景知识(例如二进制)。
+我们使用Wikipedia来说明与本书部直接相关的背景知识(例如二进制数字系统)。
 我们优化了电子书的排版，以方便便携式设备阅读，例如ipad。
 
 \section{Further Reading}
@@ -666,7 +670,7 @@ The Hello World example is in the folder \code{hello-world}, set up as
 a minimal project. You can explore the Chisel code of the blinking LED
 in \code{src/main/scala/Hello.scala}.
 Compile the blinking LED with the following steps:
-每个章节结尾都有手写的练习题。为了介绍联系，我们通常会使用一个FPGA板子上的一颗LED。
+每个章节结尾都有手写的练习题。为了介绍练习，我们通常会使用一个FPGA板子上的一颗LED。
 第一步clone或者fork\myref{https://github.com/schoeberl/chisel-examples}{chisel-examples}仓库。 
 Hello World例子在\code{hello-world}文件夹里，是一个最小的工程。你可以探索LED闪烁的Chisel代码在\code{src/main/scala/Hello.scala}。
 按下下述步骤编译LED闪烁工程：
@@ -720,6 +724,7 @@ communicate different ``emotions''. E.g., a slow blinking LED signals that
 everything is ok, a fast blinking LED signals an alarm state.
 Explore which frequencies express best those two different emotions.
 现在改变闪烁的频率然后重新运行一遍构建工程。闪烁的频率和闪烁的方式可以预示不同的状态。例如一个缓慢的闪烁信代表一切正常，一个快速的闪烁信号代表一个报警。
+探索哪个频率对应这两个不同的动作。
 
 As a more challenging extension to the exercise, generate the following blinking pattern:
 the LED shall be on for 200~ms every second. For this pattern, you might
@@ -857,7 +862,7 @@ Note that this circuit may be for a vector of bits and not only single wires
 that are combined with the AND and OR circuits.
 
 Figure~\ref{fig:logic} 表明了这个组合逻辑的表达的草图。
-注意到这个电路可能用来表示一个向量的bits，并不仅是
+注意到这个电路可能用来表示一个向量的bits，并不仅是单独的AND和OR组成的线路。
 
 In this example, we do not define the type nor the width of signal \code{logic}.
 Both are inferred from the type and width of the expression.
@@ -1116,7 +1121,7 @@ We can define a bundle (collection of signals) by defining a class that
 extends \code{Bundle} and list the fields as \code{val}s within the constructor block.
 
 Chisel捆束多个信号。整个bundle可以被整体引用，或是通过他们的名字分别访问。
-我们可以顶一个捆束（信号的集合），通过定义一个类型，拓展了\code{Bundle}，
+我们可以定义一个捆束（信号的集合），通过定义一个类型，拓展了\code{Bundle}，
 并在域内通过\code{val}列出。
 
 
@@ -1269,7 +1274,7 @@ with \code{val sw = Input(UInt(2.W))}.
 
 \shortlist{code/basic_exercise.txt}
 
-\noindent For those switches, you also need to assign the pin names for the FPGA board.
+\noindent For those switches, you also need to assign and list the fields as pin names for the FPGA board.
 You can find examples of pin assignments in the Quartus project files of the ALU project
 (e.g., for the \myref{https://github.com/schoeberl/chisel-examples/blob/master/quartus/altde2-115/alu.qsf}{DE2-115
 FPGA board}).
@@ -1388,7 +1393,7 @@ The folder \code{target} contains the class files and other generated files.
 I recommend to also use a folder for generated Verilog files, which is usually
 call \code{generated}.
 
-图3.1表示了一个常见的Chisel项目的源文件树的结构。
+Figure~\ref{fig:folders}表示了一个常见的Chisel项目的源文件树的结构。
 项目的根目录是项目home地址，这里包含了build.sbt。
 也可以包含一个Makefile用于搭建过程，一个README，和一个LICENSE文件。
 文件夹sec包含了所有源代码。
@@ -1415,7 +1420,7 @@ To use the module \code{Abc} in a different context (packet name space),
 the components of packet \code{mypacket} need to be imported. The underscore
 (\_) acts as wildcard, meaning that all classes of \code{mypacket} are imported.
 
-为了使用Abc莫款在一个不同的地方（软件包命名空间），软件包的mypack需要被引用。下划线（_）充当万用字元，意味着所有mypack的类都要被引用。
+为了使用Abc模块在一个不同的地方（软件包命名空间），软件包的mypack需要被引用。下划线（_）充当万用字元，意味着所有mypack的类都要被引用。
 
 
 \shortlist{code/usepacket.txt}
