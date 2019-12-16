@@ -2165,9 +2165,9 @@ Functions can be declared as part of a \code{Module}. However, functions that sh
 used in different modules are better placed into a Scala object that collects utility
 functions.
 
-可以将函数声明为Module的一部分。但是，应
+可以将函数声明为Module的一部分。但是，函数应
 最好将用于不同模块的模块放置在一个收集实用程序的Scala对象中
-职能。
+。
 
 \chapter{Combinational Building Blocks}
 
@@ -2536,7 +2536,7 @@ Variable names start with lowercase and classes start with upper case.
 
 首先我们定义了寄存器并给它一个名字，其次我们连接了信号\code{delayIn}给寄存器的输入。
 注意寄存器的名字是\code{Reg}开始的。
-为了简单区分组合电路和舒徐电路的元素，一般常用的方式是在开头添加\code{Reg}的名字作为开头。
+为了简单区分组合电路和时序电路的元素，一般常用的方式是在开头添加\code{Reg}的名字作为开头。
 并且记得scala的名字（同样适用于chisel）经常以\myref{https://en.wikipedia.org/wiki/Camel_case}{CamelCase}的形式。
 变量名称以小写开头，接下来的类别以首字母大写的形式。
 
@@ -2572,14 +2572,14 @@ where the reset drives the multiplexer. However, as synchronous reset is used qu
 modern FPGAs flip-flops contain a synchronous reset (and set) input to not wast LUT
 resources for the multiplexer.
 
-~\ref{fig:register-reset}表明一个具有同步复位的寄存器草图，这里同步复位驱动复用器。
+图片~\ref{fig:register-reset}表明一个具有同步复位的寄存器草图，这里同步复位驱动复用器。
 但是，一个同步复位经常被使用，是因为现代FPGA包含一个重置（和设置）是用来不浪费复用器的LUT资源。
 
 Sequential circuits change their value over time. Therefore, their behavior can be described
 by a diagram showing the signals over time. Such a diagram is called a waveform or
 \myref{https://en.wikipedia.org/wiki/Digital_timing_diagram}{timing diagram}.
 
-序列电路不断地改变数值。于是，他们的行为可以被通过图像表示不同时间下的信号。这样的图像被称为波形图或是
+时序电路不断地改变数值。于是，他们的行为可以被通过图像表示不同时间下的信号。这样的图像被称为波形图或是
 \myref{https://en.wikipedia.org/wiki/Digital_timing_diagram}{时序图}。
 
 \todo{from Luca: Do readers know about timing diagrams?}
@@ -2618,8 +2618,8 @@ with a waveform viewer and used for debugging.
 波形是以图形方式指定电路行为的出色工具。
 特别是在许多操作并行发生的更复杂的电路中
 并且数据通过电路流水线传输，时序图很方便。
-凿子测试仪还可以在测试过程中产生可显示的波形
-带有波形查看器并用于debug.r，其功能应为
+chisel测试器还可以在测试过程中产生可显示的波形
+带有波形查看器并用于debug，其功能应为
 最好将用于不同模块的模块放置在一个收集实用程序的Scala对象中
 职能。
 
@@ -2781,7 +2781,7 @@ circuit other than counting clock ticks. If we know the clock frequency, we
 can generate circuits that generate timed events, such as blinking a LED
 at some frequency as we have shown in the Chisel ``Hello World'' example.
 
-除了计数时间，技术经常被使用去生成延迟。
+除了计数时间，计数经常被使用去生成延迟。
 一个同步电路使用一个时钟和特定的频率。
 电路在这些时钟变化中生成结果。
 在数字电路中没有时间的概念，除了计算时钟周期。
@@ -2895,12 +2895,19 @@ two ports where the direction can be switched.
 
 存储器可以通过一系列的寄存器搭建，在chisel，一个\code{Vec}的\code{Reg}。
 但是，这个在硬件上是昂贵的，更大的存储器是通过\myref{https://en.wikipedia.org/wiki/Static_random-access_memory}{SRAM}搭建的。
-对于一个AI
+对于一个ASIC, 存储器编译器构建出存储器。
+FPGA自带片上存储单元，也称为模块化RAM。
+这些片上存储单元可以组合成为更大的存储器。
+FPGA上的存储器一般有一个读端和一个写端，或者可以切换方向的两个端口。
 
 FPGAs (and also ASICs) usually support synchronous memories.
 Synchronous memories have registers on their inputs (read and write address, write data,
 and write enable). That means the read data is available one clock
 cycle after setting the address.
+
+FPGA（或是ASIC）经常支持同步存储器。
+同步存储器在输入上具有寄存器(读和写地址，写数据，写使能)。
+那意味着读数据在设置地址后的一个周期的是可用的。
 
 \begin{figure}
   \centering
@@ -3008,7 +3015,9 @@ counter that can generate a single-cycle \emph{tick} signal every 500 millisecon
 Use that signal as enable signal for the 4-bit counter.
 
 使用来自上一章的7段编码器并添加一个4位计数器作为输入，去切换显示，从\code{0}到\code{F}。
-当你直接连接这个计数器到
+当你直接连接这个计数器到FPGA的时钟，你会看到所有的16个数字相互交叠(所有的7段显示一起亮)。
+于是，你需要调慢计数。创建一个秒计数器，每个周期生成一个\emph{tick}，每过500毫秒。
+使用那个信号作为使能信号，用于4位计数器。
 
 \todo{Luca: More exercises would be nice. Maybe in the future?}
 
@@ -3122,7 +3131,7 @@ output logic.
 ~\ref{tab:state:table}图标表明我们的闹铃FSM的状态表。
 我们列出了当前状态，输入值，和接下来的状态，和当前状态的输出值。原则上，我们需要
 列出所有可能状态下的所有输入值。这个表格可以有3*4=12列。我们把这个表格进行简化，
-当\emph{bad event}发生的时候，输入\emph{clear}是不管的。那意味着\emph{bad event}对于\emph{clear
+当\emph{bad event}发生的时候，输入\emph{clear}是不管的。那意味着\emph{bad event}对于\emph{clear}
 有优先级。输出列有一些重复。如果我们有一个更大的FSM或是更多输出，我们可以把列表分为两个，一个用于计算下个状态逻辑，
 一个用于计算输出逻辑。
 
@@ -3326,9 +3335,11 @@ puls for each rising edge of the input.
 
 作为Mealy FSM的输出，并不只是依赖于状态，也依赖于输入，我们不能描述输出作为状态圆的一部分。
 相反，状态间的转移函数和输入值和输出值是一起被标出的。
-注意到我们画本身的状态转移，例如，在状态\code{zero}当输入是\code{0}，FSM停留在\code{zero}，
+注意到我们画本身的状态转移，例如，在状态\code{0}当输入是\code{0}，FSM停留在\code{0}，
 输出是{0}。
-FSM的上升沿产生\code{1}作为输出，
+FSM的上升沿产生\code{1}作为输出，只有当从状态\code{0}转移到\code{1}。在状态\code{1}，
+代表输入现在是\code{1}，输出是\code{0}。我们现在想要一个对于每个输入的上升沿，
+产生单一周期的跳变。
 
 \longlist{code/rising_fsm.txt}{Rising edge detection with a Mealy FSM.}{lst:fsm:rising}
 
@@ -3364,7 +3375,7 @@ We have used this example to show one of the smallest possible Mealy FSMs.
 FSMs shall be used for more complex circuits with three and more states.
 
 我们已经使用了这个例子区表明了一个更为聪明的方式去编写Mealy FSM。
-FSM应当在更为复杂的三个或是更多状态的电路种被使用。
+FSM应当在更为复杂的三个或是更多状态的电路被使用。
 
 \section{Moore versus Mealy}
 
