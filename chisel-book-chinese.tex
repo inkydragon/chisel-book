@@ -3486,7 +3486,7 @@ Switch to green for the minor road only when a car is detected and then switch
 back to green for the priority road.
 
 一个经典FSM的例子是交通灯控制器(看~\cite[Section~14.3]{dally:vhdl:2016})。
-一个交通灯控制器需要去确定从红到绿的切换，有一个状态是两条路的中间没有信号灯（红色或是橘色）。
+一个交通灯控制器需要保证在从红灯转绿的切换期间，有一个状态是两条路都亮着禁止通行的信号灯（红色或是橘色）。
 为了使这个例子变得更有趣一些，想象一个主干道。
 副路需要有两个车辆检测器（在交叉的两个入口）。
 当检查到车辆的时候，在副路切换到绿灯，然后切换回主干道切换回绿灯。
