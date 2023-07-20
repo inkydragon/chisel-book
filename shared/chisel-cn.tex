@@ -73,3 +73,16 @@
 \newcommand{\longlist}[3]{{\lstinputlisting[float, caption={#2}, label={#3}, frame=tb, captionpos=b]{#1}}}
 
 \newcommand{\verylonglist}[3]{{\lstinputlisting[caption={#2}, label={#3}, frame=tb, captionpos=b]{#1}}}
+
+
+%% ---- XXX: Original English block
+\usepackage{xparse}
+%% Whether or not to export the original English text
+\newif\ifshowenglish
+%% Ignore english text by default!
+%% With english text.
+\showenglishtrue
+
+%% XXX: 根据全局变量 \ifshowenglish 决定是否显示英文原文
+\NewDocumentEnvironment{RawEn}{ +b }{\ifshowenglish#1\fi}{}
+%% END \NewDocumentEnvironment
