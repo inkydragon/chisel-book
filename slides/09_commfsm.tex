@@ -1,0 +1,619 @@
+\input{common/slides_common}
+
+\newif\ifbook
+\input{../shared/chisel}
+
+\title{Communicating State Machines}
+\author{Martin Schoeberl}
+\date{\today}
+\institute{Technical University of Denmark\\
+Embedded Systems Engineering}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+\begin{frame}[fragile]{Overview}
+\begin{itemize}
+\item Display multiplexing solution
+\item Ready/valid interface
+\item Serial interface (RS 232)
+\item A little bit of Scala
+\item Hardware generators
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Exam Info}
+\begin{itemize}
+\item Exam will be online
+\item All aids allowed, except Internet
+\item PDF with exam questions
+\item Upload solution in a single PDF
+\begin{itemize}
+\item Please use your study number as file name
+\item Train to do a drawing and integrate it into a PDF
+\end{itemize}
+\item Timing exercise, some coding, understanding questions, drawing circuits
+\item I uploaded older exams at DTU Learn and (partially) solutions
+\end{itemize}
+\end{frame}
+
+%\begin{frame}[fragile]{A (Minimal) Project from Scratch}
+%\begin{itemize}
+%\item \emph{How do we make a new project ourselves without editing the provided build.sbt files?}
+%\item Just two files: \code{build.sbt} and a \code{.scala} file
+%\item Create the folder/directory structure
+%\item Copy a \code{build.sbt}
+%\item Import in InteliJ
+%\item Create a \code{.scala} class
+%\item Show it now (in explorer or in terminal?)
+%\item Do this exercise today!
+%\end{itemize}
+%\end{frame}
+
+\begin{frame}[fragile]{Group Workflow Suggestions}
+\begin{itemize}
+\item Share code on GitHub (private repo)
+\item Meet in Zoom: you all have a full license from DTU
+\begin{itemize}
+\item You can take over a screen to type
+\item You can draw on it
+\item Besides ad-hoc meetings, have regular project meetings
+\end{itemize}
+\item Use Slack for quick notes and quick sharing of files
+\item Maybe also try to share the \code{.bit} file for the FPGA board
+\item Use Google docs for taking notes, start your report
+\item If you like Latex, use overleaf
+\item You can also work on the lab assignments at other times than the lab time ;-)
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{One Possible Solution for Last Lab}
+\begin{chisel}
+  val MAX_CNT = 100000.U // use a smaller value for waveform viewing
+
+  val tickCntReg = RegInit(0.U(32.W))
+  val cntReg = RegInit(0.U(4.W))
+
+  val tick = tickCntReg === MAX_CNT
+  tickCntReg := Mux(tick, 0.U, tickCntReg + 1.U)
+  when (tick) {
+    cntReg := cntReg + 1.U
+  }
+
+  val m = Module(new SevenSegDec())
+  m.io.in := cntReg
+  sevSeg := m.io.out
+\end{chisel}
+\end{frame}
+
+\begin{frame}[fragile]{A Self-Running Tester}
+\begin{itemize}
+\item \code{DisplaySpec} is a self-running circuit
+\item Has no input
+\item Needs (almost) no stimuli (\code{poke})
+\item Just run for a few cycles
+\end{itemize}
+\begin{chisel}
+class DisplaySpec extends AnyFlatSpec with ChiselScalatestTester {
+  "DisplayTest " should "pass" in {
+    test(new Display(20)).withAnnotations(Seq(WriteVcdAnnotation)) { dut =>
+      dut.io.sw.poke(0x1234.U)
+      dut.clock.step(200)
+    }
+  }
+}
+\end{chisel}
+\end{frame}
+
+
+\begin{frame}[fragile]{Running the Test}
+\begin{itemize}
+\item Does not really do any testing
+\item Just generated the waveform for debugging
+\item Just running 200 cycles does not show much
+\item Increase the number of running cycles to 100000000?
+\item Or use a different constant for testing?
+\end{itemize}
+\end{frame}
+
+
+
+
+
+\begin{frame}[fragile]{Next Labs}
+\begin{itemize}
+\item Next week: test a given Vending Machine (optional)
+\item The remaining weeks: work on the full Vending Machine
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Communicating State Machines}
+\begin{itemize}
+\item We did refactor a large FSM into smaller ones last week
+\item FSMs \emph{communicate}
+\item Simple communication is:
+\begin{itemize}
+\item Input processing to the FSM
+\item FSM with the datapath
+\end{itemize}
+\item More complex FSMs may exchange data with handshaking
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Handshaking}
+\begin{itemize}
+\item Producer of data and consumer need to agree when data is transferred
+\item Producer tells when data is available/valid with a \code{valid} signal
+\item Consumer tells when it is ready toe receive data with a \code{ready} signal
+\item When both are asserted the transfer takes place
+\item Also called \emph{flow control}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Ready-Valid Interface}
+\begin{figure}
+  \includegraphics[scale=\scale]{../figures/readyvalid}
+\end{figure}
+\begin{itemize}
+\item Ready-valid flow control
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Ready-Valid Interface, Early Ready}
+\begin{figure}
+  \includegraphics[scale=1]{../figures/ready_valid1}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{Ready-Valid Interface, Late Ready}
+\begin{figure}
+  \includegraphics[scale=1]{../figures/ready_valid2}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{Single Cycle and Back-to-Back}
+\begin{figure}
+  \includegraphics[scale=1]{../figures/ready_valid3}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{Some Rules and Usage}
+\begin{itemize}
+\item There shall be no combinational dependencies between ready and valid
+\item AXI uses ready/valid for all bus connections
+\item AXI restricts that \code{valid} asserted cannot be deasserted without a transaction
+\item AXI sender is not allowed to wait for \code{ready} before asserting \code{valid}
+\item AXI receivers do not have this restriction
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Common Interface}
+\begin{itemize}
+\item So common interface that Chisel defines a \code{DecoupledIO}
+\end{itemize}
+\shortlist{../code/fifo_decoupled.txt}
+\end{frame}
+
+\begin{frame}[fragile]{Serial I/O Interface}
+\begin{itemize}
+\item Use only one wire for data transfer
+\begin{itemize}
+\item Bits are serialized
+\item That is where you need your shift register
+\end{itemize}
+\item Shared wire or dedicated wires for transmit and receive
+\item Self timed
+\begin{itemize}
+\item Serial UART (RS 232)
+\item Ethernet
+\item USB
+\end{itemize}
+\item With a clock signal
+\begin{itemize}
+\item SPI, I2C, ...
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}[fragile]{RS 232}
+\begin{itemize}
+\item Old, but still common interface standard
+\begin{itemize}
+\item Was common in 90' in PCs
+\item Now substituted by USB
+\item Still common in embedded systems
+\item Your Basys 3 board has a RS 232 interface
+\end{itemize}
+\item Standard defines
+\begin{itemize}
+\item Electrical characteristics
+\item '1' is negative voltage (-15 to -3 V)
+\item '0' is positive voltage (+3 to +15 V)
+\item Converted by a RS 232 driver to \emph{normal} logic voltage levels
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Serial Transmission}
+\begin{itemize}
+\item Transmission consists of
+\begin{itemize}
+\item Start bit (low)
+\item 8 data bits
+\item Stop bit(s) (high)
+\end{itemize}
+\item Common baud rate is 115200 bits/s
+\end{itemize}
+\begin{figure}
+  \includegraphics[scale=0.8]{../figures/uart_wave}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile]{RS 232 on the Basys 3}
+\begin{itemize}
+\item Basys 3 has an FTDI chip for the USB interface
+\item USB interface for FPAG programming
+\item But also provides a RS 232 to the FPGA
+\item You can talk with your laptop
+\item Your VM could write out some text
+\item Open a terminal to watch (show it)
+\item Use Putty as terminal program
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{RS 232 from ip-contributions}
+\begin{itemize}
+\item A collection of Chisel hardware components
+\item Contains the RS232/UART interface
+\item Uses the Decoupled interface
+\item Distributed as library from Maven Central
+\item No need to copy source around
+\item Just include it in your \code{build.sbt}
+\item Very easy distribution of open-source components
+\item You can contribute!
+\item \href{https://github.com/freechipsproject/ip-contributions}{ip-contributions}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{First Summary and a Break}
+\begin{itemize}
+\item Main topic of today done
+\item Following is advanced material
+\item A little bit of Scala
+\item How to write hardware generators
+\item Maybe extend your display to show decimal number
+\item But first 10 minutes BREAK
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Binary-Coded Decimal (BCD)}
+\begin{itemize}
+\item Your current display shows numbers in hexadecimal
+\begin{itemize}
+\item $15_{10}$ is displayed as $0F_{16}$
+\item Which is in binary: 00001111
+\item We would like to see it as a `1' followed by a `5'
+\item Which is in binary: 0001 0101
+\end{itemize}
+\item Convert from binary to binary-coded decimal (BCD)
+\begin{itemize}
+\item But only for the display
+\item Computing in BCD is hard
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Binary to BCD Conversion Table}
+\begin{chisel}
+  val bincode = io.sw(7,0)
+  val bcd = WireDefault(bincode)
+
+  switch(bincode) {
+    is(0.U) { bcd := "b0000_0000".U }
+    is(1.U) { bcd := "b0000_0001".U }
+    is(2.U) { bcd := "b0000_0010".U }
+    // ... some more
+    is(9.U) { bcd := "b0000_1001".U }
+    is(10.U) { bcd := "b0001_0000".U }
+    is(11.U) { bcd := "b0001_0001".U }
+    is(12.U) { bcd := "b0001_0010".U }
+    // ... and many more entries
+  }
+
+  dispMux.io.price := bcd
+\end{chisel}
+\end{frame}
+
+\begin{frame}[fragile]{Binary-Coded Decimal (BCD)}
+\begin{itemize}
+\item Conversion is a table (= function)
+\item Combinational logic
+\item We \emph{could} do the table manually
+\begin{itemize}
+\item But it is large
+\item The table has 100 entries to convert 0 to 99 to BCD
+\end{itemize}
+\item Let's write a program for this
+\begin{itemize}
+\item We could use Java, Python, TCL,...
+\item With DE2 in VHDL I provided a Java program
+\item Now we can do this directly in Chisel/Scala
+\end{itemize}
+\item We will write our first \emph{hardware generator}
+\item First we need a little bit of Scala
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Chisel and Scala}
+\begin{itemize}
+\item Chisel is a library written in Scala
+\begin{itemize}
+\item Import the library with \code{import chisel3.\_}
+\end{itemize}
+\item Chisel code is Scala code
+\item When it is run is \emph{generates} hardware
+\begin{itemize}
+\item Verilog for synthesize
+\item Scala netlist for simulation (testing)
+\end{itemize}
+\item Chisel is an embedded domain specific language
+\item Two languages in one can be a little bit confusing
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Scala}
+\begin{itemize}
+\item Is object oriented
+\item Is functional
+\item Strongly typed with very good type inference
+\item Runs on the Java virtual machine
+\item Can call Java libraries
+\item Consider it as Java++
+\begin{itemize}
+\item Can almost be written like Java
+\item With a more lightweight syntax
+% \item Scala for Java Refugees is a nice tutorial (but link is dead)
+% \item \url{http://www.codecommit.com/blog/scala/roundup-scala-for-java-refugees}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Scala Hello World}
+\shortlist{../src/main/scala/HelloScala.scala}
+\begin{itemize}
+\item Compile with \code{scalac} and run with \code{scala}
+\item You can even use Scala as a scripting language
+\item Or run with \code{sbt run}
+\item Show both
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Scala Values and Variables}
+\begin{itemize}
+\item Scala has two type of variables: \code{val}s and \code{var}s
+\item A \code{val} cannot be reassigned, it is a constant
+\item We use a \code{val} to name a hardware component in Chisel
+\end{itemize}
+\shortlist{../code/scala_val.txt}
+\begin{itemize}
+\item Types are usually inferred
+\item But can be explicitly stated as follows
+\end{itemize}
+\shortlist{../code/scala_int_type.txt}
+\end{frame}
+
+\begin{frame}[fragile]{Scala Variables}
+\begin{itemize}
+\item A \code{var} can be reassigned, it is like a classic variable
+\item We use a \code{var} to write a hardware generator in Chisel
+\end{itemize}
+\shortlist{../code/scala_var.txt}
+\end{frame}
+
+\begin{frame}[fragile]{Simple Loops}
+\shortlist{../code/scala_loop.txt}
+\begin{itemize}
+\item We use a loop to generate hardware components
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Scala \code{for} Loop for Circuit Generation}
+\shortlist{../code/scala_loop_gen.txt}
+\begin{itemize}
+\item \code{for} is Scala
+\item This loop generates several connections
+\item The connections are parallel hardware
+\item This is a shift register
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Conditions}
+\shortlist{../code/scala_condition.txt}
+\begin{itemize}
+\item Executed at runtime, when the circuit is created
+\item This is \emph{not} a mlutplexer
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Scala Arrays and Lists}
+\begin{chisel}
+// An integer array with 10 elements
+val numbers = new Array[Int](10)
+for (i <- 0 until numbers.length) {
+  numbers(i) = i*10
+}
+println(numbers(9))
+
+
+// List of integers
+val list = List(1, 2, 3)
+println(list)
+// Different form of list construction
+val listenum = 'a' :: 'b' :: 'c' :: Nil
+println(listenum)
+\end{chisel}
+\end{frame}
+
+
+\begin{frame}[fragile]{Scala Classes}
+\begin{chisel}
+// A simple class
+class Example {
+  // A field, initialized in the constructor
+  var n = 0
+
+  // A setter method
+  def set(v: Int) = {
+    n = v
+  }
+
+  // Another method
+  def print() = {
+    println(n)
+  }
+}
+\end{chisel}
+\end{frame}
+
+\begin{frame}[fragile]{Scala (Singleton) Object}
+\begin{chisel}
+object Example {}
+\end{chisel}
+\begin{itemize}
+\item For \emph{static} fields and methods
+\begin{itemize}
+\item Scala has no static fields or methods like Java
+\end{itemize}
+\item Needed for \code{main}
+\item Useful for helper functions
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Singleton Object for the \code{main}}
+\begin{chisel}
+// A singleton object
+object Example {
+
+  // The start of a Scala program
+  def main(args: Array[String]): Unit = {
+
+    val e = new Example()
+    e.print()
+    e.set(42)
+    e.print()
+  }
+}
+\end{chisel}
+\begin{itemize}
+\item Compile and run it with sbt (or within Eclipse/IntelliJ):
+\end{itemize}
+\begin{chisel}
+sbt "runMain Example"
+\end{chisel}
+\end{frame}
+
+
+
+
+
+
+
+\begin{frame}[fragile]{Conditional Circuit Generation}
+\begin{chisel}
+class Base extends Module { val io = new Bundle() }
+class VariantA extends Base { }
+class VariantB extends Base { }
+
+val m = if (useA) Module(new VariantA())
+        else Module(new VariantB())
+\end{chisel}
+\begin{itemize}
+\item \code{if} and \code{else} is Scala
+\item \code{if} is an expression that returns a value
+\begin{itemize}
+\item Like ``\code{cond ? a : b;}'' in C and Java
+\end{itemize}
+\item This is not a hardware multiplexer
+\item Decides which module to generate
+\item Could even read an XML file for the configuration
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{A Table with a Chisel \code{Vec}}
+\begin{itemize}
+\item A Chisel \code{Vec} is a collection of signals/wires or registers
+\item Similar to an Array in other languages
+\item \code{Vec} in a \code{Wire} is a combinational table (multiplexer)
+\item \code{Vec} in a \code{Reg} is a collection of registers
+\item Create with number of elements and hardware type
+\end{itemize}
+\shortlist{../code/vec.txt}
+\end{frame}
+
+\begin{frame}[fragile]{A Combinational \code{Vec}}
+\begin{itemize}
+\item A combinational \code{Vec} is basically a multiplexer
+\item Input signal/wire connected with a constant index
+\item Output select with a Chisel \code{UInt} signal
+\end{itemize}
+\shortlist{../code/vec_access.txt}
+\begin{itemize}
+\item Also convenient to represent a larger table
+\begin{itemize}
+\item Instead of a \code{switch} table
+\item Input can be \emph{generated} with Scala code
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Binary to BCD Conversion}
+\shortlist{../code/bcd_table.txt}
+\end{frame}
+
+\begin{frame}[fragile]{Today Lab}
+\begin{itemize}
+\item Use of a UART
+\item \href{https://github.com/schoeberl/chisel-lab/tree/master/lab7}{lab7}
+\item Is a communicating FSM problem, uses ready/valid handshake
+\item You can discuss your solution with a TA
+\item Could be used for extended functions in the Vending Machine
+\item You can now talk with your laptop :-)
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Summary}
+\begin{itemize}
+\item Communicating circuits/FSMs need handshaking
+\item Ready-valid interface
+\item Scala can be used to write circuit \emph{generators}
+\item We explored generation of a binary to BCD conversion table
+\end{itemize}
+\end{frame}
+
+
+
+\end{document}
+
+%\begin{frame}[fragile]{xxx}
+%\begin{itemize}
+%\item yyy
+%\end{itemize}
+%\end{frame}

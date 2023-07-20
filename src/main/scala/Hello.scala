@@ -21,7 +21,7 @@ class Hello extends Module {
   val io = IO(new Bundle {
     val led = Output(UInt(1.W))
   })
-  val CNT_MAX = (50000000 / 2 - 1).U;
+  val CNT_MAX = (50000000 / 2 - 1).U
   
   val cntReg = RegInit(0.U(32.W))
   val blkReg = RegInit(0.U(1.W))
@@ -35,11 +35,28 @@ class Hello extends Module {
 }
 //- end
 
+// following does not produce a Verilog file
+// chisel3.stage.ChiselStage.emitVerilog(new Hello())
+
 /**
  * An object extending App to generate the Verilog code.
  */
+
 //- start generate
 object Hello extends App {
-  chisel3.Driver.execute(Array[String](), () => new Hello())
+  emitVerilog(new Hello())
+}
+//- end
+
+//- start generate_options
+object HelloOption extends App {
+  emitVerilog(new Hello(), Array("--target-dir", "generated"))
+}
+//- end
+
+//- start generate_string
+object HelloString extends App {
+  val s = getVerilogString(new Hello())
+  println(s)
 }
 //- end

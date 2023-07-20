@@ -1,0 +1,68 @@
+\input{../slides/common/slides_common}
+
+\newif\ifbook
+\input{../shared/chisel}
+\title{Template for Chisel Slides}
+\author{Martin Schoeberl}
+\date{\today}
+\institute{Technical University of Denmark}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+\begin{frame}[fragile]{Goals for This Template}
+\begin{itemize}
+\item Get faster in adding slides
+\begin{itemize}
+\item with Latex snippets
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%
+\begin{frame}[fragile]{Title}
+\begin{chisel}
+code
+\end{chisel}
+\begin{itemize}
+\item xxx
+\item xxx
+\item xxx
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Title}
+\begin{itemize}
+\item xxx
+\item xxx
+\item xxx
+\item xxx
+\item xxx
+\end{itemize}
+\end{frame}
+%%%%%%%%%%%%%%%%
+
+
+\begin{frame}[fragile]{Code example}
+\begin{chisel}
+(a | b) & ~(c ^ d)
+
+val addVal = a + b
+val orVal = a | b
+val boolVal = a >= b
+\end{chisel}
+\begin{itemize}
+\item The usual operations 
+\item Simple name assignment with val
+\item Width inference
+\item Type inference
+\item Types: Bits, UInt, SInt, Bool
+\end{itemize}
+\end{frame}
+
+\end{document}

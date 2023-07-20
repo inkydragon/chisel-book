@@ -1,18 +1,15 @@
 
-scalaVersion := "2.11.7"
+scalaVersion := "2.13.8"
 
-// libraryDependencies += "edu.berkeley.cs" %% "chisel" % "latest.release"
-
-// libraryDependencies += "edu.berkeley.cs" %% "chisel" % "2.2.38"
-
-resolvers ++= Seq(
-  Resolver.sonatypeRepo("snapshots"),
-  Resolver.sonatypeRepo("releases")
+scalacOptions ++= Seq(
+  "-deprecation",
+  "-feature",
+  "-unchecked",
+  "-Xfatal-warnings",
+  "-language:reflectiveCalls",
 )
 
-scalacOptions := Seq("-deprecation")
-
-libraryDependencies += "edu.berkeley.cs" %% "chisel3" % "3.1.8"
-libraryDependencies += "edu.berkeley.cs" %% "chisel-iotesters" % "1.2.10"
-
-libraryDependencies += "org.scalatest" %% "scalatest" % "3.0.5" % "test"
+val chiselVersion = "3.5.6"
+addCompilerPlugin("edu.berkeley.cs" %% "chisel3-plugin" % chiselVersion cross CrossVersion.full)
+libraryDependencies += "edu.berkeley.cs" %% "chisel3" % chiselVersion
+libraryDependencies += "edu.berkeley.cs" %% "chiseltest" % "0.5.6"

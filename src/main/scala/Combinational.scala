@@ -49,6 +49,25 @@ class CombWhen extends Module {
   io.out := w
 }
 
+class CombWhen2Untested extends Module {
+  val io = IO(new Bundle {
+    val data = Input(UInt(4.W))
+    val out = Output(Bool())
+  })
+
+  val coinSum = io.data
+  val price = 5.U
+  //- start comb_wire2
+  val enoughMoney = Wire(Bool())
+
+  enoughMoney := false.B
+  when (coinSum >= price) {
+    enoughMoney := true.B
+  }
+  //- end
+  io.out := enoughMoney
+}
+
 class CombOther extends Module {
   val io = IO(new Bundle {
     val cond = Input(Bool())
@@ -61,7 +80,7 @@ class CombOther extends Module {
 
   when (cond) {
     w := 1.U
-  } otherwise {
+  } .otherwise {
     w := 2.U
   }
   //- end
@@ -85,7 +104,7 @@ class CombElseWhen extends Module {
     w := 1.U
   } .elsewhen (cond2) {
     w := 2.U
-  } otherwise {
+  } .otherwise {
     w := 3.U
   }
   //- end
@@ -98,10 +117,9 @@ class CombWireDefault extends Module {
     val out = Output(UInt(4.W))
   })
 
-  // TODO: change to WireDefault when 3.2 is out
   val cond = io.cond
   //- start comb_wiredefault
-  val w = WireInit(0.U)
+  val w = WireDefault(0.U)
 
   when (cond) {
     w := 3.U

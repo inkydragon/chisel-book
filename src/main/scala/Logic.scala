@@ -7,6 +7,10 @@ class Logic extends Module {
     val b = Input(UInt(1.W))
     val c = Input(UInt(1.W))
     val out = Output(UInt(1.W))
+    val cat = Output(UInt(16.W))
+    val ch = Output(UInt(8.W))
+    val word = Output(UInt(16.W))
+    val result = Output(UInt(4.W))
   })
 
   //- start types
@@ -28,7 +32,7 @@ class Logic extends Module {
   //- end
 
   //- start const_width
-  8.U(4.W) // An 4-bit constant of 8
+  3.U(4.W) // An 4-bit constant of 3
   //- end
 
   //- start const_base
@@ -36,6 +40,11 @@ class Logic extends Module {
   "o377".U       // octal representation of 255
   "b1111_1111".U // binary representation of 255
   //- end
+
+  //- start const_char
+  val aChar = 'A'.U
+  //- end
+  io.ch := aChar
 
   //- start bool
   Bool()
@@ -92,11 +101,52 @@ class Logic extends Module {
   val highByte = 0xff.U
 
   //- start concat
-  val word = Cat(highByte, lowByte)
+  val word = highByte ## lowByte
   //- end
+  io.cat := word
 
   val sel = b === c
   //- start mux
   val result = Mux(sel, a, b)
   //- end
+
+  /*
+  //- start no_partial_assign
+  val assignWord = Wire(UInt(16.W))
+
+  assignWord(7, 0) := lowByte
+  assignWord(15, 8) := highByte
+  //- end
+  */
+
+  //- start partial_assign_solution
+  val assignWord = Wire(UInt(16.W))
+
+  class Split extends Bundle {
+    val high = UInt(8.W)
+    val low = UInt(8.W)
+  }
+
+  val split = Wire(new Split())
+  split.low := lowByte
+  split.high := highByte
+
+  assignWord := split.asUInt()
+  //- end
+  io.word := assignWord
+
+  val data = 5.U(4.W)
+  //- start partial_vec_bool
+  val vecResult = Wire(Vec(4, Bool()))
+
+  // example assignments
+  vecResult(0) := data(0)
+  vecResult(1) := data(1)
+  vecResult(2) := data(2)
+  vecResult(3) := data(3)
+
+  val uintResult = vecResult.asUInt
+  //- end
+  io.result := uintResult
+
 }

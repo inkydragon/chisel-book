@@ -19,7 +19,7 @@ class ParamFunc extends Module {
   //- start param_func
   def myMux[T <: Data](sel: Bool, tPath: T, fPath: T): T = {
 
-    val ret = WireInit(fPath)
+    val ret = WireDefault(fPath)
     when (sel) {
       ret := tPath
     }
@@ -61,7 +61,7 @@ class ParamFunc extends Module {
   fVal.b := false.B
   fVal.d := 13.U
 
-  // The mulitplexer with a complex type
+  // The multiplexer with a complex type
   val resB = myMux(selB, tVal, fVal)
   //- end
 

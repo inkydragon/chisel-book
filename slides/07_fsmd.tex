@@ -1,0 +1,461 @@
+\input{common/slides_common}
+
+\newif\ifbook
+\input{../shared/chisel}
+
+\title{Finite State Machine with Datapath}
+\author{Martin Schoeberl}
+\date{\today}
+\institute{Technical University of Denmark\\
+Embedded Systems Engineering}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+
+
+\begin{frame}[fragile]{ChatGPT and Copilot (again)}
+\begin{itemize}
+\item ChatGPT and Copilot are allowed!
+\begin{itemize}
+\item In this course
+\item For coding
+\item And for improving your report writing
+\item In case you want to use it
+\end{itemize}
+\item You are still responsible for the code and text
+\item Write in the preface if you used it
+\item Write a section on reflecting the usage
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Overview}
+\begin{itemize}
+\item Review \code{Vec}
+\item Counter based circuits
+\item Finite-state machines (FSMs)
+\item FSM with Datapath
+\item Input processing
+\item Functional abstraction
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Last Lab}
+\begin{itemize}
+\item A table to describe a 7-segment decoder and drive it
+\item Did you finish the exercises?
+\item Did you run it on your Basys3 board?
+\item Show it a TA for a tick!
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Vectors}
+\begin{itemize}
+\item A powerful abstraction
+\item Let us repeat it today
+\item A vector (\code{Vec}) is an indexable collection
+\item Similar to an array in Java
+\item Selecting an element for read is a multiplexer
+\item Selecting an element to write is an input to a multiplexer or a register enable
+\item Bundles are constructs to structure data
+\item Similar to a class in Java or a record in C/VHDL
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{A Vector is a Multiplexer}
+\begin{itemize}
+\item Follwing code is a 3:1 multiplexer
+\end{itemize}
+\shortlist{../code/vec_mux.txt}
+\begin{figure}
+  \includegraphics[scale=0.6]{../figures/vec-mux}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{A Vector of Registers}
+\begin{itemize}
+\item Following code shows vectors and registers in action
+\end{itemize}
+\shortlist{../code/vec_reg.txt}
+\begin{itemize}
+\item Can you draw the schematic?
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Schematic of the Reg of Vec}
+\begin{figure}
+  \includegraphics[scale=0.6]{../figures/vec-reg}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{Generating Timing with Counters}
+\begin{itemize}
+\item Generate a \code{tick} at a lower frequency
+\item We used it in Lab 1 for the blinking LED
+\item You needed it for last week's lab
+\item We will use it again in next week's lab
+\item Use it for driving the display multiplexing at 1~kHz
+\end{itemize}
+\begin{figure}
+  \includegraphics[scale=0.8]{../figures/tick_wave}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile]{The Tick Generation}
+\shortlist{../code/sequ_tick_gen.txt}
+\end{frame}
+
+\begin{frame}[fragile]{Using the Tick}
+\begin{itemize}
+\item A counter running at a \emph{slower frequency}
+\item By using the \code{tick} as an enable signal
+\end{itemize}
+\shortlist{../code/sequ_tick_counter.txt}
+\end{frame}
+
+\begin{frame}[fragile]{The \emph{Slow} Counter}
+\begin{itemize}
+\item Incremented every \code{tick}
+\end{itemize}
+\begin{figure}
+  \includegraphics[scale=0.8]{../figures/tick_count_wave}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{What is the Use of This \emph{Slow} Counter?}
+\begin{itemize}
+\item This will be your lab exercise next week
+\item For the display multiplexing
+\item Then you need to generate a timing of 1 kHz (1 ms)
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Finite-State Machine (FSM)}
+\begin{itemize}
+\item Has a register that contains the state
+\item Has a function to computer the next state
+\begin{itemize}
+\item Depending on current state and input
+\end{itemize}
+\item Has an output depending on the state
+\begin{itemize}
+\item And maybe on the input as well
+\end{itemize}
+\item Every synchronous circuit can be considered a finite state machine
+\item However, sometimes the state space is a little bit too large
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Basic Finite-State Machine}
+\begin{itemize}
+\item A state register
+\item Two combinational blocks
+\begin{itemize}
+\item Next state logic
+\item Output logic
+\end{itemize}
+\end{itemize}
+\begin{figure}
+  \includegraphics[scale=\scale]{../figures/fsm}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{State Diagrams are Convenient}
+\begin{figure}
+  \includegraphics[scale=\scale]{../figures/state-diag-moore}
+\end{figure}
+\begin{itemize}
+\item States and transitions depending on input values
+\item Example is a simple alarm FSM
+\item Nice visualization
+\item Will not work for large FSMs
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{A Mealy FSM}
+\begin{itemize}
+\item Similar to the former FSM
+\item Output also depends in the input
+\item Output is \emph{faster}
+\item Less composable as we may have combinational circles
+\end{itemize}
+\begin{figure}
+  \includegraphics[scale=\scale]{../figures/mealy}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{The Mealy FSM for the Rising Edge}
+\begin{itemize}
+\item Output is also part of the transition arrows
+\end{itemize}
+\begin{figure}
+  \includegraphics[scale=\scale]{../figures/state-diag-mealy}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{State Diagram for the Moore Rising Edge Detection}
+\begin{itemize}
+\item We need three states
+\end{itemize}
+\begin{figure}
+  \includegraphics[scale=\scale]{../figures/state-diag-rising-moore}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{Comparing with a Timing Diagram}
+\begin{itemize}
+\item Moore is delayed by one clock cycle compared to Mealy
+\end{itemize}
+\begin{figure}
+  \includegraphics[scale=1]{../figures/rising}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{What is Better?}
+\begin{itemize}
+\item It depends ;-)
+\item Moore is on the save side
+\item Moore is composable
+\item Mealy has \emph{faster} reaction
+\item Both are tools in you toolbox
+\item Keep it simple with your vending machine and use a Moore FSM
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Working Break}
+\begin{itemize}
+\item 20' break
+\item We are half way through the course
+\item Therefore, a midterm \href{https://docs.google.com/forms/d/e/1FAIpQLSd93nSVDE-sk75GtU3OgMB0TI7HxVB5i3KlDu0YILb39WMdIw/viewform?usp=sf_link}{evaluation}
+\item Send also on Slack (from the slide sources or the website)
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{FSM with Datapath}
+\begin{itemize}
+\item A type of computing machine
+\item Consists of a finite-state machine (FSM) and a datapath
+\item The FSM is the master (the controller) of the datapath
+\item The datapath has computing elements
+\begin{itemize}
+\item E.g., adder, incrementer, constants, multiplexers, ...
+\end{itemize}
+\item The datapath has storage elements (registers)
+\begin{itemize}
+\item E.g., sum of money payed, count of something, ...
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{FSM-Datapath Interaction}
+\begin{itemize}
+\item The FSM controls the datapath
+\begin{itemize}
+\item For example, add 2 to the sum
+\end{itemize}
+\item By controlling multiplexers
+\begin{itemize}
+\item For example, select how much to add
+\item Not adding means selecting 0 to add
+\end{itemize}
+\item Which value goes where
+\item The FSM logic also depends on datapath output
+\begin{itemize}
+\item Is there enough money payed to release a can of soda?
+\end{itemize}
+\item FSM and datapath interact
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Popcount Example}
+\begin{itemize}
+\item An FSMD that computes the popcount
+\item Also called the Hamming weight
+\item Compute the number of `1's in a word
+\item Input is the data word
+\item Output is the count
+\item Code available at \href{https://github.com/schoeberl/chisel-book/blob/master/src/main/scala/PopulationCount.scala}{PopulationCount.scala}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Popcount Block Diagram}
+
+\begin{figure}
+  \includegraphics[scale=\scale]{../figures/popcnt-fsmd}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile]{Popcount Connection}
+\begin{columns}
+\column{0.6\textwidth}
+\begin{itemize}
+\item Input \code{din} and output \code{popCount}
+\item Both connected to the datapath
+\item We need some handshaking
+\item For data input and for count output
+\end{itemize}
+\column{0.4\textwidth}
+\begin{figure}
+  \includegraphics[scale=0.45]{../figures/popcnt-fsmd}
+\end{figure}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{Popcount Handshake}
+\begin{columns}
+\column{0.6\textwidth}
+\begin{itemize}
+\item We use a ready-valid handshake
+\item When data is available valid is asserted
+\item When the receiver can accept data ready is asserted
+\item Transfer takes place when both are asserted
+\item Draw the ready/valid handshake on the black board
+\end{itemize}
+\column{0.4\textwidth}
+\begin{figure}
+  \includegraphics[scale=0.45]{../figures/popcnt-fsmd}
+\end{figure}
+\end{columns}
+\end{frame}
+
+
+\begin{frame}[fragile]{The FSM}
+\begin{figure}
+  \includegraphics[scale=\scale]{../figures/popcnt-states}
+\end{figure}
+\begin{itemize}
+\item A Very Simple FSM
+\item Two transitions depend on input/output handshake
+\item One transition on the datapath output
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{The Datapath}
+\begin{figure}
+  \includegraphics[scale=0.65]{../figures/popcnt-data}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{Let's Explore the Code}
+\begin{itemize}
+\item In \href{https://github.com/schoeberl/chisel-book/blob/master/src/main/scala/PopulationCount.scala}{PopulationCount.scala}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Usage of an FSMD}
+\begin{itemize}
+\item Maybe the main part your vending machine is an FSMD?
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Input Processing}
+\begin{itemize}
+\item Input signals are not synchronous to the clock
+\item May violate setup and hold time of a flip-flop
+\item Can lead to metastability
+\item Signals need to be \emph{synchronized}
+\item Using two flip-flops
+\item Metastability cannot be avoided
+\item Assumption is:
+\begin{itemize}
+\item First flip-flop may become metastable
+\item But will resolve within the clock period
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Input Synchronizer}
+\begin{figure}
+  \includegraphics[scale=\scale]{../figures/synchronizer}
+\end{figure}
+\shortlist{../code/input_sync.txt}
+\end{frame}
+
+\begin{frame}[fragile]{Bouncing Buttons}
+\begin{itemize}
+\item Buttons and switches need some time to transition between on and off
+\item May bounce between the two values
+\item Without processing we detect more than one event
+\item Solution is to filter out bouncing
+\begin{itemize}
+\item Can be done electrically (R + C + Schmitt trigger)
+\item That is why you have the extra PCB with the buttons
+\item But we can also do this digitally
+\item You can then drop your additional board ;-)
+\end{itemize}
+\item Assume  bouncing time $t_{bounce}$
+\item Sample at a period $T > t_{bounce}$
+\item Only use sampled signal
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Sampling for Debouncing}
+\begin{figure}
+  \includegraphics[scale=\scale]{../figures/debounce}
+\end{figure}
+\end{frame}
+
+
+\begin{frame}[fragile]{Sampling for Debouncing}
+\shortlist{../code/input_fac.txt}
+\shortlist{../code/input_debounce.txt}
+\begin{itemize}
+\item We already know how to do this!
+\item Just generate timing with a counter
+\item We sample at 100 Hz (bouncing below 10 ms)
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Agile Hardware Design Course}
+\begin{itemize}
+\item Advanced Chisel
+\item by Scott Beamer from UC Santa Cruz
+\item Includes executable slides
+\item \url{https://classes.soe.ucsc.edu/cse228a/Winter23/}
+\item Includes Videos
+\item I will do a similar course for the new CE Bachelor
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Today's Lab}
+\begin{itemize}
+\item Paper \& pencil exercises (see course website)
+\item Exercises on FSMs
+\item From the Dally book
+\item Just sketch the Chisel code
+\item On paper or in a plain text editor
+\item As usual, show and discuss your solution with a TA
+\item Also finish you lab from last week and get the tick
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Summary}
+\begin{itemize}
+\item Counters are used to generate timing
+\item An FSM can control a datapath, which is an FSMD
+\item An FSMD is a computing machine
+\item Functions to structure your code
+\end{itemize}
+\end{frame}
+
+
+\end{document}
+
+%\begin{frame}[fragile]{xxx}
+%\begin{itemize}
+%\item yyy
+%\end{itemize}
+%\end{frame}

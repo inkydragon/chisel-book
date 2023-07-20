@@ -1,0 +1,560 @@
+\input{common/slides_common}
+
+\newif\ifbook
+\input{../shared/chisel}
+
+\title{Testing and Verification}
+\author{Martin Schoeberl}
+\date{\today}
+\institute{Technical University of Denmark\\
+Embedded Systems Engineering}
+
+\begin{document}
+
+\begin{frame}
+\titlepage
+\end{frame}
+
+\begin{frame}[fragile]{TODO 2024}
+\begin{itemize}
+\item This is material for barely one hour -- extend it
+\item Testing needs a for loop: explain it and some Scala (in the testing context)
+\item Maybe a better test example. At least make it a 4 Mux and write when it is done, same for the Heap example
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Overview}
+\begin{itemize}
+\item Today is Open House
+\begin{itemize}
+\item They will visit our lecture and the lab
+\end{itemize}
+\item Review components
+\item Debugging and testing
+\item Digital designers (sometimes) call testing verification
+\begin{itemize}
+\item To distinguish from final chip testing
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{DTU Chip Day}
+\begin{itemize}
+\item Note the date: Tu 18 April afternoon
+\item Start with sandwiches and finish with beer
+\item Presentation of chip design and verification work/companies in Denmark
+\item Several chip companies will present and are participating
+\item Opportunity to network for: theses with companies, internship, student jobs
+\end{itemize}
+\end{frame}
+
+%\begin{frame}[fragile]{Some Clarification - TODO: Maybe drop or change}
+%\begin{itemize}
+%\item Online learning is hard, I understand
+%\item Installing all tools on your laptop can also be hard
+%\begin{itemize}
+%\item We are back physical now
+%\end{itemize}
+%\item Don't be afraid from the \emph{power user} demos
+%\begin{itemize}
+%\item Just for ``entertainment'' and for advanced users
+%\item You can also simply ignore it
+%\end{itemize}
+%\item Learning Objectives
+%\begin{itemize}
+%\item How to build medium sized digital circuits
+%\item Describe them in Chisel  and implement them in an FPGA
+%\item Timing analysis of digital circuits
+%\end{itemize}
+%\end{itemize}
+%\end{frame}
+
+\begin{frame}[fragile]{Direction of a Connection}
+\begin{itemize}
+\item The flow on a \code{Wire} has a direction
+\item One end is the output/driver/source and the other end is the input/sink
+\item Or producer and consumer
+\item An expression has also a direction:
+\begin{itemize}
+\item The right hand site produces a value
+\item The left hand site consumes the value
+\end{itemize}
+\item \code{sink := source1 + source2}
+\item Like in Java and other programming languages
+\item Draw a figure
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Last Chisel Lab (week 3)}
+\begin{itemize}
+\item On components and small sequential circuits
+\begin{itemize}
+\item Registers plus combinational circuits
+\end{itemize}
+\item Did you finish the exercises?
+\begin{itemize}
+\item Do the poll
+\end{itemize}
+\item They are not mandatory, but helpful for preparation for the final project
+\item Let's look at solutions
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Components are Modules}
+\begin{itemize}
+\item Components are building blocks
+\begin{itemize}
+\item Like concrete, physical ICs
+\end{itemize}
+\item Components have input and output ports (= pins)
+\begin{itemize}
+\item Organized as a \code{Bundle}
+\item Assigned to the field \code{io}
+\end{itemize}
+\item We build circuits as a hierarchy of components
+\begin{itemize}
+\item You did a 4:1 multiplexer out of three 2:1 multiplexers
+\end{itemize}
+\item In Chisel a component is called \code{Module}
+\item Components/Modules are used to organize the circuit
+\begin{itemize}
+\item Similar to using methods in Java
+\item But they are connected with \emph{wires}
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{A Binary Watch}
+\begin{itemize}
+\item Built out of discrete, digital components
+\end{itemize}
+\begin{figure}
+    \centering
+    \href{https://commons.wikimedia.org/wiki/File:Relogio_binario.JPG}{\includegraphics[scale=0.3]{binary-watch.jpg}}
+\end{figure}
+
+{\tiny Source: Diogo Sousa, \href{https://en.wikipedia.org/wiki/Public_domain}{public domain}}
+\end{frame}
+
+
+\begin{frame}[fragile]{Let Us Build a Counter}
+\begin{itemize}
+\item Counting from 0 up to 9
+\item Restart from 0
+\item Build it out of components
+\item We need:
+\begin{itemize}
+\item Adder
+\item Register
+\item Multiplexer
+\end{itemize}
+\item
+\item But these are very tiny components
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{An Adder (Component/Module)}
+\begin{columns}
+\begin{column}{0.4\textwidth}
+\begin{figure}
+  \includegraphics[scale=\scale]{../figures/components-adder}
+\end{figure}
+\end{column}
+\begin{column}{0.6\textwidth}
+\shortlist{../code/components_add.txt}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{A Register}
+\begin{columns}
+\begin{column}{0.4\textwidth}
+\begin{figure}
+  \includegraphics[scale=\scale]{../figures/components-register}
+\end{figure}
+\end{column}
+\begin{column}{0.6\textwidth}
+\shortlist{../code/components_reg.txt}
+\end{column}
+\end{columns}
+\end{frame}
+
+\begin{frame}[fragile]{The Counter Schematics}
+\begin{figure}
+  \includegraphics[scale=0.6]{../figures/components-counter}
+\end{figure}
+\end{frame}
+
+\begin{frame}[fragile]{The Counter in Chisel}
+\shortlist{../code/components_cnt.txt}
+\end{frame}
+
+\begin{frame}[fragile]{Summarize Components}
+\begin{itemize}
+\item Think like concrete components (ICs)
+\item They have named pins (\code{io.name})
+\begin{itemize}
+\item In hardware language these pins are often called ports
+\item Ports have a direction (input or output)
+\end{itemize}
+\item They need to be created:
+\begin{itemize}
+\item \code{val mc = Module(new MyComponent())}
+\end{itemize}
+\item and pins need to be connected with \code{:=}
+\item One module is special, as it is the top module
+\end{itemize}
+\end{frame}
+
+%\begin{frame}[fragile]{XXX}
+%\begin{itemize}
+%\item xxx
+%\item xxx
+%\item xxx
+%\item xxx
+%\item xxx
+%\end{itemize}
+%\end{frame}
+
+
+
+\begin{frame}[fragile]{Chisel Main}
+
+\begin{itemize}
+\item Create one top-level Module
+\item Invoke the \code{emitVerilog()} from the App
+\item Pass the top module (e.g., \code{new Hello()})
+\item Optional: pass some parameters (in an \code{Array})
+\item Following code generates Verilog code for the \emph{Hello World}
+\end{itemize}
+\shortlist{../code/generate.txt}
+\end{frame}
+
+\begin{frame}[fragile]{Testing and Debugging}
+\begin{itemize}
+\item Nobody writes perfect code ;-)
+\item We need a method to improve the code
+\item In Java we can simply print values:
+\begin{itemize}
+\item \code{println("42");}
+\end{itemize}
+\item What can we do in hardware?
+\begin{itemize}
+\item Describe the whole circuit and hope it works?
+\item We can switch an LED on and off
+\item Test it with switches and LEDs in an FPGA
+\end{itemize}
+\item We need some tools for \href{https://en.wikipedia.org/wiki/Debugging#/media/File:H96566k.jpg}{debugging}
+\item Writing testers in Chisel
+\item We test by running a simulation of the circuit
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{ScalaTest}
+\begin{itemize}
+\item Testing framework for Scala and Java
+\item Tests are placed under \code{src/test/scala}
+\item \code{sbt} understands ScalaTest
+\item Run all tests with:
+\begin{chisel}
+sbt test
+\end{chisel}
+\item When all (unit) tests are ok, the test suit passes
+\item A little bit funny syntax
+\item ChiselTest is based on ScalaTest
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Testing with Chisel}
+\begin{itemize}
+\item A test contains
+\begin{itemize}
+\item a device under test (DUT) and
+\item the testing logic
+\end{itemize}
+\item Set input values with \code{poke}
+\item Advance the simulation with \code{step}
+\item Read the output values with \code{peek}
+\item Compare the values with \code{expect}
+\item Import following packages
+\shortlist{../code/test_import.txt}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{An Example DUT}
+\begin{itemize}
+\item A device-under test (DUT)
+\item Just 2-bit AND logic and equvicalence
+\shortlist{../code/test_dut.txt}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{A ChiselTest}
+\begin{itemize}
+\item Extends class \code{AnyFlatSpec} with \code{ChiselScalatestTester}
+\item Has the device-under test (DUT) as parameter of the \code{test()} function
+\item Test function contains the test code
+\item Testing code can use all features of Scala
+\item Is placed in \code{src/test/scala}
+\item Is run with \code{sbt test}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{A Simple Tester}
+\begin{itemize}
+\item Just using \code{println} for manual inspection
+\shortlist{../code/test_bench_simple.txt}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{A Real Tester}
+\begin{itemize}
+\item Poke values and \code{expect} some output
+\shortlist{../code/test_bench.txt}
+\end{itemize}
+\end{frame}
+
+
+
+\begin{frame}[fragile]{Generating Waveforms}
+\begin{itemize}
+\item Waveforms are timing diagrams
+\item Good to see many parallel signals and registers
+\begin{verbatim}
+sbt "testOnly SimpleTest -- -DwriteVcd=1"
+\end{verbatim}
+\item Or setting an attribute for the \code{test()} function
+\begin{chisel}
+test(new DeviceUnderTest)
+    .withAnnotations(Seq(WriteVcdAnnotation))
+\end{chisel}
+\item IO signals and registers are dumped
+\item Option \code{--debug} puts all wires into the dump
+\item Generates a .vcd file in
+\begin{chisel}
+    test_run_dir/test-name
+\end{chisel}
+\item Viewing with GTKWave or ModelSim
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Display Waveform with GTKWave}
+\begin{itemize}
+\item Run the tester: \code{sbt test}
+\item Locate the .vcd file in test\_run\_dir/...
+\item Start GTKWave
+\item Open the .vcd file with
+\begin{itemize}
+\item File -- Open New Tab
+\end{itemize}
+\item Select the circuit
+\item Drag and drop the interesting signals
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Waveform Testing Demo}
+\begin{itemize}
+\item Counter with a limit from last Chisel lab (\code{Count6})
+\item Show Count6 tester: the original and the waveform
+\item Run it and look at waveform
+\item Add the solution
+\item Run again and reload the waveform
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{A Self-Running Circuit}
+\begin{itemize}
+\item \code{Count6} is a self-running circuit
+\item Needs no stimuli (\code{poke})
+\item Just run for a few cycles
+\end{itemize}
+\begin{chisel}
+    test(new Count6) { dut =>
+      dut.clock.step(20)
+    }
+\end{chisel}
+\end{frame}
+
+\begin{frame}[fragile]{The WaveForm}
+\begin{itemize}
+\item The complete test
+\item Note the \code{.withAnnotations(Seq(WriteVcdAnnotation)}
+\end{itemize}
+\begin{chisel}
+class Count6WaveSpec extends AnyFlatSpec with ChiselScalatestTester {
+  "CountWave6 " should "pass" in {
+    test(new Count6).withAnnotations(Seq(WriteVcdAnnotation)) { dut =>
+      dut.clock.step(20)
+    }
+  }
+}
+\end{chisel}
+\end{frame}
+
+\begin{frame}[fragile]{Display Waveform with GTKWave}
+\begin{itemize}
+\item Run the tester: \code{sbt test}
+\item Locate the .vcd file in test\_run\_dir/...
+\item Start GTKWave
+\item Open the .vcd file with
+\begin{itemize}
+\item File -- Open New Tab
+\end{itemize}
+\item Select the circuit
+\item Drag and drop the interesting signals
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Vending Machine Testing}
+\begin{itemize}
+\item I provide a minimal tester to generate a waveform
+\item Adding some coins and buying
+\item You can and shall extend this tester
+\item Better having more than one tester
+\item Show the waveform of the test
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Printf Debugging}
+\begin{itemize}
+\item We can \emph{print} in the hardware during simulation
+\item Printing happens on the rising edge of the clock
+\item Good to see many parallel signals and registers
+\item \code{printf} anywhere in the module definition
+\end{itemize}
+\shortlist{../code/test_dut_printf.txt}
+\end{frame}
+
+
+\begin{frame}[fragile]{Test Driven Development (TDD)}
+\begin{itemize}
+\item Software development process
+\begin{itemize}
+\item Can we learn from SW development for HW design?
+\end{itemize}
+\item Writing the test first, then the implementation
+\item Started with extreme programming
+\begin{itemize}
+\item Frequent releases
+\item Accept change as part of the development
+\end{itemize}
+\item A path to \emph{Agile Hardware Development!}
+\item Not used in its pour form
+\begin{itemize}
+\item Writing all those tests is simply considerer too much work
+\item \textbf{But}, write at least one test for each component
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Regression Tests}
+\begin{itemize}
+\item Tests are collected over time
+\item When a bug is found, a test is written to reproduce this bug
+\item Collection of tests increases
+\item Runs every night to test for \emph{regression}
+\begin{itemize}
+\item Did a code change introduce a bug in the current code base?
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Continuous Integration (CI)}
+\begin{itemize}
+\item Next logical step from regression tests
+\item Run all tests whenever code is changed
+\item Automate this with a repository, e.g., on GitHub
+\item Run CI on GitHub
+\item Show about this on the Chisel book
+\begin{itemize}
+\item Show \code{sbt test}
+\item Live demo on GitHub
+\item Mail from GitHub when it fails
+\end{itemize}
+\item \url{https://github.com/schoeberl/chisel-book/actions}
+\item Maybe show how to set this up (it is easy ;)
+\begin{itemize}
+\item Start with the \href{https://github.com/schoeberl/chisel-empty}{chisel-empty} template
+\item Open it with IntelliJ
+\item Add action in GitHub
+\end{itemize}
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Testing versus Debugging}
+\begin{itemize}
+\item Debugging is during code development
+\item Waveform and \code{println} are easy tools for debugging
+\item Debugging does not help for regression tests
+\item Write small test cases for regression tests
+\item Keeps your code base \emph{intact} when doing changes
+\item Better confidence in changes not introducing new bugs
+\end{itemize}
+\end{frame}
+
+
+\begin{frame}[fragile]{Scala Build Tool (sbt)}
+\begin{itemize}
+\item Downloads Scala compiler if needed
+\item Downloads dependent libraries (e.g., Chisel)
+\item Compiles Scala programs
+\item Executes Scala programs
+\item Does a lot of magic, maybe too much
+\item Compile and run with:
+\end{itemize}
+\begin{chisel}
+sbt "runMain simple.Example"
+sbt run
+sbt test
+sbt "testOnly MySpec"
+sbt compile
+\end{chisel}
+\end{frame}
+
+\begin{frame}[fragile]{Build Configuration}
+\begin{itemize}
+\item File name: \code{build.sbt}
+\item Defines needed Scala version
+\item Library dependencies
+\end{itemize}
+\begin{chisel}
+scalaVersion := "2.12.13"
+
+scalacOptions ++= Seq("-feature", "-language:reflectiveCalls")
+
+resolvers ++= Seq(Resolver.sonatypeRepo("releases"))
+
+addCompilerPlugin("edu.berkeley.cs" % "chisel3-plugin" % "3.5.0" cross CrossVersion.full)
+libraryDependencies += "edu.berkeley.cs" %% "chisel3" % "3.5.0"
+libraryDependencies += "edu.berkeley.cs" %% "chiseltest" % "0.5.0"
+\end{chisel}
+\end{frame}
+
+\begin{frame}[fragile]{Today's Lab}
+\begin{itemize}
+\item Testing a faulty multiplexer
+\item Do not look into the multiplexer code, find out with testing
+\item Use ChiselTest (the description has been updated)
+\item You have to start from scratch with the tester
+\item Show and discuss your testing code with a TA (or me)
+\item \href{https://github.com/schoeberl/chisel-lab/tree/master/lab4}{Lab 4}
+\item And an additional challenge brought to you by Tjark
+\end{itemize}
+\end{frame}
+
+\begin{frame}[fragile]{Summary}
+\begin{itemize}
+\item Small sequential circuits are our building blocks
+\item We build larger circuits by combining components (modules)
+\item There is no \emph{println} in (real) hardware
+\item We need to write tests for the development
+\item Debugging versus regression tests
+\end{itemize}
+\end{frame}
+
+\end{document}
+

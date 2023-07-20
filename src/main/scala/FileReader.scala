@@ -18,8 +18,9 @@ class FileReader extends Module {
     idx += 1
   }
 
-  // convert the Scala integer array into the Chisel type Vec
-  val table = VecInit(array.map(_.U(8.W)))
+  // convert the Scala integer array to a Seq
+  // and into a vector of Chisel UInt
+  val table = VecInit(array.toIndexedSeq.map(_.U(8.W)))
 
   // use the table
   io.data := table(io.address)

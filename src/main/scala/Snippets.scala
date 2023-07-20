@@ -1,4 +1,6 @@
 // Just code snippets for syntax check by the compiler
+// TODO: maybe this should go and all used code placed into
+// modules that are tested.
 
 import chisel3._
 
@@ -9,7 +11,25 @@ class BasicExercise extends Module {
     val led = Output(UInt(1.W))
   })
   //- end
+
+  // This is possible
+  val + = 1.U
+  val Module = 2.U
+  val when = 3.U
+
   io.led := io.sw(0) & io.sw(1)
+}
+
+class NosensKeywords extends Module {
+  val io = IO(new Bundle {
+    val led = Output(UInt(1.W))
+  })
+
+  // This is possible, but does not make sense
+  val + = 1.U
+  val Module = 2.U
+  val when = 3.U
+
 }
 
 class AluIO extends Bundle {
@@ -51,16 +71,6 @@ class ParamChannel(n: Int) extends Bundle {
 }
 
 
-class Adder extends Module {
-  val io = IO(new Bundle {
-    val a = Input(UInt(4.W))
-    val b = Input(UInt(4.W))
-    val result = Output(UInt(4.W))
-  })
-
-  val addVal = io.a + io.b
-  io.result := addVal
-}
 
 class Conditional extends Module {
   val io = IO(new Bundle {
@@ -104,6 +114,41 @@ class Snippets extends Module {
   val add8 = Module(new ParamAdder(8))
 }
 
+class ExplainWireAndCo extends Module {
+  val io = IO(new Bundle {
+    val cond = Input(Bool())
+    val out = Output(UInt(4.W))
+  })
+
+  //- start wire_reg
+  val number = Wire(UInt())
+  val reg = Reg(SInt())
+  //- end
+
+  val value = WireDefault(1.U)
+
+  //- start wire_reg_reassign
+  number := 10.U
+  reg := value - 3.U
+  //- end
+
+}
+
+class ExplainWireAndCo2 extends Module {
+  val io = IO(new Bundle {
+    val cond = Input(Bool())
+    val out = Output(UInt(4.W))
+  })
+
+  //- start wire_reg_default
+  val number = WireDefault(10.U(4.W))
+  //- end
+
+  //- start wire_reg_init
+  val reg = RegInit(0.S(8.W))
+  //- end
+}
+
 object Snippets extends App {
-  chisel3.Driver.execute(Array("--target-dir", "generated"), () => new Conditional())
+  emitVerilog(new Conditional(), Array("--target-dir", "generated"))
 }

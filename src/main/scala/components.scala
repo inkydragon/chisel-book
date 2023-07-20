@@ -4,6 +4,53 @@ import chisel3._
 import chisel3.util._
 //- end
 
+//- start components_add
+class Adder extends Module {
+  val io = IO(new Bundle {
+    val a = Input(UInt(8.W))
+    val b = Input(UInt(8.W))
+    val y = Output(UInt(8.W))
+  })
+
+  io.y := io.a + io.b
+}
+//- end
+
+//- start components_reg
+class Register extends Module {
+  val io = IO(new Bundle {
+    val d = Input(UInt(8.W))
+    val q = Output(UInt(8.W))
+  })
+
+  val reg = RegInit(0.U)
+  reg := io.d
+  io.q := reg
+}
+//- end
+
+//- start components_cnt
+class Count10 extends Module {
+  val io = IO(new Bundle {
+    val dout = Output(UInt(8.W))
+  })
+
+  val add = Module(new Adder())
+  val reg = Module(new Register())
+
+  // the register output
+  val count = reg.io.q
+  // connect the adder
+  add.io.a := 1.U
+  add.io.b := count
+  val result = add.io.y
+  // connect the Mux and the register input
+  val next = Mux(count === 9.U, 0.U, result)
+  reg.io.d := next
+  io.dout := count
+}
+//- end
+
 //- start components_ab
 class CompA extends Module {
   val io = IO(new Bundle {
@@ -30,11 +77,11 @@ class CompB extends Module {
 //- start components_c
 class CompC extends Module {
   val io = IO(new Bundle {
-    val in_a = Input(UInt(8.W))
-    val in_b = Input(UInt(8.W))
-    val in_c = Input(UInt(8.W))
-    val out_x = Output(UInt(8.W))
-    val out_y = Output(UInt(8.W))
+    val inA = Input(UInt(8.W))
+    val inB = Input(UInt(8.W))
+    val inC = Input(UInt(8.W))
+    val outX = Output(UInt(8.W))
+    val outY = Output(UInt(8.W))
   })
 
   // create components A and B
@@ -42,13 +89,13 @@ class CompC extends Module {
   val compB = Module(new CompB())
 
   // connect A
-  compA.io.a := io.in_a
-  compA.io.b := io.in_b
-  io.out_x := compA.io.x
+  compA.io.a := io.inA
+  compA.io.b := io.inB
+  io.outX := compA.io.x
   // connect B
   compB.io.in1 := compA.io.y
-  compB.io.in2 := io.in_c
-  io.out_y := compB.io.out
+  compB.io.in2 := io.inC
+  io.outY := compB.io.out
 }
 //- end
 
@@ -66,11 +113,11 @@ class CompD extends Module {
 //- start components_top
 class TopLevel extends Module {
   val io = IO(new Bundle {
-    val in_a = Input(UInt(8.W))
-    val in_b = Input(UInt(8.W))
-    val in_c = Input(UInt(8.W))
-    val out_m = Output(UInt(8.W))
-    val out_n = Output(UInt(8.W))
+    val inA = Input(UInt(8.W))
+    val inB = Input(UInt(8.W))
+    val inC = Input(UInt(8.W))
+    val outM = Output(UInt(8.W))
+    val outN = Output(UInt(8.W))
   })
 
   // create C and D
@@ -78,13 +125,13 @@ class TopLevel extends Module {
   val d = Module(new CompD())
 
   // connect C
-  c.io.in_a := io.in_a
-  c.io.in_b := io.in_b
-  c.io.in_c := io.in_c
-  io.out_m := c.io.out_x
+  c.io.inA := io.inA
+  c.io.inB := io.inB
+  c.io.inC := io.inC
+  io.outM := c.io.outX
   // connect D
-  d.io.in := c.io.out_y
-  io.out_n := d.io.out
+  d.io.in := c.io.outY
+  io.outN := d.io.out
 }
 //- end
 
@@ -160,7 +207,7 @@ class Fetch extends Module {
     val instr = Output(UInt(32.W))
     val pc = Output(UInt(32.W))
   })
-  // ... Implementation od fetch
+  // ... Implementation of fetch
 }
 //- end
 
