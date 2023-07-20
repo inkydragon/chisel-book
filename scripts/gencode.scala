@@ -3,11 +3,12 @@
 import java.io._
 import scala.io.Source
 
-val files = new File("src/main/scala").listFiles
-files.map(f => extract("src/main/scala/" + f.getName))
+@main def entryPoint() =
+  val files = new File("src/main/scala").listFiles
+  files.map(f => extract("src/main/scala/" + f.getName))
 
-val tfiles = new File("src/test/scala").listFiles
-tfiles.map(f => extract("src/test/scala/" + f.getName))
+  val tfiles = new File("src/test/scala").listFiles
+  tfiles.map(f => extract("src/test/scala/" + f.getName))
 
 /*
     val writer = new PrintWriter(new File("Write.txt"))
@@ -16,7 +17,7 @@ tfiles.map(f => extract("src/test/scala/" + f.getName))
     writer.close()
 */
 
-def extract(f: String) {
+def extract(f: String) =
 
   println(f)
   var code: PrintWriter = null
@@ -36,5 +37,3 @@ def extract(f: String) {
         code.println(l)
     }
   }
-
-}
