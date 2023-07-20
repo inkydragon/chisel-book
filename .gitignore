@@ -12,6 +12,9 @@ project/
 *.blg
 *.fdb_latexmk
 *.fls
+*.idx
+*.ilg
+*.ind
 *.lo[fglt]
 *.out
 *.toc
