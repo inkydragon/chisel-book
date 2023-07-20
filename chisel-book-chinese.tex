@@ -19,7 +19,7 @@
 %\setlength{\paperwidth}{15.73cm} \setlength{\paperheight}{20.96cm}
 \setlength{\paperwidth}{15.72cm} \setlength{\paperheight}{20.95cm}
 %\typearea{calc} % without BCOR results to a DIV of 8 for 11pt
-\typearea[1cm]{18} % TODO: check if 1 cm is the correct number
+\typearea[1.1cm]{15} % used 18, but 15 gives more space for the binding, TODO: check if 1.1 cm is the correct number
 
 \usepackage{scrlayer-scrpage}
 \setkomafont{pagehead}{\scshape\small}
@@ -27,16 +27,22 @@
 
 
 \newif\ifbook
-%\booktrue % comment out for the eBook version
+%\booktrue % comment out for the print book version
 
 \ifbook
 \else
-\cfoot{\hyperlink{contents}{{\textnormal{Contents}}}}
+\ifoot{\hyperlink{contents}{{\textnormal{Contents}}}}
+\cfoot{\hyperlink{index}{{\textnormal{Index}}}}
 \fi
 
 
+
 \usepackage{pslatex} % -- times instead of computer modern, especially for the plain article class
-\usepackage[colorlinks=true,bookmarks=false]{hyperref}
+\usepackage[pdftex,
+            pdfauthor={Martin Schoeberl},
+            pdftitle={Digital Design with Chisel},
+            colorlinks=true,bookmarks=true]{hyperref}
+
 \usepackage{booktabs}
 \usepackage{graphicx}
 \usepackage{xcolor}
@@ -44,6 +50,8 @@
 \usepackage{cite}
 \usepackage{dirtree}
 \usepackage{pdfpages}
+\usepackage{makeidx}
+%\usepackage{showidx} % for index debugging
 % For alignment on tables
 \usepackage{dcolumn}
 \newcommand{\cc}[1]{\multicolumn{1}{c}{#1}}
@@ -56,6 +64,15 @@
 % another TT, suggested by Alex
 % \usepackage{inconsolata}
 % \usepackage[T1]{fontenc} % needed as well?
+
+% Smaller verbatim text
+\usepackage{etoolbox}
+\makeatletter
+\patchcmd{\@verbatim}
+  {\verbatim@font}
+  {\verbatim@font\small}
+  {}{}
+\makeatother
 
 \usepackage[procnames]{listings}
 
@@ -75,8 +92,12 @@
   urlcolor   = blue,
   colorlinks = true,
   bookmarks=true,
+  pdfpagemode=UseOutlines,
 }
 \fi
+
+
+\makeindex
 
 % not really used
 \newenvironment{comment}
@@ -105,8 +126,10 @@
 \fi
 
 % uncomment following for final submission
-\renewcommand{\todo}[1]{}
-\renewcommand{\martin}[1]{}
+%\renewcommand{\todo}[1]{}
+%\renewcommand{\martin}[1]{}
+
+\makeindex
 
 \begin{document}
 
@@ -127,6 +150,9 @@
 \ \\
 \vspace{1cm}
 {\usekomafont{title}\mdseries\huge Digital Design with Chisel}
+\ \\
+\vspace{1cm}
+{\usekomafont{title}\mdseries\Large Fifth Edition}
 \cleardoublepage
 \end{flushleft}
 \newpage
@@ -138,6 +164,7 @@
 \vspace{1cm}
 {\usekomafont{title}\Huge Digital Design with Chisel\\
 \bigskip
+{\usekomafont{title}\huge Fifth Edition}\\
 \bigskip
 \bigskip
 \bigskip
@@ -159,7 +186,7 @@
 {\small
 
 %\lowertitleback{
-Copyright \copyright{} 2016--2019 Martin Schoeberl
+Copyright \copyright{} 2016--2023 Martin Schoeberl
   \medskip\\
   \begin{tabular}{lp{.8\textwidth}}
     \raisebox{-12pt}{\includegraphics[height=18pt]{figures/cc_by_sa}} &
@@ -188,7 +215,7 @@ Schoeberl, Martin
 \begin{quote}
 Digital Design with Chisel\\
 Martin Schoeberl\\
-Includes bibliographical references.\\ \todo{and index. \\}
+Includes bibliographical references and an index.\\
 ISBN 9781689336031
 \end{quote}
 
