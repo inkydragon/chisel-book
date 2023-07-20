@@ -612,12 +612,10 @@ Here a list of further reading for digital design and Chisel:
 \begin{itemize}
 \item \myref{http://www.cambridge.org/es/academic/subjects/engineering/circuits-and-systems/digital-design-systems-approach}{Digital Design: A Systems Approach}, by William J. Dally and R. Curtis Harting,
 is a modern textbook on digital design. It is available in two versions: using Verilog or VHDL as a hardware description language.
-\end{itemize}
-
 \myref{http://www.cambridge.org/es/academic/subjects/engineering/circuits-and-systems/digital-design-systems-approach}{Digital Design: A Systems Approach}, 作者是William J. Dally 和 R. Curtis Harting,
 ，是一本现代的数字设计的教科书。它有两个版本，使用Verilog或是VHDL作为硬件描述语言。
-
 \end{itemize}
+
 The official Chisel documentation and further documents are available online:
 Chisel官方文档和之后的文档都会更新到网上：
 
@@ -655,8 +653,6 @@ a Chisel course focusing on hardware generators, as a Jupyter notebook
 作为jupyter notebook。
 
 \item A \myref{https://github.com/ccelio/chisel-style-guide}{Chisel Style Guide} by Christopher Celio.
-\end{itemize}
-
 \item \myref{https://github.com/ccelio/chisel-style-guide}{Chisel Style Guide}，作者是Christopher Celio。
 \end{itemize}
 
@@ -1420,7 +1416,7 @@ To use the module \code{Abc} in a different context (packet name space),
 the components of packet \code{mypacket} need to be imported. The underscore
 (\_) acts as wildcard, meaning that all classes of \code{mypacket} are imported.
 
-为了使用Abc模块在一个不同的地方（软件包命名空间），软件包的mypack需要被引用。下划线（_）充当万用字元，意味着所有mypack的类都要被引用。
+为了使用Abc模块在一个不同的地方（软件包命名空间），软件包的mypack需要被引用。下划线（\_）充当万用字元，意味着所有mypack的类都要被引用。
 
 
 \shortlist{code/usepacket.txt}
@@ -1636,7 +1632,7 @@ addition:
 we can wrap a Chisel test into a ScalaTest class. For the \code{Tester} shown
 before this is:
 
-\noindent尽管Chisel测试比Scala程序的单元测试更重要，我们可以将Chisel测试包装到ScalaTest类中。对于显示的Tester
+\noindent 尽管Chisel测试比Scala程序的单元测试更重要，我们可以将Chisel测试包装到ScalaTest类中。对于显示的Tester
 在此之前：
 
 \shortlist{code/scalatest_simple.txt}
@@ -2441,7 +2437,7 @@ for the legal input values.
 Describe a combinational circuit to convert a 4-bit binary input to the encoding of a
 \myref{https://en.wikipedia.org/wiki/Seven-segment_display}{7-segment display}.
 
-描述一个组合电路，用来转换4位二进制输入作为myref{https://en.wikipedia.org/wiki/Seven-segment_display}{7位输出}的编码。
+描述一个组合电路，用来转换4位二进制输入作为\myref{https://en.wikipedia.org/wiki/Seven-segment_display}{7位输出}的编码。
 
 You can either define the codes for the decimal digits, which was the initial
 usage of a 7-segment display or additionally, define encodings for the remaining bit pattern
@@ -2744,7 +2740,7 @@ conditional statement.
 \noindent If we are in the mood of counting down, we start (reset the counter register)
 with the maximum value and reset the counter to that value when reaching 0.
 
-\noindent如果我们有倒数的想法，我们开始（重置计数器寄存器）
+\noindent 如果我们有倒数的想法，我们开始（重置计数器寄存器）
 设置为最大值，并在达到0时将计数器重置为该值。
 
 \shortlist{code/down_counter.txt}
@@ -5201,7 +5197,7 @@ When you change the Chisel library, you should run the Chisel tests.
 In an \code{sbt} based project, this is usually run with:
 
 更改Chisel库时，应运行Chisel测试。
-在基于\code{sbt的项目中，通常使用以下命令运行：
+在基于 \code{sbt} 的项目中，通常使用以下命令运行：
 
 \begin{verbatim}
 $ sbt test

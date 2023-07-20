@@ -15,6 +15,7 @@ project/
 *.lo[fglt]
 *.out
 *.toc
+*.xdv
 *.synctex*
 *.gz
 *.tar.bz2
