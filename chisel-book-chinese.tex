@@ -2997,7 +2997,7 @@ write and an asynchronous read. As this memory type is usually not directly avai
 in an FPGA, the synthesize tool will build it out of flip-flops.
 Therefore, we recommend using \code{SyncReadMem}.
 
-Chisel也提供了\code{Mem}，代表了一个具有同步写入和同步读出的存储器。但是这个存储器一般不在FPGA可以使用，
+Chisel也提供了\code{Mem}，代表了一个具有同步写入和异步读出的存储器。但是这个存储器在FPGA中通常不能直接使用，
 综合工具会把它变为触发器。于是，我们推荐使用\code{SyncReadMem}。
 
 \section{Exercise}
