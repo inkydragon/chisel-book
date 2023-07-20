@@ -3187,7 +3187,7 @@ If we want a different encoding, e.g., one-hot encoding, we can define Chisel
 constants for the state names.}
 Therefore, we use an enumeration type with symbolic names for the states:
 
-\noindent 尽管曾经在最佳状态编码上进行过一些研究。两种常用选择是二进制或是读热码。但是，我们把这些底层决定交给综合工具，
+\noindent 尽管曾经在最佳状态编码上进行过一些研究。两种常用选择是二进制或是独热码。但是，我们把这些底层决定交给综合工具，
 并实现可读代码。\footnote{在目前的版本，\code{Enum}代表二进制编码的状态。
 如果我们想要另一种编码，例如，独热码，我们为状态名称定义chisel常量。}
 于是，我们使用了\code{Enum}类和符号化名字用于表示状态：
