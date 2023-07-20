@@ -5688,7 +5688,12 @@ A memory with sequential registered read and write ports is defined in Chisel 2 
 \bibliographystyle{plain}
 \bibliography{chisel}
 
+\phantomsection
+\hypertarget{index}{}
+\printindex
+
 \end{document}
+%% 以下是一些 TODO。默认不编译
 
 \chapter{Headings}
 
@@ -5711,14 +5716,18 @@ writing is going on.}
 1. base functions: +, - , and or, register (with reset, with enable)
 
 
-\section{Build Process and Testing}
+\section{Build Process}
 
  * A full example (blinking LED again)
  * Packages
  * Source organization (Scala)
  * Object to generate Verilog
- * Testing
  * sbt
+
+\section{Testing with Chisel}
+
+ * iotesters
+ * chiseltest
 
 \section{Components/Modules}
 
@@ -5727,21 +5736,15 @@ writing is going on.}
  * building blocks (adder, mux, ALU, counter, memory)
  * maybe split into combinational and sequential
 
- * 搭建模块（加法器，复用器，ALU，计数器，存储器）
- * 可能会分为组合和时序逻辑
-
 \section{Bundles and Vecs (better title needed)}
 
 \section{Medium Complex Circuits (better title needed)}
 
 3. small designs (better name): UART, FIFO, PWM, VGA, sigma delta
 
-
 \section{State Machines and Data Path}
 
  * Covered in stuff for Dally book lecture spring 2019
-
- *
 
 \section{Memory}
 
@@ -5749,12 +5752,6 @@ writing is going on.}
  * Vec based read/write
  * All other variations
  * Escape code in VHDL and Verilog for unsupported memories
-
-
- *
- *
- *
- *
 
 \section{Tips and Tricks (better title needed)}
 
@@ -5765,12 +5762,6 @@ Stuff that saves a little hardware, but might not worse the less readable code
  * Mux with one hot encoding of select
  * little tricks: count down, add/sub
 
- *
- *
- *
- *
-
-
 
 \section{Scala for Hardware Developers}
 
@@ -5778,42 +5769,27 @@ Stuff that saves a little hardware, but might not worse the less readable code
  * functions for hardware generation
  * Classes and constructor
 
- *
- *
- *
- 
  \section{More Complex Testing}
- 
-  * As we know now sone Scala it is time to use the power of Scala for better testing
 
-  *
+  * As we know now sone Scala it is time to use the power of Scala for better testing
 
 \section{Hardware Generation}
 
  * More advanced stuff
  * Table generation (sinus, assembler)
 
-  *
-  *
- 
  \section{Leros}
- 
+
   * as a more complex design
   4. full design(s): processor
-
-  *
-  *
 
 \section{Chisel 2}
 
  * Some notes for reading Chisel 2 code
  * Update Lipsi to Chisel 3 to work on the 2 to 3 documentation
 
-  *
-  *
- 
  \section{Chisel Projects}
- 
+
   * Projects written in Chisel, as paper reference, some words and a URL.
   * 使用Chisel编写的项目，作为纸质引用，一些words和一个URL
 
@@ -5826,5 +5802,14 @@ Stuff that saves a little hardware, but might not worse the less readable code
  * 和很多Wiki的链接
 
 
+% \end{document}
+
+\subsection*{Course Abstract}
+
+Chisel is a hardware construction language implemented as a domain specific language in Scala. Therefore, the full power of a modern programming language is available to describe hardware and, more important, hardware generators. Chisel has been developed at UC Berkeley and successfully used for several tape outs of RISC-V. Here at DTU we used Chisel in the T-CREST project and in teaching advanced computer architecture.
+
+In this course I will give an overview of Chisel to describe circuits at the RTL, how to use the Chisel tester functionality to test and simulate digital circuits, present how to synthesize circuits for an FPGA, and present advanced functionality of Chisel for the description of circuit generators. Besides lecturing we will have lab sessions to describe small circuits and evaluate them in an FPGA.
+
+The aim of the course is to get a basic understanding of a modern hardware description language and be able to describe simple circuits in Chisel. This course shall give a basis to explore more advanced concepts of circuit generators written in Chisel/Scala.
 
 \end{document}
