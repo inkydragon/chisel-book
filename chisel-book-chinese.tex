@@ -752,7 +752,6 @@ and import that project into Eclipse.\footnote{This function needs the Eclipse p
 或者导入一个工程入Eclipse。\footnote{This function needs the Eclipse plugin for sbt.}
 在InterlliJ中你可以创建一个工程从已经存在的源码中，然后选择\code{build.sbt}文件。
 
-
 \myref{https://code.visualstudio.com/}{Visual Studio Code} is another option for a Chisel IDE.
 The \myref{https://marketplace.visualstudio.com/items?itemName=scalameta.metals}{Scala Metals}
 extension provides Scala support.
@@ -818,7 +817,6 @@ We optimized the format of the eBook for reading on a tablet, such as an iPad.
 电子书提供了更多的资源和\myref{https://www.wikipedia.org/}{Wikipedia}入口。
 我们使用Wikipedia来说明与本书部直接相关的背景知识(例如二进制数字系统)。
 我们优化了电子书的排版，以方便便携式设备阅读，例如ipad。
-
 
 
 \section{Further Reading}
@@ -979,9 +977,14 @@ These essential elements can be combined to build larger, more interesting circu
 
 在这个章节，我们介绍数字设计的组成部分。这些基本的组成部分可以被合并到更大，更有趣的电路中。
 
-\section{Signal Types and Constants}
+Digital systems, in general, use binary signals, which means a single bit or signal
+can only have one of two possible values. These values are often called 0 and 1. However, we
+also use following terms: low/high, false/true, and deasserted/asserted.
+These terms mean the same two possible values of a binary signal.
 
-Chisel provides three data types to describe signals, combinational logic, and registers:
+\section{Chisel Types and Constants}
+
+Chisel provides three data types to describe connections, combinational logic, and registers:
 \code{Bits}, \code{UInt}, and \code{SInt}. \code{UInt} and \code{SInt} extend \code{Bits},
 and all three types represent a vector of bits. \code{UInt} gives this vector of
 bits the meaning of an unsigned integer and \code{SInt} of a signed
@@ -991,6 +994,8 @@ Chisel uses \myref{https://en.wikipedia.org/wiki/Two\%27s\_complement}{two's com
 as signed integer representation.
 Here is the definition for different types, an 8-bit \code{Bits}, an 8-bit unsigned integer, and a 10-bit
 signed integer:
+\index{Integer!unsigned}
+\index{Integer!signed}
 
 Chisel提供了三种数据类型用来描述型号，组合逻辑，和寄存器：\code{Bits}， \code{UInt}，和\code{SInt}。
 \code{UInt}和code{SInt}是\code{Bits}的拓展，并且所有的三种类型代表bits的矢量。
@@ -999,22 +1004,25 @@ Chisel提供了三种数据类型用来描述型号，组合逻辑，和寄存�
 Chisel使用\myref{https://en.wikipedia.org/wiki/Two\%27s\_complement}{two's complement}表示有符号数的整型。
 以下是不同类型的定义，8位\code{Bits}，8位无符号整型，和一个10位有符号整型：
 
-
 \shortlist{code/types.txt}
 
 \noindent The width of a vector of bits is defined by a Chisel width type (\code{Width}).
 The following expression casts the Scala integer \code{n} to a Chisel \code{width},
-which is used for the definition of the \code{Bits} vector:
+which we use for the definition of the \code{Bits} vector:
 
 Bits的矢量宽度被Chisel的width类型(\code{Width})定义。以下表示把scala的整型\code{n}转换成Chisel的\code{width}，用于\code{Bits}矢量的定义。
 
 \shortlist{code/n_w.txt}
+
+\index{Integer!width}
+
 
 \noindent Constants can be defined by using a Scala integer and converting it to a Chisel type:
 
 常量可以通过Scala整型定义并把它转换成Chisel类型。定义一个为0的UInt常量，和定义一个为03的SInt常量。
 
 \shortlist{code/constants.txt}
+\index{Integer!constant}
 
 \noindent Constants can also be defined with a width, by using the Chisel width type:
 
@@ -1022,10 +1030,16 @@ Bits的矢量宽度被Chisel的width类型(\code{Width})定义。以下表示把
 
 \shortlist{code/const_width.txt}
 
-\noindent If you find the notion of 8.U and 4.W a little bit funny, consider it as a variant of an integer
-constant with a type. This notation is similar to 8L, representing a long integer constant in C, Java, and Scala.
+\noindent If you find the notation of 3.U and 4.W a little bit funny, consider it as a variant of an integer
+constant with a type. This notation is similar to 3L, representing a long integer constant in C, Java, and Scala.
 
 当你发现8.U和4.W的表示方式有些有趣，你可以认为它是一个整型常量附带一个类型。这个表示方式类似于8L，代表一个C，Java或Scala中的长整型。
+
+{\bf Possible pitfall:} One possible error when defining constants with a dedicated width is missing the \code{.W}
+specifier for a width. E.g., \code{1.U(32)} will \emph{not} define a 32-bit wide constant representing 1.
+Instead, the expression \code{(32)} is interpreted as bit extraction from position 32, which results
+in a single bit constant of 0. Probably not what the original intention of the programmer was.
+
 
 Chisel benefits from Scala's type inference and in many places type information can be left out.
 The same is also valid for bit widths. In many cases, Chisel will automatically infer the correct width.
@@ -1044,13 +1058,18 @@ the constants in, in this case 8 bits.
 对于以其它作为基底的十进制以外的常量，常量被定义为字符串，开头\code{h}是16进制，\code{o}是8进制，\code{b}是2进制。
 以下的例子表明了常量255的定义，在不同的基底。在这个例子，我们省略了位宽，chisel推断了最小宽度用来表示常量，在这个例子是8位。（16进制表示255， 8进制表示255， 二进制表示255）
 
-
 \shortlist{code/const_base.txt}
 
 \noindent The above code shows how to use an underscore to group digits in the
 string that represents a constant. The underscore is ignored.
 
 以上代码也表示了如何使用下划线去群组数字来标识常量。下划线是被忽略的。
+
+Characters to represent text (in \myref{https://en.wikipedia.org/wiki/ASCII}{ASCII} encoding)
+can also be used as constants in Chisel:
+
+\shortlist{code/const_char.txt}
+
 
 To represent logic values, Chisel defines the type \code{Bool}.
 \code{Bool} can represent a \emph{true} or \emph{false} value.
@@ -1061,8 +1080,8 @@ and \code{false} to Chisel \code{Bool} constants.
 为了表示逻辑值，Chisel定义了\code{Bool}类型。Bool可以表示\emph{true}或\emph{false}值。
 以下的代码表示了\code{Bool}类型的定义以及\code{Bool}常量的定义，通过转换Scala Boolean常量\code{true}和\code{false}， 到Chisel的\code{Bool}类型。
 
-
 \shortlist{code/bool.txt}
+\index{Bool}
 
 
 \section{Combinational Circuits}
@@ -1072,12 +1091,11 @@ as they are defined in C, Java, Scala, and several other programming languages,
 to described combinational circuits: \code{\&} is the AND operator and \code{|} is
 the OR operator.
 Following line of code defines a circuit that combines signals \code{a} and \code{b} with \emph{and}
-gates and combines the result with signal \code{c} with \emph{or} gates.
+gates and combines the result with signal \code{c} with \emph{or} gates and names it \code{logic}.
 
 Chisel使用\myref{https://en.wikipedia.org/wiki/Boolean_algebra}{Boolean algebra}操作符，
 和C，Java，Scala和可能很多其它编程语言中定义的一样，去描述组合电路。
 以下代码定义了一个对\code{a}和\code{b}进行\emph{and}逻辑，然后把它的结果和\code{c}进行\emph{or}逻辑的电路：
-
 
 \shortlist{code/logic.txt}
 
@@ -1090,7 +1108,7 @@ Chisel使用\myref{https://en.wikipedia.org/wiki/Boolean_algebra}{Boolean algebr
 \end{figure}
 
 
-Figure~\ref{fig:logic} shows the schematic of this combinatorial expression.
+\noindent Figure~\ref{fig:logic} shows the schematic of this combinatorial expression.
 Note that this circuit may be for a vector of bits and not only single wires
 that are combined with the AND and OR circuits.
 
@@ -1101,9 +1119,10 @@ In this example, we do not define the type nor the width of signal \code{logic}.
 Both are inferred from the type and width of the expression.
 The standard logic operations in Chisel are:
 
+\index{logical operations}
+
 在这个例子，我们不定义类型或是信号\code{logic}的宽度。两个都是从类型和表达式位宽推演过来的.
 标准Chisel的逻辑操作是：
-
 
 \shortlist{code/bool_ops.txt}
 
@@ -1113,8 +1132,9 @@ The standard logic operations in Chisel are:
 4. 按位取反（译者：这个和！有区别的，注意）
 
 \noindent The arithmetic operations use the standard operators:
-
 \noindent 算术操作使用标准操作符
+
+\index{arithmetic operations}
 
 \shortlist{code/arith_ops.txt}
 
@@ -1123,13 +1143,14 @@ The standard logic operations in Chisel are:
 \noindent The resulting width of the operation is the maximum width of the operators for
 addition and subtraction, the sum of the two widths for the multiplication, and usually
 the width of the numerator for divide and modulo operations.\footnote{The exact
-details are available in the \myref{https://github.com/freechipsproject/firrtl/blob/master/spec/spec.pdf}{FIRRTL specification}.}
+details are available in the \myref{https://github.com/chipsalliance/firrtl-spec/releases/latest/download/spec.pdf}{FIRRTL specification}.}
 
 加法和减法操作结果的宽度是操作数的最大宽度，乘法操作结果的库纳杜是两个操作数的位宽加和, 除法和余数操作的结果是被除数的位宽。
 \footnote{ \myref{https://github.com/freechipsproject/firrtl/blob/master/spec/spec.pdf}{FIRRTL specification}.}
 
 A signal can also first be defined as a \code{Wire} of some type. Afterward, we can assign a
 value to the wire with the \code{:=} update operator.
+\index{Wire}
 
 一个信号也可以先被定义为某种类型的\code{Wire}。随后，我们可以给这个wire赋一个值，使用\code{:=}。
 
@@ -1140,24 +1161,24 @@ A single bit can be extracted as follows:
 一个简单的bit可以被如下提取：
 
 \shortlist{code/single_bit.txt}
+\index{Bit!extraction}
 
 \noindent A subfield can be extracted from end to start position:
-
 \noindent 一个分割可以从终点到起点提取：
 
 \shortlist{code/sub_field.txt}
 
-\noindent Bit fields are concatenated with \code{Cat}.
-
-\noindent bit域通过\code{Cat}合并.
+\noindent Bit fields are concatenated with the \code{\#\#} operator.\footnote{Note that there is a \codefoot{Cat} function available that performs the same
+operation with \codefoot{Cat(highByte, lowByte)}.}
 
 \shortlist{code/concat.txt}
+\index{Bit!concatenation}
 
 Table~\ref{tab:operators} shows the full list of operators
-(see also \myref{https://github.com/freechipsproject/chisel3/wiki/Builtin-Operators}{builtin operators}).
+(see also \myref{https://www.chisel-lang.org/chisel3/docs/explanations/operators.html}{builtin operators}).
 The Chisel operator precedence is determined by the evaluation order of the circuit,
 which follows the \myref{https://docs.scala-lang.org/tour/operators.html}{Scala operator precedence}.
-If in doubt, it is always a good praxis to use parentheses.\footnote{The operator precedence in
+If in doubt, it is always a good practice to use parentheses.\footnote{The operator precedence in
 Chisel is a side effect of the hardware elaboration when the tree of hardware nodes
 is created by executing the Scala operators. The Scala operator precedence is similar but
 not identical to Java/C. Verilog has the same operator precedence as C, but VHDL
@@ -1173,11 +1194,11 @@ Verilog有逻辑上的操作符优先级，但是VHDL里，这些操作符的优
 
 
 Table~\ref{tab:functions} shows various functions defined on and for Chisel data types.
+
 表格~\ref{tab:functions} 表明了不同函数在根据chisel类型做的定义。
 
 \begin{table}
  \centering
- \label{tab:operators}
   \begin{tabular}{lll}
     \toprule
     Operator & Description & Data types \\
@@ -1191,14 +1212,16 @@ Table~\ref{tab:functions} shows various functions defined on and for Chisel data
     \code{\& | \^} & AND, OR, XOR & UInt, SInt, Bool \\
     \code{!} & logical NOT & Bool \\
     \code{\&\& ||} & logical AND, OR & Bool \\
-    \bottomrule 
-  \end{tabular} 
+    \bottomrule
+  \end{tabular}
   \caption{Chisel defined hardware operators.}
+ \label{tab:operators}
 \end{table}
+
+\index{Operators}
 
 \begin{table}
  \centering
- \label{tab:functions}
   \begin{tabular}{lll}
     \toprule
     Function & Description & Data types \\
@@ -1207,14 +1230,22 @@ Table~\ref{tab:functions} shows various functions defined on and for Chisel data
     \code{v(n)} & extraction of a single bit & UInt, SInt \\
     \code{v(end, start)} & bitfield extraction & UInt, SInt \\
     \code{Fill(n, v)} & bitstring replication, n times & UInt, SInt \\
-    \code{Cat(a, b, ...)} & bit field concatenation & UInt, SInt \\
-    \bottomrule 
-  \end{tabular} 
+    \code{a \#\# b} & bitfield concatenation & UInt, SInt \\
+    \code{Cat(a, b, ...)} & bitfield concatenation & UInt, SInt \\
+    \bottomrule
+  \end{tabular}
   \caption{Chisel defined hardware functions, invoked on \code{v}.}
-\end{table}                                            
-    
+   \label{tab:functions}
+\end{table}
+
+\index{Bit!reduction}
+\index{Bitfield!extraction}
+\index{Bitfield!concatenation}
+
 
 \subsection{Multiplexer}
+
+\index{Multiplexer}
 
 A \myref{https://en.wikipedia.org/wiki/Multiplexer}{multiplexer} is a circuit that selects between alternatives.
 In the most basic form, it selects between two alternatives. Figure~\ref{fig:mux} shows
@@ -1225,7 +1256,6 @@ signal \code{b}.
 \myref{https://en.wikipedia.org/wiki/Multiplexer}{复用器}是一个选择选项的电路。
 在最基本的形式，它在二者选择其一。图2.2~\ref{fig:mux}表示一个二选一复用器，或是用mux简单表示。
 取决于选择信号(\code{sel})，\code{y}会表示信号\code{a}或是信号\code{b}。
-
 
 \begin{figure}
   \centering
@@ -1253,7 +1283,7 @@ type.
 With logical and arithmetical operations and a multiplexer, every combinational
 circuit can be described. However, Chisel provides further components and control abstractions
 for a more elegant description of a combinational circuit, which are described in
-a later chapter.
+Chapter~\ref{chap:comb}.
 
 通过逻辑和算术操作，一个复用器，每个组合电路都能被描述。
 但是，Chisel提供了更多部分和控制的抽象用来更优雅地描述组合电路，这些在稍后章节讲。
@@ -1266,19 +1296,19 @@ also called register, which is described next.
 
 \section{Registers}
 
+\index{Register}
+\index{Reg}
+
 Chisel provides a register, which is a collection of
 \myref{https://en.wikipedia.org/wiki/Flip-flop\_(electronics)\#D\_flip-flop}{D flip-flops}.
 The register is implicitly connected to a global clock and is updated on the rising edge.
 When an initialization value is provided at the declaration of the register,
 it uses a synchronous reset connected to a global reset signal.
-
-Chisel提供了一个寄存器，这是一个\myref{https://en.wikipedia.org/wiki/Flip-flop\_(electronics)\#D\_flip-flop}{D flip-flops}的集合。这个寄存器隐含连接到一个总时钟，并且上升触发。当一个初始值随着在寄存器声明的时候被提供，它使用的是一个同步复位，连接到总复位信号。
-
 A register can be any Chisel type that can be represented as a collection of bits.
 Following code defines an 8-bit register, initialized with 0 at reset:
 
+Chisel提供了一个寄存器，这是一个\myref{https://en.wikipedia.org/wiki/Flip-flop\_(electronics)\#D\_flip-flop}{D flip-flops}的集合。这个寄存器隐含连接到一个总时钟，并且上升触发。当一个初始值随着在寄存器声明的时候被提供，它使用的是一个同步复位，连接到总复位信号。
 一个寄存器可以是任何bits集合的Chisel类型。下边的代码定义了一个八位寄存器，在复位初始化为0。
-
 
 \shortlist{code/register.txt}
 
@@ -1289,11 +1319,23 @@ the output of the register can be used just with the name in an expression:
 
 \shortlist{code/reg_con.txt}
 
+\begin{figure}
+  \centering
+  \includegraphics[scale=\scale]{figures/register-reset-0}
+  \caption{A D flip-flop based register with a synchronous reset to 0.}
+  \label{fig:register-reset-0}
+\end{figure}
+
 \noindent A register can also be connected to its input at the definition:
 
 寄存器也可以连接到它的输入使用如下定义: 
 
 \shortlist{code/reg_next.txt}
+
+Figure~\ref{fig:register-reset-0} shows the circuit of our register definition with
+a clock, a synchronous reset to \code{0.U}, input \code{d}, and output \code{q}.
+The global signals \code{clock} and \code{reset} are implicitly connected to
+each register defined.
 
 \noindent A register can also be connected to its input and a constant as
 initial value at the definition:
@@ -1307,17 +1349,24 @@ a common practice is to postfix register names with \code{Reg}.
 Another common practice, coming from Java and Scala, is to use
 \myref{https://en.wikipedia.org/wiki/Camel_case}{camelCase} for
 identifier consisting of several words. The convention is to start
-functions and variables with a lower case and classes (types) with
-an upper case.
+functions and variables with a lower case letter and classes (types),
+e.g., a \code{Module} name, with an upper case letter.
 
 为了区分表示组合逻辑和寄存器的信号，一个常见的方式是在寄存器前边加上前缀\code{Reg}。
 另一个常见的方式，来自 Java 和 Scala，是去使用 \myref{https://en.wikipedia.org/wiki/Camel_case}{camelCase}，由几个单词组成的标识。
 这个方式是函数和变量用首字母小写，类用首字母大写。
 
+In Chisel you are relative free to name your identifiers. However, use taste and
+descriptive names. Furthermore, several words are reserved. They are listed
+in Appendix~\ref{sec:reserved}.
+
+
+
 
 \subsection{Counting}
 
-Counting is a fundamental operation in digital systems. On might count events.
+\index{Counting}
+Counting is a fundamental operation in digital systems. One might count events.
 However, more often counting is used to define a time interval. Counting the
 clock cycles and triggering an action when the time interval has expired.
 
@@ -1325,38 +1374,44 @@ clock cycles and triggering an action when the time interval has expired.
 但是，经常计数是被使用去定义一个时间间隔。
 计数时钟，并引发一个操作，当时间间隔过期的时候。
 
-
 A simple approach is counting up to a value. However, in computer science,
-and digital design, counting starts at 0. Therefore, if we want to count till
-10, we count from 0 to 9. The following code shows such a counter that counts
+and digital design, counting starts at 0. Therefore, if we want to count
+10 clock cycles, we count from 0 to 9. The following code shows such a counter that counts
 till 9 and wraps around to 0 when reaching 9.
 
 一个简单的方式是计数到一个值。但是，在计算机科学和数字设计，计数从0开始。于是，如果我们想要数到10，我们是从0数到9.以下代码表示一个计数器，数到9，并返回到0当数到9的时候。
-
 
 \shortlist{code/counter.txt}
 
 \section{Structure with Bundle and Vec}
 
-Chisel provides two constructs to group related signals: (1) a \code{Bundle} to group
-signals of different types and (2) a \code{Vec} to represent an indexable collection of signals
-of the same type.
-\code{Bundle}s and \code{Vec}s can be arbitrarily nested.
+\index{Structure}
+\index{Array}
+\index{Collection}
+\index{Vector}
+\index{Bundle}
+\index{Vec}
+
+Chisel provides two constructs to group related signals: (1) a \code{Bundle} and (2) a \code{Vec}.
+A \code{Bundle} groups signals of different types as named fields.
+A \code{Vec} represents an indexable collection of signals (elements) of the same type.
+\code{Bundle}s and \code{Vec}s create new, user defined Chisel types and can be arbitrarily nested.
 
 Chisel提供两个集成小组相关的信号：(1) 一个是\code{Bundle}， 组织不同类型信号 和 
 (2) 一个是 \code{Vec}， 去代表一个可索引的相同类型的信号。
 \code{Bundle}s和\code{Vec}s可以任意交织。
 
+\subsection{Bundle}
 
-A Chisel bundle groups several signals. The entire bundle can be referenced
+A Chisel \code{Bundle} groups several signals. The entire bundle can be referenced
 as a whole, or individual fields can be accessed by their name.
+A \code{Bundle} is similar to a \code{struct} in C and SystemVerilog or a \code{record} in VHDL.
 We can define a bundle (collection of signals) by defining a class that
 extends \code{Bundle} and list the fields as \code{val}s within the constructor block.
 
 Chisel捆束多个信号。整个bundle可以被整体引用，或是通过他们的名字分别访问。
 我们可以定义一个捆束（信号的集合），通过定义一个类型，拓展了\code{Bundle}，
 并在域内通过\code{val}列出。
-
 
 \shortlist{code/bundle.txt}
 
@@ -1365,14 +1420,11 @@ The fields are accessed with the dot notation:
 
 \noindent 为了使用捆束，我们使用\code{new}，并把它包裹进\code{Wire}。域通过点标识访问。
 
-
 \shortlist{code/bundle_use.txt}
 
 Dot notation is common in object-oriented languages, where \code{x.y} means
 \code{x} is a reference to an object and \code{y} is a field of that object.
 As Chisel is object-oriented, we use dot notation to access fields in a bundle.
-A bundle is similar to a \code{struct} in C, a \code{record} in VHDL, or a
-\code{struct} in SystemVerilog.
 A bundle can also be referenced as a whole:
 
 点标识是面向对象语言的常见做法，\code{x.y}意味着\code{x}是一个对象的引用，\code{y}是那个对象的域。
@@ -1382,10 +1434,22 @@ A bundle can also be referenced as a whole:
 
 \shortlist{code/bundle_ref.txt}
 
-A Chisel \code{Vec} represents a collection of signals of the same type (a vector).
+\subsection{Vec}
+
+A Chisel \code{Vec} (a vector) represents a collection of Chisel types of the same type.
 Each element can be accessed by an index. A Chisel \code{Vec} is similar
-to array data structures in other programing languages.\footnote{The name \codefoot{Array}
+to array data structures in other programming languages.\footnote{The name \codefoot{Array}
 is already used in Scala.}
+
+A \code{Vec} is used for three different purposes: (1) dynamic addressing in hardware,
+which is a multiplexer; (2) a register file, which includes multiplexing the read and
+generating the enable signal for the write; (3) parametrization if the number of
+ports of a \code{Module}. For other collections of \emph{things}, being it hardware elements
+or other generator data, it is better to use the Scala collection \code{Seq}.
+
+\subsubsection{Combinational Vec}
+
+
 A \code{Vec} is created by calling the constructor with two parameters: the
 number of elements and the type of the elements. A combinational \code{Vec}
 needs to be wrapped into a \code{Wire}
@@ -1396,18 +1460,77 @@ Chisel的\code{Vec}代表一系列相同类型的信号。
 \code{Vec}通过使用两个参数传入构造函数：元素的数量和元素的类型。组合逻辑 \code{Vec}
 需要被打包进\code{Wire}。
 
+\shortlist{code/vec.txt}
 
 \noindent Individual elements are accessed with \code{(index)}.
+A vector wrapped into a \code{Wire} is just a multiplexer.
+
 \noindent 单一元素通过\code{(index)}被访问到。
 
 \shortlist{code/vec_access.txt}
 
-A vector wrapped into a \code{Wire} is a multiplexer.
-We can also wrap a vector into a register to define an array of registers.
+Here is another example of using \code{Vec} as a multiplexer.
+The three inputs are connected to the three wires \code{x}, \code{y},
+and \code{z}. The \code{select} wire selects which input is used and
+connects it to \code{muxOut}.
+
+\shortlist{code/vec_mux.txt}
+
+\noindent Figure~\ref{fig:vec-mux} shows the resulting schematic of the above code snippet.
+
+\begin{figure}
+  \centering
+  \includegraphics[scale=\scale]{figures/vec-mux}
+  \caption{A vector wrapped in a \code{Wire} is just a multiplexer.}
+  \label{fig:vec-mux}
+\end{figure}
+
+Similar to using a \code{WireDefault}, we can set default values of a \code{Vec} with \code{VecInit}.
+The following code represents a 3:1 multiplexer with three constant defaults. Note that we specify
+the size (3 bits) of the \code{UInt} data types with the first constant.
+With the condition (\code{cond}) we can overwrite those default values.
+This overwrite hardware itself consists of three 2:1 multiplexers. The last line selects
+one of the three inputs of the \code{defVec} multiplexer. Note that \code{VecInit} already returns
+Chisel hardware, so we do not need to wrap it in a \code{Wire}.\footnote{This is different from
+a plain \codefoot{Vec} that needs to be wrapped into a \codefoot{Wire}. We could wrap the \codefoot{VecInit}
+into a \codefoot{WireDefault}, but this uncommon coding style.}
+
+\shortlist{code/vec_init.txt}
+
+It is not only possible to set initial constants (like in \code{WireDefault}) for the \code{Vec} input,
+but we can also connect signals (wires) with \code{VecInit} to the inputs of the \code{Vec}.
+The following example connects the wires \code{d}, \code{e}, and \code{f} to the three
+inputs of the \code{Vec}.
+
+\shortlist{code/vec_init_sig.txt}
+
+
+\subsubsection{Register Vec}
+
+We can also wrap a \code{Vec} into a register to define an array of registers.
+The following code shows a vector of three registers.
+\shortlist{code/vec_reg.txt}
+
+Figure~\ref{fig:vec-reg} shows the schematic of that circuit. It contains three registers.
+The read index (\code{rdIdx}) selects the multiplexer connected to the output of the three
+registers. The output signal is \code{dout}
+The write index (\code{wrIdx}) selects which register will be written with the data
+from \code{din}. \code{wrIdx} is driving a decoder which selects one of the three
+enable signals of the registers.
+
+\begin{figure}[t]
+  \centering
+  \includegraphics[scale=\scale]{figures/vec-reg}
+  \caption{A vector of registers.}
+  \label{fig:vec-reg}
+\end{figure}
+
+
+\index{Register file}
 Following example defines a register file for a processor; 32 registers
-each 32-bits wide, as for a classic 32-bit 
+each 32-bits wide, as used in a classic 32-bit
 \myref{https://en.wikipedia.org/wiki/Reduced_instruction_set_computer}{RISC}
-processor, like the 32-bit version of \myref{https://en.wikipedia.org/wiki/RISC-V}{RISC-V}.
+processor such as the 32-bit version of \myref{https://en.wikipedia.org/wiki/RISC-V}{RISC-V}.
 
 被包裹进\code{Wire}的向量是一个复用器。
 我们也可以把向量传入寄存器去定义一列寄存器。
@@ -1421,6 +1544,24 @@ processor, like the 32-bit version of \myref{https://en.wikipedia.org/wiki/RISC-
 \noindent 寄存器的一个元素通过索引访问，并用作正常寄存器。
 
 \shortlist{code/reg_file_access.txt}
+
+A register of a vector can also be initialized. This is then the value that the register is reset to.
+To initialize the register file, we use A \code{VecInit} with the constants for reset, wrapped
+into a \code{RegInit}. The input of the three registers are then connected to wires \code{d},
+\code{e}, and \code{f}.
+
+\shortlist{code/reg_vec_init.txt}
+
+If we want to reset all elements of a large register file to the same value (probably 0), we
+can use a Scala sequence \code{Seq}. \code{VecInit} can be constructed with a sequence
+containing Chisel types. \code{Seq} contains a creation function \code{fill} to initialize a sequence
+with identical values.
+The following code constructs a register file containing 32 registers, each 32-bit wide and reset to
+0:
+
+\shortlist{code/reg_vec_reset.txt}
+
+\subsubsection{Combining Bundle and Vec}
 
 We can freely mix bundles and vectors. When creating a vector with a bundle
 type, we need to pass a prototype for the vector fields. Using our
@@ -1438,7 +1579,7 @@ type, we need to pass a prototype for the vector fields. Using our
 
 When we want a register of a bundle type that needs a reset value,
 we first create a \code{Wire} of that bundle, set the individual fields
-as needed, and then passing this bundle to a \code{RegInit}:
+as needed, and then pass this bundle to a \code{RegInit}:
 
 当我们想要一个需要reset值的寄存器的类型，我们首先创造一个具有那个捆束的\code{Wire}，设置单独的域，
 然后把捆束传给\code{RegInit}。
@@ -1447,7 +1588,72 @@ as needed, and then passing this bundle to a \code{RegInit}:
 
 With combinations of \code{Bundle}s and \code{Vec}s we can define our own data
 structures, which are powerful abstractions.
+
 通过\code{Bundle}和\code{Vec}的组合，我们可以定义我们自己的数据结构，这个是有力的抽象。
+
+{\bf Possible pitfall:} In Chisel 3, partial assignments are not allowed, although they have been
+allowed in Chisel 2 and are possible in Verilog and VHDL. The following code will generate
+an error during circuit elaboration:
+
+\shortlist{code/no_partial_assign.txt}
+
+\noindent The argument is that it would be better to use bundles for this use case.
+One possible workaround for this issue is to create a (local) bundle, create a \code{Wire}
+from that bundle, assign the individual fields, casting that bundle with \code{asUInt()}
+to a \code{UInt}, and assigne this value to the target \code{UInt}.
+Note that we define here a \code{Bundle} as a local data structure as we need it only
+locally.
+
+\shortlist{code/partial_assign_solution.txt}
+
+\noindent The small drawback of this solution is that one needs to know in which orders
+bundle fields are merged to a single bit vector. Another option is to use a vector of \code{Bool}
+to individually assign values and then convert it to a \code{UInt}.
+
+\shortlist{code/partial_vec_bool.txt}
+
+\section{Wire, Reg, and IO}
+\index{Wire}
+\index{Reg}
+\index{IO}
+
+\code{UInt}, \code{SInt}, and \code{Bits} are Chisel types which by themselves do not
+represent hardware. Only wrapping them into a \code{Wire}, \code{Reg}, or \code{IO}
+generates hardware. A \code{Wire} represents combinational logic, a \code{Reg}
+represents a register (collection of D flip-flops), and an \code{IO} represents a
+connection of a module (like pins of a concrete integrated circuit (IC)).
+Any Chisel type can be wrapped in a \code{Wire}, \code{Reg}, or \code{IO}.
+
+You give a hardware component a name by assigning it to a Scala immutable
+variable:\footnote{Scala also supports mutable variables with \codefoot{var}, but those are of no use
+when describing hardware in Chisel.}
+
+\shortlist{code/wire_reg.txt}
+
+\noindent You can later assign (or reassign) a value or expression to a \code{Wire}, \code{Reg}, or \code{IO}
+with the Chisel operator \code{:=}
+
+\shortlist{code/wire_reg_reassign.txt}
+
+\noindent Note the small difference between the Scala assignment operator ``\code{=}''
+and the Chisel operator ``\code{:=}''. You use Scala's ``\code{=}'' operator when \emph{creating} a hardware
+object (and giving it a name) but you use Chisel's ``\code{:=}'' operator when assigning or reassigning a value to
+an \emph{existing} hardware object.
+
+Combinational values can be conditionally assigned, but they need to be assigned in every branch
+of the condition. Otherwise, one would describe a latch, which the Chisel compiler will reject.
+The best practice is to define a default value at the creation of the \code{Wire}.
+Therefore, the former code is better rewritten as follows.
+
+\shortlist{code/wire_reg_default.txt}
+
+\noindent Although Chisel infers the needed bit width for signals and registers, it is also a good practice
+to specify the intended bit width at the creation of the hardware object.
+In most cases it is also good practice to set registers to known initial values on
+reset:\footnote{Leaving the register value undefined on reset may save some load on the reset
+wire. However, testing and verification is simplified with known reset values.}
+
+\shortlist{code/wire_reg_init.txt}
 
 \section{Chisel Generates Hardware}
 
@@ -1460,7 +1666,7 @@ line of code after the other is executed, in hardware all lines of code
 在看到一些Chisel代码，可能看起来和经典编程语言像是Java或C比较相似。但是，Chisel（或是其它硬件描述语言）
 描述了硬件部分。而在软件项目中，一行代码在前一行过后执行，而硬件执行全部\emph{execute in parallel}。
 
-It is essential to keep in mind that Chisel code does generate hardware.
+It is essential to keep in mind that Chisel code generates hardware.
 Try to imagine, or draw on a sheet of paper, the individual blocks that
 are generated by your Chisel circuit description.
 Each creation of a component adds hardware; each assignment statement
@@ -1473,10 +1679,9 @@ generates gates and/or flip-flops.
 More technically, when Chisel executes your code it runs as a Scala program, and
 by executing the Chisel statements, it \emph{collects} the hardware components
 and connects those nodes. This network of hardware nodes is the hardware,
-which can spill out Verilog code for ASIC or FPGA synthesis or can be
+which Chisel can spill out as Verilog code for ASIC or FPGA synthesis or can be
 tested with a Chisel tester.
-The network of hardware nodes is what is executed in fully parallel.
-
+The network of hardware nodes is what is executed fully in parallel.
 
 从技术上讲，Chisel执行代码时，它将作为Scala程序运行，并且
 通过执行Chisel语句，它\emph{collects}硬件组件
@@ -1485,16 +1690,16 @@ The network of hardware nodes is what is executed in fully parallel.
 用Chisel测试仪测试。
 硬件节点网络是完全并行执行的。
 
-For a software engineer imagine this immense parallelism that you can
+For a software engineer, imagine this immense parallelism that you can
 create in hardware without needing to partition your application into threads
-and getting the locking correct for the communication.
-
+and get the locking correct for the communication.
 
 对于软件工程师，可以想象一下，您可以
 在硬件中创建，而无需将应用程序划分为线程
 并正确锁定通信。
 
-\section{Exercise}
+
+\section{Exercises}
 
 In the introduction you implemented a blinking LED on an FPGA board
 (from \myref{https://github.com/schoeberl/chisel-examples}{chisel-examples}), which is a reasonable
@@ -1507,7 +1712,7 @@ with \code{val sw = Input(UInt(2.W))}.
 
 \shortlist{code/basic_exercise.txt}
 
-\noindent For those switches, you also need to assign and list the fields as pin names for the FPGA board.
+\noindent For those switches, you also need to assign the pins for the FPGA board.
 You can find examples of pin assignments in the Quartus project files of the ALU project
 (e.g., for the \myref{https://github.com/schoeberl/chisel-examples/blob/master/quartus/altde2-115/alu.qsf}{DE2-115
 FPGA board}).
@@ -1532,7 +1737,6 @@ a select signal, and the other two are the two inputs for the 2:1 multiplexer.
 
 现在使用两个开关并完成一个基本的组合电路函数，例如，二输入与门并在LED显示结果。改变函数。下一步包括三输入开关来完成一个复用器，一个充当选择信号，另外两个充当双输入复用器的输入。
 
-
 Now you have been able to implement simple combinational functions and test them
 in real hardware in an FPGA. As a next step, we will take a first look at how the build
 process works to generate an FPGA configuration. Furthermore, we will also
@@ -1540,6 +1744,8 @@ explore a simple testing framework from Chisel, which allows you to test circuit
 without configuring an FPGA and toggle switches.
 
 现在你已经可以补充简单的组合函数并在一个实际的FPGA进行简单的测试。作为下一步，我们会看一下搭建过程如何生成FPGA设置。更多地，我们也会探索一个简单的Chisel测试框架，这允许你不去设置FPGA和开关来测试电路。
+
+
 
 
 \chapter{Build Process and Testing}
